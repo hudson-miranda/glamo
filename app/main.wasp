@@ -76,6 +76,8 @@ app OpenSaaS {
     seeds: [
       // Populates the database with a bunch of fake users to work with during development.
       import { seedMockUsers } from "@src/server/scripts/dbSeeds",
+      // Seeds Glamo-specific data (RBAC permissions and roles)
+      import { seedGlamoData } from "@src/server/scripts/glamoSeeds",
     ]
   },
 
