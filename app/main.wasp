@@ -656,4 +656,40 @@ page NotificationsPage {
   authRequired: true,
   component: import NotificationsPage from "@src/client/modules/notifications/NotificationsPage"
 }
+
+route ServicesListRoute { path: "/services", to: ServicesListPage }
+page ServicesListPage {
+  authRequired: true,
+  component: import ServicesListPage from "@src/client/modules/services/ServicesListPage"
+}
+
+route AppointmentsListRoute { path: "/appointments", to: AppointmentsListPage }
+page AppointmentsListPage {
+  authRequired: true,
+  component: import AppointmentsListPage from "@src/client/modules/appointments/AppointmentsListPage"
+}
+
+route SalesListRoute { path: "/sales", to: SalesListPage }
+page SalesListPage {
+  authRequired: true,
+  component: import SalesListPage from "@src/client/modules/sales/SalesListPage"
+}
+
+route InventoryListRoute { path: "/inventory", to: InventoryListPage }
+page InventoryListPage {
+  authRequired: true,
+  component: import InventoryListPage from "@src/client/modules/inventory/InventoryListPage"
+}
+
+route CashRegisterRoute { path: "/cash-register", to: CashRegisterPage }
+page CashRegisterPage {
+  authRequired: true,
+  component: import CashRegisterPage from "@src/client/modules/cashRegister/CashRegisterPage"
+}
+
+route ReportsRoute { path: "/reports", to: ReportsPage }
+page ReportsPage {
+  authRequired: true,
+  component: import ReportsPage from "@src/client/modules/reports/ReportsPage"
+}
 //#endregion
