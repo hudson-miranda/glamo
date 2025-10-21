@@ -296,6 +296,55 @@ page NotFoundPage {
 }
 //#endregion
 
+//#region Glamo - Clients Module
+query listClients {
+  fn: import { listClients } from "@src/clients/operations",
+  entities: [Client, Appointment, Sale]
+}
+
+query getClient {
+  fn: import { getClient } from "@src/clients/operations",
+  entities: [Client, Appointment, Sale, User, Service, ServiceVariant, Product, ClientCredit]
+}
+
+action createClient {
+  fn: import { createClient } from "@src/clients/operations",
+  entities: [Client, Log]
+}
+
+action updateClient {
+  fn: import { updateClient } from "@src/clients/operations",
+  entities: [Client, Log]
+}
+
+action deleteClient {
+  fn: import { deleteClient } from "@src/clients/operations",
+  entities: [Client, Appointment, Log]
+}
+//#endregion
+
+//#region Glamo - Notifications Module
+query listNotifications {
+  fn: import { listNotifications } from "@src/notifications/operations",
+  entities: [Notification]
+}
+
+action createNotification {
+  fn: import { createNotification } from "@src/notifications/operations",
+  entities: [Notification, UserSalon, Log]
+}
+
+action markNotificationRead {
+  fn: import { markNotificationRead } from "@src/notifications/operations",
+  entities: [Notification, Log]
+}
+
+action markAllNotificationsRead {
+  fn: import { markAllNotificationsRead } from "@src/notifications/operations",
+  entities: [Notification, Log]
+}
+//#endregion
+
 //#region Contact Form Messages
 // TODO: 
 // add functionality to allow users to send messages to admin
