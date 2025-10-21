@@ -306,3 +306,52 @@ page AdminMessagesPage {
   component: import AdminMessages from "@src/admin/dashboards/messages/MessagesPage"
 }
 //#endregion
+
+//#region Glamo - Clients Module
+query listClients {
+  fn: import { listClients } from "@src/clients/operations",
+  entities: [User, Client, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+query getClient {
+  fn: import { getClient } from "@src/clients/operations",
+  entities: [User, Client, Appointment, Sale, ClientCredit, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action createClient {
+  fn: import { createClient } from "@src/clients/operations",
+  entities: [User, Client, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action updateClient {
+  fn: import { updateClient } from "@src/clients/operations",
+  entities: [User, Client, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action deleteClient {
+  fn: import { deleteClient } from "@src/clients/operations",
+  entities: [User, Client, Appointment, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+//#endregion
+
+//#region Glamo - Notifications Module
+query listNotifications {
+  fn: import { listNotifications } from "@src/notifications/operations",
+  entities: [User, Notification, UserSalon]
+}
+
+action createNotification {
+  fn: import { createNotification } from "@src/notifications/operations",
+  entities: [User, Notification, Log, UserSalon]
+}
+
+action markNotificationRead {
+  fn: import { markNotificationRead } from "@src/notifications/operations",
+  entities: [User, Notification, Log]
+}
+
+action markAllNotificationsRead {
+  fn: import { markAllNotificationsRead } from "@src/notifications/operations",
+  entities: [User, Notification, Log]
+}
+//#endregion
