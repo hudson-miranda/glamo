@@ -439,3 +439,201 @@ action updateAppointmentStatus {
   entities: [User, Appointment, AppointmentStatusLog, Log, UserSalon, Role, Permission, RolePermission, UserRole]
 }
 //#endregion
+
+//#region Glamo - Sales Module
+query listSales {
+  fn: import { listSales } from "@src/sales/operations",
+  entities: [User, Sale, Client, Voucher, SaleService, SaleProduct, SalePackage, Service, ServiceVariant, Product, Package, Payment, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+query getSale {
+  fn: import { getSale } from "@src/sales/operations",
+  entities: [User, Sale, Salon, Client, Voucher, SaleService, SaleProduct, SalePackage, Service, ServiceVariant, Product, Package, Payment, PaymentMethod, CreditPayment, ClientCredit, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+query listClientCredits {
+  fn: import { listClientCredits } from "@src/sales/operations",
+  entities: [User, Client, ClientCredit, CreditPayment, Payment, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action createSale {
+  fn: import { createSale } from "@src/sales/operations",
+  entities: [User, Sale, Client, Voucher, Service, ServiceVariant, Product, Package, SaleService, SaleProduct, SalePackage, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action updateSale {
+  fn: import { updateSale } from "@src/sales/operations",
+  entities: [User, Sale, SaleService, SaleProduct, SalePackage, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action closeSale {
+  fn: import { closeSale } from "@src/sales/operations",
+  entities: [User, Sale, SaleService, SaleProduct, SalePackage, Service, ServiceVariant, Product, CommissionConfig, Payment, PaymentMethod, ClientCredit, CreditPayment, StockRecord, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action cancelSale {
+  fn: import { cancelSale } from "@src/sales/operations",
+  entities: [User, Sale, SaleProduct, Product, StockRecord, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action addClientCredit {
+  fn: import { addClientCredit } from "@src/sales/operations",
+  entities: [User, Client, ClientCredit, PaymentMethod, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+//#endregion
+
+//#region Glamo - Inventory Module
+query listProducts {
+  fn: import { listProducts } from "@src/inventory/operations",
+  entities: [User, Product, ProductCategory, ProductBrand, Supplier, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+query getProduct {
+  fn: import { getProduct } from "@src/inventory/operations",
+  entities: [User, Product, Salon, ProductCategory, ProductBrand, Supplier, StockRecord, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+query getLowStockProducts {
+  fn: import { getLowStockProducts } from "@src/inventory/operations",
+  entities: [User, Product, ProductCategory, ProductBrand, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+query listProductCategories {
+  fn: import { listProductCategories } from "@src/inventory/operations",
+  entities: [User, ProductCategory, Product, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+query listProductBrands {
+  fn: import { listProductBrands } from "@src/inventory/operations",
+  entities: [User, ProductBrand, Product, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+query listSuppliers {
+  fn: import { listSuppliers } from "@src/inventory/operations",
+  entities: [User, Supplier, Product, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action createProduct {
+  fn: import { createProduct } from "@src/inventory/operations",
+  entities: [User, Product, ProductCategory, ProductBrand, Supplier, StockRecord, Notification, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action updateProduct {
+  fn: import { updateProduct } from "@src/inventory/operations",
+  entities: [User, Product, ProductCategory, ProductBrand, Supplier, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action deleteProduct {
+  fn: import { deleteProduct } from "@src/inventory/operations",
+  entities: [User, Product, SaleProduct, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action recordStockMovement {
+  fn: import { recordStockMovement } from "@src/inventory/operations",
+  entities: [User, Product, StockRecord, Notification, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action createProductCategory {
+  fn: import { createProductCategory } from "@src/inventory/operations",
+  entities: [User, ProductCategory, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action updateProductCategory {
+  fn: import { updateProductCategory } from "@src/inventory/operations",
+  entities: [User, ProductCategory, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action deleteProductCategory {
+  fn: import { deleteProductCategory } from "@src/inventory/operations",
+  entities: [User, ProductCategory, Product, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action createProductBrand {
+  fn: import { createProductBrand } from "@src/inventory/operations",
+  entities: [User, ProductBrand, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action updateProductBrand {
+  fn: import { updateProductBrand } from "@src/inventory/operations",
+  entities: [User, ProductBrand, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action deleteProductBrand {
+  fn: import { deleteProductBrand } from "@src/inventory/operations",
+  entities: [User, ProductBrand, Product, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action createSupplier {
+  fn: import { createSupplier } from "@src/inventory/operations",
+  entities: [User, Supplier, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action updateSupplier {
+  fn: import { updateSupplier } from "@src/inventory/operations",
+  entities: [User, Supplier, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action deleteSupplier {
+  fn: import { deleteSupplier } from "@src/inventory/operations",
+  entities: [User, Supplier, Product, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+//#endregion
+
+//#region Glamo - Cash Register Module
+query listCashSessions {
+  fn: import { listCashSessions } from "@src/cashRegister/operations",
+  entities: [User, CashRegisterSession, CashMovement, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+query getCashSession {
+  fn: import { getCashSession } from "@src/cashRegister/operations",
+  entities: [User, Salon, CashRegisterSession, CashMovement, Payment, PaymentMethod, Sale, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+query getDailyCashReport {
+  fn: import { getDailyCashReport } from "@src/cashRegister/operations",
+  entities: [User, CashRegisterSession, CashMovement, Payment, PaymentMethod, Sale, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action openCashSession {
+  fn: import { openCashSession } from "@src/cashRegister/operations",
+  entities: [User, CashRegisterSession, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action closeCashSession {
+  fn: import { closeCashSession } from "@src/cashRegister/operations",
+  entities: [User, CashRegisterSession, CashMovement, Payment, PaymentMethod, Sale, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action addCashMovement {
+  fn: import { addCashMovement } from "@src/cashRegister/operations",
+  entities: [User, CashRegisterSession, CashMovement, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+//#endregion
+
+//#region Glamo - Reports Module
+query getSalesReport {
+  fn: import { getSalesReport } from "@src/reports/operations",
+  entities: [User, Sale, SaleService, SaleProduct, SalePackage, Service, Product, Package, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+query getCommissionsReport {
+  fn: import { getCommissionsReport } from "@src/reports/operations",
+  entities: [User, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+query getInventoryReport {
+  fn: import { getInventoryReport } from "@src/reports/operations",
+  entities: [User, Product, ProductCategory, ProductBrand, StockRecord, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+query getAppointmentReport {
+  fn: import { getAppointmentReport } from "@src/reports/operations",
+  entities: [User, Appointment, Client, Service, AppointmentService, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+query getFinancialReport {
+  fn: import { getFinancialReport } from "@src/reports/operations",
+  entities: [User, Payment, PaymentMethod, Sale, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+//#endregion
