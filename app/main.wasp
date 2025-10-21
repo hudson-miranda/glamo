@@ -68,7 +68,7 @@ app OpenSaaS {
       // }
     },
     onAuthFailedRedirectTo: "/login",
-    onAuthSucceededRedirectTo: "/demo-app",
+    onAuthSucceededRedirectTo: "/dashboard",
   },
 
   db: {
@@ -635,5 +635,25 @@ query getAppointmentReport {
 query getFinancialReport {
   fn: import { getFinancialReport } from "@src/reports/operations",
   entities: [User, Payment, PaymentMethod, Sale, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+//#endregion
+
+//#region Glamo Frontend - Dashboard and Core Pages
+route DashboardRoute { path: "/dashboard", to: DashboardPage }
+page DashboardPage {
+  authRequired: true,
+  component: import DashboardPage from "@src/client/modules/dashboard/DashboardPage"
+}
+
+route ClientsListRoute { path: "/clients", to: ClientsListPage }
+page ClientsListPage {
+  authRequired: true,
+  component: import ClientsListPage from "@src/client/modules/clients/ClientsListPage"
+}
+
+route NotificationsRoute { path: "/notifications", to: NotificationsPage }
+page NotificationsPage {
+  authRequired: true,
+  component: import NotificationsPage from "@src/client/modules/notifications/NotificationsPage"
 }
 //#endregion
