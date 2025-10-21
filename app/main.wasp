@@ -402,3 +402,40 @@ action manageCommissionConfig {
   entities: [User, Service, CommissionConfig, Log, UserSalon, Role, Permission, RolePermission, UserRole]
 }
 //#endregion
+
+//#region Glamo - Appointments Module
+query listAppointments {
+  fn: import { listAppointments } from "@src/appointments/operations",
+  entities: [User, Appointment, Client, Service, ServiceVariant, AppointmentService, AppointmentAssistant, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+query getAppointment {
+  fn: import { getAppointment } from "@src/appointments/operations",
+  entities: [User, Appointment, Client, Service, ServiceVariant, AppointmentService, AppointmentAssistant, Voucher, AppointmentRepetition, AppointmentStatusLog, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+query getAvailableSlots {
+  fn: import { getAvailableSlots } from "@src/appointments/operations",
+  entities: [User, Appointment, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action createAppointment {
+  fn: import { createAppointment } from "@src/appointments/operations",
+  entities: [User, Appointment, Client, Service, ServiceVariant, AppointmentService, AppointmentAssistant, AppointmentStatusLog, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action updateAppointment {
+  fn: import { updateAppointment } from "@src/appointments/operations",
+  entities: [User, Appointment, Client, Service, ServiceVariant, AppointmentService, AppointmentAssistant, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action deleteAppointment {
+  fn: import { deleteAppointment } from "@src/appointments/operations",
+  entities: [User, Appointment, AppointmentStatusLog, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action updateAppointmentStatus {
+  fn: import { updateAppointmentStatus } from "@src/appointments/operations",
+  entities: [User, Appointment, AppointmentStatusLog, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+//#endregion

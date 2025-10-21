@@ -61,21 +61,49 @@ This document tracks the implementation status of the Glamo salon management sys
 - [x] Proper entity dependencies configured
 - [x] Database seeds configured to run RBAC seed
 
-## Sprint 2 Status: 🔜 PENDING
+## Sprint 2 Status: ✅ COMPLETED
 
-### 🔜 Appointments Module
-- [ ] Create Appointment CRUD with conflict detection
-- [ ] Implement `availableSlots` query
-- [ ] Add support for services, assistants, and recurrence
-- [ ] Implement status lifecycle with AppointmentStatusLog
-- [ ] Add comprehensive tests for conflicts and edge cases
+### ✅ Services Module
+- [x] **listServices** query with search and pagination
+- [x] **getService** query with full relationships (variants, commission config, categories)
+- [x] **createService** action with validations
+- [x] **updateService** action
+- [x] **deleteService** action (soft delete with active appointment check)
+- [x] **createServiceVariant** action
+- [x] **updateServiceVariant** action
+- [x] **deleteServiceVariant** action (soft delete with active appointment check)
+- [x] **manageCommissionConfig** action (create or update commission rules)
+- [x] Comprehensive audit logging for all operations
+- [x] Full documentation in `src/services/README.md`
 
-### 🔜 Services + Commission Engine
-- [ ] Create Service and ServiceVariant CRUD
-- [ ] Implement CommissionConfig management
-- [ ] Build commission calculation engine
-- [ ] Handle solo/with assistant/as assistant scenarios
-- [ ] Add edge case tests (negative values, 100% solo, 50/50 split)
+### ✅ Commission Engine
+- [x] **calculateCommission** main routing function
+- [x] **calculateSoloCommission** for professionals working alone
+- [x] **calculateWithAssistantCommission** with optional deduction
+- [x] **calculateAsAssistantCommission** for assistant roles
+- [x] Support for FIXED and PERCENT value types
+- [x] Handles cost and non-commissionable value deductions
+- [x] Edge cases covered (negative values, 100% solo, 50/50 splits, multiple assistants)
+- [x] Full documentation with examples in `commissionCalculator.ts`
+
+### ✅ Appointments Module
+- [x] **listAppointments** query with filtering (professional, client, status, date range)
+- [x] **getAppointment** query with full details and status history
+- [x] **createAppointment** action with conflict detection
+- [x] **updateAppointment** action with re-validation
+- [x] **deleteAppointment** action (soft delete/cancel)
+- [x] **updateAppointmentStatus** action with lifecycle validation
+- [x] **getAvailableSlots** query for scheduling
+- [x] Conflict detection helper module:
+  - [x] Professional double-booking prevention
+  - [x] Assistant conflict detection
+  - [x] Time slot overlap detection
+  - [x] Business hours validation
+- [x] Status lifecycle management (PENDING → CONFIRMED → IN_SERVICE → DONE)
+- [x] Support for multiple services per appointment
+- [x] Assistant assignment support
+- [x] Comprehensive audit logging and status logs
+- [x] Full documentation in `src/appointments/README.md`
 
 ## Sprint 3 Status: 🔜 PENDING
 
