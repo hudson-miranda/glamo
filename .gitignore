@@ -1,0 +1,21 @@
+cat <<EOF > .gitignore
+# Node
+node_modules/
+npm-debug.log
+.env
+.env.*
+.DS_Store
+
+# Wasp
+.wasp/out/
+.wasp/build/
+wasp-lock.yaml
+
+# Prisma
+prisma/dev.db
+prisma/migrations/
+
+# IDEs
+.vscode/
+.idea/
+EOF
