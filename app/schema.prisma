@@ -8,105 +8,948 @@ generator client {
 }
 
 model User {
-  id                        String          @id @default(uuid())
-  createdAt                 DateTime        @default(now())
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  email                     String?         @unique
-  username                  String?         @unique
-  isAdmin                   Boolean         @default(false)
+  email    String? @unique
+  username String? @unique
+  isAdmin  Boolean @default(false)
 
-  paymentProcessorUserId    String?         @unique
-  lemonSqueezyCustomerPortalUrl String?     // You can delete this if you're not using Lemon Squeezy as your payments processor.
-  subscriptionStatus        String?         // 'active', 'cancel_at_period_end', 'past_due', 'deleted'
-  subscriptionPlan          String?         // 'hobby', 'pro'
-  datePaid                  DateTime?
-  credits                   Int             @default(3)
+  // OpenSaaS payment fields
+  paymentProcessorUserId        String?   @unique
+  lemonSqueezyCustomerPortalUrl String? // You can delete this if you're not using Lemon Squeezy as your payments processor.
+  subscriptionStatus            String? // 'active', 'cancel_at_period_end', 'past_due', 'deleted'
+  subscriptionPlan              String? // 'hobby', 'pro'
+  datePaid                      DateTime?
+  credits                       Int       @default(3)
 
-  gptResponses              GptResponse[]
-  contactFormMessages       ContactFormMessage[]
-  tasks                     Task[]
-  files                     File[]
+  // Glamo-specific fields
+  name          String?
+  phone         String?
+  phone2        String?
+  phoneType     String?
+  phoneType2    String?
+  address       String?
+  addressNumber String?
+  complement    String?
+  city          String?
+  state         String?
+  zipCode       String?
+  birthDate     DateTime?
+  activeSalonId String?
+  deletedAt     DateTime?
+
+  // OpenSaaS relations
+  gptResponses        GptResponse[]
+  contactFormMessages ContactFormMessage[]
+  tasks               Task[]
+  files               File[]
+
+  // Glamo relations
+  activeSalon              Salon?                 @relation("ActiveSalon", fields: [activeSalonId], references: [id], onDelete: Restrict)
+  userSalons               UserSalon[]
+  notifications            Notification[]
+  logs                     Log[]
+  createdServices          Service[]              @relation("ServiceCreatedBy")
+  updatedServices          Service[]              @relation("ServiceUpdatedBy")
+  createdProducts          Product[]              @relation("ProductCreatedBy")
+  updatedProducts          Product[]              @relation("ProductUpdatedBy")
+  createdPackages          Package[]              @relation("PackageCreatedBy")
+  updatedPackages          Package[]              @relation("PackageUpdatedBy")
+  professionalAppointments Appointment[]          @relation("ProfessionalAppointments")
+  appointmentAssistants    AppointmentAssistant[]
+  appointmentStatusLogs    AppointmentStatusLog[]
+  availableTimeslots       AvailableTimeslot[]
+  payments                 Payment[]
+  handledSales             Sale[]                 @relation("EmployeeSales")
+  createdSales             Sale[]                 @relation("SalesCreatedBy")
+  updatedSales             Sale[]                 @relation("SalesUpdatedBy")
+  clientCredits            ClientCredit[]
+  cashSessionsOpened       CashRegisterSession[]  @relation("SessionOpenedBy")
+  cashSessionsClosed       CashRegisterSession[]  @relation("SessionClosedBy")
+  createdVouchers          Voucher[]
 }
 
 model GptResponse {
-  id                        String          @id @default(uuid())
-  createdAt                 DateTime        @default(now())
-  updatedAt                 DateTime        @updatedAt
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user                      User            @relation(fields: [userId], references: [id])
-  userId                    String
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
-  content                   String
+  content String
 }
 
 model Task {
-  id                        String          @id @default(uuid())
-  createdAt                 DateTime        @default(now())
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
 
-  user                      User            @relation(fields: [userId], references: [id])
-  userId                    String
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
-  description               String
-  time                      String          @default("1")
-  isDone                    Boolean         @default(false)
+  description String
+  time        String  @default("1")
+  isDone      Boolean @default(false)
 }
 
 model File {
-  id                        String          @id @default(uuid())
-  createdAt                 DateTime        @default(now())
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
 
-  user                      User            @relation(fields: [userId], references: [id])
-  userId                    String
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
-  name                      String
-  type                      String
-  key                       String
-  uploadUrl                 String
+  name      String
+  type      String
+  key       String
+  uploadUrl String
 }
 
 model DailyStats {
-  id                               Int             @id @default(autoincrement())
-  date                             DateTime        @default(now()) @unique
+  id   Int      @id @default(autoincrement())
+  date DateTime @unique @default(now())
 
-  totalViews                       Int             @default(0)
-  prevDayViewsChangePercent        String          @default("0")
-  userCount                        Int             @default(0)
-  paidUserCount                    Int             @default(0)
-  userDelta                        Int             @default(0)
-  paidUserDelta                    Int             @default(0)
-  totalRevenue                     Float           @default(0)
-  totalProfit                      Float           @default(0)
+  totalViews                Int    @default(0)
+  prevDayViewsChangePercent String @default("0")
+  userCount                 Int    @default(0)
+  paidUserCount             Int    @default(0)
+  userDelta                 Int    @default(0)
+  paidUserDelta             Int    @default(0)
+  totalRevenue              Float  @default(0)
+  totalProfit               Float  @default(0)
 
-  sources                          PageViewSource[]
+  sources PageViewSource[]
 }
 
 model PageViewSource {
+  name String
+  date DateTime @default(now())
+
+  dailyStats   DailyStats? @relation(fields: [dailyStatsId], references: [id])
+  dailyStatsId Int?
+
+  visitors Int
+
   @@id([date, name])
-  name                     String
-  date                     DateTime        @default(now())
-
-  dailyStats               DailyStats?     @relation(fields: [dailyStatsId], references: [id])
-  dailyStatsId             Int?
-
-  visitors                 Int
 }
 
 model Logs {
-  id                       Int             @id @default(autoincrement())
-  createdAt                DateTime        @default(now())
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
 
-  message                  String
-  level                    String
+  message String
+  level   String
 }
 
 model ContactFormMessage {
-  id                        String          @id @default(uuid())
-  createdAt                 DateTime        @default(now())
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
 
-  user                      User            @relation(fields: [userId], references: [id])
-  userId                    String
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
-  content                   String
-  isRead                    Boolean         @default(false)
-  repliedAt                 DateTime?
+  content   String
+  isRead    Boolean   @default(false)
+  repliedAt DateTime?
+}
+
+// ============================================================================
+// GLAMO-SPECIFIC MODELS
+// ============================================================================
+
+// ============================================================================
+// RBAC & Multi-Tenant Models
+// ============================================================================
+
+model Salon {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name           String
+  description    String?
+  cnpj           String?
+  address        String?
+  addressNumber  String?
+  complement     String?
+  city           String?
+  state          String?
+  zipCode        String?
+  phoneType      String?
+  phone          String?
+  phoneType2     String?
+  phone2         String?
+  email          String?
+  targetAudience String[]
+  siteUrl        String?
+  facebookUrl    String?
+  instagramUrl   String?
+  deletedAt      DateTime?
+
+  activeUsers        User[]                @relation("ActiveSalon")
+  userSalons         UserSalon[]
+  roles              Role[]
+  clients            Client[]
+  services           Service[]
+  products           Product[]
+  packages           Package[]
+  appointments       Appointment[]
+  sales              Sale[]
+  notifications      Notification[]
+  availableTimeslots AvailableTimeslot[]
+  serviceRooms       ServiceRoom[]
+  clientCredits      ClientCredit[]
+  cashSessions       CashRegisterSession[]
+  productCategories  ProductCategory[]
+  productBrands      ProductBrand[]
+  suppliers          Supplier[]
+}
+
+model UserSalon {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId    String
+  salonId   String
+  isActive  Boolean   @default(true)
+  deletedAt DateTime?
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Restrict)
+  salon     Salon      @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  userRoles UserRole[]
+
+  @@unique([userId, salonId])
+}
+
+model Role {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  salonId   String
+  name      String
+  deletedAt DateTime?
+
+  salon           Salon            @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  rolePermissions RolePermission[]
+  userRoles       UserRole[]
+
+  @@unique([salonId, name])
+}
+
+model Permission {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  name        String  @unique
+  description String?
+
+  rolePermissions RolePermission[]
+}
+
+model RolePermission {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  roleId       String
+  permissionId String
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Restrict)
+
+  @@unique([roleId, permissionId])
+}
+
+model UserRole {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  userSalonId String
+  roleId      String
+
+  userSalon UserSalon @relation(fields: [userSalonId], references: [id], onDelete: Restrict)
+  role      Role      @relation(fields: [roleId], references: [id], onDelete: Restrict)
+
+  @@unique([userSalonId, roleId])
+}
+
+// ============================================================================
+// Audit & Notification Models
+// ============================================================================
+
+model Log {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  userId   String?
+  entity   String
+  entityId String
+  action   String
+  before   Json?
+  after    Json?
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+enum NotificationChannel {
+  INTERNAL
+  PUSH
+  EMAIL
+  WHATSAPP
+}
+
+enum NotificationType {
+  INFO
+  WARNING
+  ALERT
+  SYSTEM
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId          String
+  salonId         String
+  title           String
+  message         String
+  type            NotificationType    @default(INFO)
+  channel         NotificationChannel @default(INTERNAL)
+  systemGenerated Boolean             @default(false)
+  read            Boolean             @default(false)
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Restrict)
+  salon Salon @relation(fields: [salonId], references: [id], onDelete: Restrict)
+}
+
+// ============================================================================
+// Client Models
+// ============================================================================
+
+model Client {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  salonId      String
+  userId       String?
+  name         String
+  email        String?
+  phone        String?
+  cpf          String?
+  cnpj         String?
+  observations String?
+  deletedAt    DateTime?
+
+  salon         Salon          @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  appointments  Appointment[]
+  sales         Sale[]
+  clientCredits ClientCredit[]
+
+  @@unique([salonId, email])
+}
+
+model ClientCredit {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  clientId       String
+  professionalId String?
+  salonId        String
+  amount         Float
+  origin         String
+  paymentMethod  String?
+  date           DateTime @default(now())
+  notes          String?
+
+  client         Client          @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  professional   User?           @relation(fields: [professionalId], references: [id], onDelete: SetNull)
+  salon          Salon           @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  creditPayments CreditPayment[]
+}
+
+// ============================================================================
+// Service Models
+// ============================================================================
+
+model ServiceRoom {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  salonId     String
+  name        String
+  description String?
+  deletedAt   DateTime?
+
+  salon    Salon     @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  services Service[]
+}
+
+enum ValueType {
+  FIXED
+  PERCENT
+}
+
+model Service {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  salonId                    String
+  createdByUserId            String
+  updatedByUserId            String?
+  serviceRoomId              String?
+  name                       String
+  description                String?
+  hasVariants                Boolean   @default(false)
+  duration                   Int
+  price                      Float
+  costValue                  Float     @default(0)
+  costValueType              ValueType @default(FIXED)
+  nonCommissionableValue     Float     @default(0)
+  nonCommissionableValueType ValueType @default(FIXED)
+  cardColor                  String?
+  deletedAt                  DateTime?
+
+  salon               Salon                @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  createdBy           User                 @relation("ServiceCreatedBy", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  updatedBy           User?                @relation("ServiceUpdatedBy", fields: [updatedByUserId], references: [id], onDelete: SetNull)
+  serviceRoom         ServiceRoom?         @relation(fields: [serviceRoomId], references: [id], onDelete: SetNull)
+  variants            ServiceVariant[]
+  categories          ServiceCategory[]
+  commissionConfig    CommissionConfig?
+  appointmentServices AppointmentService[]
+  saleServices        SaleService[]
+  packageServices     PackageService[]
+}
+
+model ServiceVariant {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  serviceId                  String
+  name                       String
+  description                String?
+  duration                   Int
+  price                      Float
+  costValue                  Float     @default(0)
+  costValueType              ValueType @default(FIXED)
+  nonCommissionableValue     Float     @default(0)
+  nonCommissionableValueType ValueType @default(FIXED)
+  deletedAt                  DateTime?
+
+  service             Service              @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  appointmentServices AppointmentService[]
+  saleServices        SaleService[]
+}
+
+model ServiceCategory {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  serviceId String
+  name      String
+  color     String?
+
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+}
+
+model CommissionConfig {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  serviceId                        String    @unique
+  commissionType                   String
+  baseValueType                    ValueType
+  baseValue                        Float
+  deductAssistantsFromProfessional Boolean   @default(false)
+  soloValue                        Float
+  soloValueType                    ValueType
+  withAssistantValue               Float
+  withAssistantValueType           ValueType
+  asAssistantValue                 Float
+  asAssistantValueType             ValueType
+
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+}
+
+// ============================================================================
+// Appointment Models
+// ============================================================================
+
+model AvailableTimeslot {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId      String
+  salonId     String
+  weekday     String
+  startTime   String
+  endTime     String
+  isAvailable Boolean @default(true)
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Restrict)
+  salon Salon @relation(fields: [salonId], references: [id], onDelete: Restrict)
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  IN_SERVICE
+  DONE
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PARTIAL
+  PAID
+  REFUNDED
+}
+
+model Appointment {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  salonId        String
+  clientId       String
+  professionalId String
+  voucherId      String?
+  startAt        DateTime
+  endAt          DateTime
+  status         AppointmentStatus @default(PENDING)
+  paymentStatus  PaymentStatus     @default(PENDING)
+  notes          String?
+  deletedAt      DateTime?
+
+  salon        Salon                  @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  client       Client                 @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  professional User                   @relation("ProfessionalAppointments", fields: [professionalId], references: [id], onDelete: Restrict)
+  voucher      Voucher?               @relation(fields: [voucherId], references: [id], onDelete: SetNull)
+  services     AppointmentService[]
+  assistants   AppointmentAssistant[]
+  repetition   AppointmentRepetition?
+  statusLogs   AppointmentStatusLog[]
+}
+
+model AppointmentService {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  appointmentId  String
+  serviceId      String
+  variantId      String?
+  customPrice    Float?
+  customDuration Int?
+  discount       Float   @default(0)
+
+  appointment Appointment     @relation(fields: [appointmentId], references: [id], onDelete: Restrict)
+  service     Service         @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  variant     ServiceVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+}
+
+model AppointmentAssistant {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  appointmentId   String
+  assistantUserId String
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Restrict)
+  assistant   User        @relation(fields: [assistantUserId], references: [id], onDelete: Restrict)
+
+  @@unique([appointmentId, assistantUserId])
+}
+
+model AppointmentRepetition {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  appointmentId String    @unique
+  rule          String
+  repeatUntil   DateTime?
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Restrict)
+}
+
+model AppointmentStatusLog {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  appointmentId   String
+  updatedByUserId String
+  fromStatus      AppointmentStatus?
+  toStatus        AppointmentStatus
+  changedAt       DateTime           @default(now())
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Restrict)
+  updatedBy   User        @relation(fields: [updatedByUserId], references: [id], onDelete: Restrict)
+}
+
+// ============================================================================
+// Product & Inventory Models
+// ============================================================================
+
+model ProductCategory {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  salonId     String
+  name        String
+  description String?
+  deletedAt   DateTime?
+
+  salon    Salon     @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  products Product[]
+}
+
+model ProductBrand {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  salonId     String
+  name        String
+  description String?
+  deletedAt   DateTime?
+
+  salon    Salon     @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  products Product[]
+}
+
+model Supplier {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  salonId       String
+  name          String
+  description   String?
+  email         String?
+  phoneType     String?
+  phone         String?
+  phoneType2    String?
+  phone2        String?
+  contactName   String?
+  cnpj          String?
+  address       String?
+  addressNumber String?
+  complement    String?
+  city          String?
+  state         String?
+  zipCode       String?
+  deletedAt     DateTime?
+
+  salon    Salon     @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  products Product[]
+}
+
+model Product {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  salonId             String
+  categoryId          String?
+  brandId             String?
+  supplierId          String?
+  createdByUserId     String
+  updatedByUserId     String?
+  name                String
+  costPrice           Float
+  salePrice           Float
+  stockQuantity       Int       @default(0)
+  initialStock        Int       @default(0)
+  minimumStock        Int       @default(0)
+  saleCommissionValue Float     @default(0)
+  saleCommissionType  ValueType @default(FIXED)
+  unitOfMeasure       String?
+  quantityPerPackage  Int       @default(1)
+  barcode             String?
+  sku                 String?
+  deletedAt           DateTime?
+
+  salon        Salon            @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  category     ProductCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  brand        ProductBrand?    @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  supplier     Supplier?        @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  createdBy    User             @relation("ProductCreatedBy", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  updatedBy    User?            @relation("ProductUpdatedBy", fields: [updatedByUserId], references: [id], onDelete: SetNull)
+  stockRecords StockRecord[]
+  saleProducts SaleProduct[]
+}
+
+enum MovementType {
+  IN
+  OUT
+  ADJUST
+}
+
+model StockRecord {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  productId        String
+  movementType     MovementType
+  quantity         Int
+  reason           String?
+  previousQuantity Int
+  finalQuantity    Int
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+}
+
+// ============================================================================
+// Package Models
+// ============================================================================
+
+model Package {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  salonId         String
+  createdByUserId String
+  updatedByUserId String?
+  name            String
+  description     String?
+  totalPrice      Float
+  validityType    String?
+  validityValue   Int?
+  isArchived      Boolean   @default(false)
+  deletedAt       DateTime?
+
+  salon           Salon            @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  createdBy       User             @relation("PackageCreatedBy", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  updatedBy       User?            @relation("PackageUpdatedBy", fields: [updatedByUserId], references: [id], onDelete: SetNull)
+  packageServices PackageService[]
+  salePackages    SalePackage[]
+}
+
+model PackageService {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  packageId       String
+  serviceId       String
+  customUnitPrice Float?
+  quantity        Int    @default(1)
+
+  package Package @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+}
+
+// ============================================================================
+// Voucher Models
+// ============================================================================
+
+model Voucher {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId             String
+  code               String    @unique
+  discountValue      Float?
+  discountPercentage Float?
+  discountType       String
+  applicableTo       String?
+  applicableEntityId String?
+  usageLimit         Int?
+  usedCount          Int       @default(0)
+  expirationDate     DateTime?
+  issueDate          DateTime  @default(now())
+  status             String
+  deletedAt          DateTime?
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Restrict)
+  appointments Appointment[]
+  sales        Sale[]
+}
+
+// ============================================================================
+// Sales & Payment Models
+// ============================================================================
+
+enum SaleStatus {
+  OPEN
+  PAID
+  CANCELLED
+}
+
+model Sale {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  salonId         String
+  clientId        String?
+  employeeId      String
+  voucherId       String?
+  createdByUserId String
+  updatedByUserId String?
+  originalTotal   Float
+  discountTotal   Float      @default(0)
+  finalTotal      Float
+  status          SaleStatus @default(OPEN)
+  deletedAt       DateTime?
+
+  salon        Salon         @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  client       Client?       @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  employee     User          @relation("EmployeeSales", fields: [employeeId], references: [id], onDelete: Restrict)
+  voucher      Voucher?      @relation(fields: [voucherId], references: [id], onDelete: SetNull)
+  createdBy    User          @relation("SalesCreatedBy", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  updatedBy    User?         @relation("SalesUpdatedBy", fields: [updatedByUserId], references: [id], onDelete: SetNull)
+  saleServices SaleService[]
+  saleProducts SaleProduct[]
+  salePackages SalePackage[]
+  payments     Payment[]
+}
+
+model SaleService {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  saleId     String
+  serviceId  String
+  variantId  String?
+  unitPrice  Float
+  discount   Float   @default(0)
+  finalPrice Float
+
+  sale    Sale            @relation(fields: [saleId], references: [id], onDelete: Restrict)
+  service Service         @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  variant ServiceVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+}
+
+model SaleProduct {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  saleId     String
+  productId  String
+  quantity   Int
+  unitPrice  Float
+  discount   Float  @default(0)
+  finalPrice Float
+
+  sale    Sale    @relation(fields: [saleId], references: [id], onDelete: Restrict)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+}
+
+model SalePackage {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  saleId        String
+  packageId     String
+  originalPrice Float
+  discount      Float  @default(0)
+  finalPrice    Float
+
+  sale    Sale    @relation(fields: [saleId], references: [id], onDelete: Restrict)
+  package Package @relation(fields: [packageId], references: [id], onDelete: Restrict)
+}
+
+enum PaymentMethodType {
+  CASH
+  CARD
+  PIX
+  ONLINE
+  CREDIT_CLIENT
+}
+
+model PaymentMethod {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  name     String
+  type     PaymentMethodType
+  isOnline Boolean           @default(false)
+
+  payments Payment[]
+}
+
+model Payment {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  userId   String
+  saleId   String
+  methodId String
+  amount   Float
+  status   PaymentStatus @default(PENDING)
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Restrict)
+  sale           Sale            @relation(fields: [saleId], references: [id], onDelete: Restrict)
+  method         PaymentMethod   @relation(fields: [methodId], references: [id], onDelete: Restrict)
+  creditPayments CreditPayment[]
+}
+
+model CreditPayment {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  paymentId  String
+  creditId   String
+  amountUsed Float
+
+  payment Payment      @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  credit  ClientCredit @relation(fields: [creditId], references: [id], onDelete: Restrict)
+}
+
+// ============================================================================
+// Cash Register Models
+// ============================================================================
+
+model CashRegisterSession {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  salonId        String
+  openedBy       String
+  openedAt       DateTime  @default(now())
+  openingBalance Float
+  closedBy       String?
+  closedAt       DateTime?
+  closingBalance Float?
+  reconciled     Boolean   @default(false)
+
+  salon     Salon          @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  opener    User           @relation("SessionOpenedBy", fields: [openedBy], references: [id], onDelete: Restrict)
+  closer    User?          @relation("SessionClosedBy", fields: [closedBy], references: [id], onDelete: SetNull)
+  movements CashMovement[]
+}
+
+enum CashMovementType {
+  PAYMENT
+  SANGRIA
+  SUPRIMENTO
+}
+
+model CashMovement {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  sessionId String
+  type      CashMovementType
+  amount    Float
+  notes     String?
+
+  session CashRegisterSession @relation(fields: [sessionId], references: [id], onDelete: Restrict)
 }
