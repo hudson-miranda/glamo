@@ -334,6 +334,23 @@ action deleteClient {
 }
 //#endregion
 
+//#region Glamo - Salon Management
+query getUserSalons {
+  fn: import { getUserSalons } from "@src/salon/operations",
+  entities: [User, Salon, UserSalon, Role, UserRole]
+}
+
+action createSalon {
+  fn: import { createSalon } from "@src/salon/operations",
+  entities: [User, Salon, UserSalon, Role, UserRole, Log]
+}
+
+action switchActiveSalon {
+  fn: import { switchActiveSalon } from "@src/salon/operations",
+  entities: [User, Salon, UserSalon]
+}
+//#endregion
+
 //#region Glamo - Notifications Module
 query listNotifications {
   fn: import { listNotifications } from "@src/notifications/operations",
@@ -643,6 +660,12 @@ route DashboardRoute { path: "/dashboard", to: DashboardPage }
 page DashboardPage {
   authRequired: true,
   component: import DashboardPage from "@src/client/modules/dashboard/DashboardPage"
+}
+
+route CreateSalonRoute { path: "/onboarding/create-salon", to: CreateSalonPage }
+page CreateSalonPage {
+  authRequired: true,
+  component: import CreateSalonPage from "@src/client/modules/onboarding/CreateSalonPage"
 }
 
 route ClientsListRoute { path: "/clients", to: ClientsListPage }

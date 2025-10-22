@@ -1,8 +1,83 @@
 import { DashboardLayout } from '../../layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
-import { Users, Calendar, DollarSign, TrendingUp } from 'lucide-react';
+import { Button } from '../../../components/ui/button';
+import { EmptyState } from '../../../components/ui/empty-state';
+import { Users, Calendar, DollarSign, TrendingUp, Plus, Loader2, Building2 } from 'lucide-react';
+import { useSalonContext } from '../../hooks/useSalonContext';
+import { useQuery, listClients, listAppointments } from 'wasp/client/operations';
+import { Link } from 'wasp/client/router';
 
 export default function DashboardPage() {
+  const { activeSalonId } = useSalonContext();
+
+  // Fetch real data
+  const { data: clientsData, isLoading: isLoadingClients } = useQuery(
+    listClients,
+    {
+      salonId: activeSalonId || '',
+      page: 1,
+      perPage: 1, // We only need the count
+    },
+    {
+      enabled: !!activeSalonId,
+    }
+  );
+
+  const { data: appointmentsData, isLoading: isLoadingAppointments } = useQuery(
+    listAppointments,
+    {
+      salonId: activeSalonId || '',
+      page: 1,
+      perPage: 100, // Get today's appointments
+    },
+    {
+      enabled: !!activeSalonId,
+    }
+  );
+
+  // Calculate stats
+  const totalClients = clientsData?.totalCount || 0;
+  
+  // Filter today's appointments
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
+  const todayAppointments = appointmentsData?.data?.filter((apt: any) => {
+    const aptDate = new Date(apt.date);
+    return aptDate >= today && aptDate < tomorrow;
+  }) || [];
+
+  const appointmentsToday = todayAppointments.length;
+  const completedToday = todayAppointments.filter((apt: any) => apt.status === 'DONE').length;
+  const pendingToday = todayAppointments.filter((apt: any) => 
+    apt.status === 'PENDING' || apt.status === 'CONFIRMED' || apt.status === 'IN_SERVICE'
+  ).length;
+
+  // Show empty state if no salon selected
+  if (!activeSalonId) {
+    return (
+      <DashboardLayout>
+        <EmptyState
+          icon={Building2}
+          title='No salon selected'
+          description='Create or select a salon to start managing your business'
+          action={
+            <Button asChild>
+              <Link to='/onboarding/create-salon'>
+                <Plus className='mr-2 h-4 w-4' />
+                Create Salon
+              </Link>
+            </Button>
+          }
+        />
+      </DashboardLayout>
+    );
+  }
+
+  const isLoading = isLoadingClients || isLoadingAppointments;
+
   return (
     <DashboardLayout>
       <div className='space-y-6'>
@@ -23,10 +98,16 @@ export default function DashboardPage() {
               <Users className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold'>245</div>
-              <p className='text-xs text-muted-foreground'>
-                +12% from last month
-              </p>
+              {isLoading ? (
+                <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
+              ) : (
+                <>
+                  <div className='text-2xl font-bold'>{totalClients}</div>
+                  <p className='text-xs text-muted-foreground'>
+                    Registered clients
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -38,10 +119,16 @@ export default function DashboardPage() {
               <Calendar className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold'>18</div>
-              <p className='text-xs text-muted-foreground'>
-                4 completed, 14 pending
-              </p>
+              {isLoading ? (
+                <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
+              ) : (
+                <>
+                  <div className='text-2xl font-bold'>{appointmentsToday}</div>
+                  <p className='text-xs text-muted-foreground'>
+                    {completedToday} completed, {pendingToday} pending
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -53,9 +140,9 @@ export default function DashboardPage() {
               <DollarSign className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold'>R$ 15,234</div>
+              <div className='text-2xl font-bold'>R$ --</div>
               <p className='text-xs text-muted-foreground'>
-                +8% from last month
+                Coming soon
               </p>
             </CardContent>
           </Card>
@@ -68,23 +155,49 @@ export default function DashboardPage() {
               <TrendingUp className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold'>+12.5%</div>
+              <div className='text-2xl font-bold'>--</div>
               <p className='text-xs text-muted-foreground'>
-                Compared to last quarter
+                Coming soon
               </p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Recent Activity */}
+        {/* Quick Actions */}
         <Card>
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className='text-sm text-muted-foreground'>
-              Dashboard analytics and quick actions will be displayed here.
-            </p>
+            <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
+              <Button asChild variant='outline' className='h-auto py-4'>
+                <Link to='/appointments' className='flex flex-col items-center space-y-2'>
+                  <Calendar className='h-6 w-6' />
+                  <span>New Appointment</span>
+                </Link>
+              </Button>
+              
+              <Button asChild variant='outline' className='h-auto py-4'>
+                <Link to='/sales' className='flex flex-col items-center space-y-2'>
+                  <DollarSign className='h-6 w-6' />
+                  <span>New Sale</span>
+                </Link>
+              </Button>
+              
+              <Button asChild variant='outline' className='h-auto py-4'>
+                <Link to='/clients' className='flex flex-col items-center space-y-2'>
+                  <Users className='h-6 w-6' />
+                  <span>Add Client</span>
+                </Link>
+              </Button>
+              
+              <Button asChild variant='outline' className='h-auto py-4'>
+                <Link to='/services' className='flex flex-col items-center space-y-2'>
+                  <Plus className='h-6 w-6' />
+                  <span>Add Service</span>
+                </Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

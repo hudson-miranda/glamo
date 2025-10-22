@@ -5,6 +5,7 @@ import './Main.css';
 import NavBar from './components/NavBar/NavBar';
 import { demoNavigationitems, marketingNavigationItems } from './components/NavBar/constants';
 import CookieConsentBanner from './components/cookie-consent/Banner';
+import { ErrorBoundary } from './providers/ErrorBoundary';
 
 /**
  * use this component to wrap all child components
@@ -28,6 +29,18 @@ export default function App() {
     return location.pathname.startsWith('/admin');
   }, [location]);
 
+  const isDashboardPage = useMemo(() => {
+    return location.pathname.startsWith('/dashboard') ||
+           location.pathname.startsWith('/clients') ||
+           location.pathname.startsWith('/services') ||
+           location.pathname.startsWith('/appointments') ||
+           location.pathname.startsWith('/sales') ||
+           location.pathname.startsWith('/inventory') ||
+           location.pathname.startsWith('/cash-register') ||
+           location.pathname.startsWith('/reports') ||
+           location.pathname.startsWith('/notifications');
+  }, [location]);
+
   useEffect(() => {
     if (location.hash) {
       const id = location.hash.replace('#', '');
@@ -39,9 +52,9 @@ export default function App() {
   }, [location]);
 
   return (
-    <>
+    <ErrorBoundary>
       <div className='min-h-screen bg-background text-foreground'>
-        {isAdminDashboard ? (
+        {isAdminDashboard || isDashboardPage ? (
           <Outlet />
         ) : (
           <>
@@ -53,6 +66,6 @@ export default function App() {
         )}
       </div>
       <CookieConsentBanner />
-    </>
+    </ErrorBoundary>
   );
 }
