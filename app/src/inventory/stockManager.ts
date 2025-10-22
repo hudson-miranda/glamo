@@ -50,14 +50,15 @@ export async function checkLowStock(
     // Create notification for each user
     for (const userSalon of usersToNotify) {
       try {
-        await createSystemNotification({
-          salonId: product.salonId,
-          userId: userSalon.userId,
-          type: 'WARNING',
-          title: 'Low Stock Alert',
-          message: `Product "${product.name}" is at or below minimum stock level. Current: ${product.stockQuantity}, Minimum: ${product.minimumStock}`,
-          channels: ['INTERNAL'],
-        }, context);
+        await createSystemNotification(
+          context.entities,
+          userSalon.userId,
+          product.salonId,
+          'Low Stock Alert',
+          `Product "${product.name}" is at or below minimum stock level. Current: ${product.stockQuantity}, Minimum: ${product.minimumStock}`,
+          'WARNING',
+          'INTERNAL'
+        );
       } catch (error) {
         console.error(`Failed to create low stock notification for user ${userSalon.userId}:`, error);
       }

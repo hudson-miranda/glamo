@@ -1,4 +1,5 @@
 import { HttpError } from 'wasp/server';
+import { Prisma } from '@prisma/client';
 import type { 
   GetSalesReport,
   GetCommissionsReport,
@@ -220,7 +221,7 @@ export const getSalesReport: GetSalesReport<GetSalesReportInput, any> = async (
       entity: 'Report',
       entityId: salonId,
       action: 'VIEW',
-      before: null,
+      before: Prisma.DbNull,
       after: { type: 'sales', startDate, endDate, groupBy },
     },
   });
@@ -272,7 +273,7 @@ export const getCommissionsReport: GetCommissionsReport<GetCommissionsReportInpu
       entity: 'Report',
       entityId: salonId,
       action: 'VIEW',
-      before: null,
+      before: Prisma.DbNull,
       after: { type: 'commissions', startDate, endDate, groupBy },
     },
   });
@@ -379,7 +380,7 @@ export const getInventoryReport: GetInventoryReport<GetInventoryReportInput, any
       entity: 'Report',
       entityId: salonId,
       action: 'VIEW',
-      before: null,
+      before: Prisma.DbNull,
       after: { type: 'inventory', categoryId, brandId, lowStockOnly },
     },
   });
@@ -462,7 +463,7 @@ export const getAppointmentReport: GetAppointmentReport<GetAppointmentReportInpu
           name: true,
         },
       },
-      appointmentServices: {
+      services: {
         include: {
           service: {
             select: {
@@ -498,10 +499,10 @@ export const getAppointmentReport: GetAppointmentReport<GetAppointmentReportInpu
         key = apt.startAt.toISOString().split('T')[0];
         break;
       case 'professional':
-        key = apt.professional.name || apt.professionalId;
+        key = apt.professionalId;
         break;
       case 'service':
-        apt.appointmentServices.forEach(as => {
+        apt.services.forEach(as => {
           const serviceKey = as.service.name;
           if (!groupedData[serviceKey]) {
             groupedData[serviceKey] = {
@@ -534,7 +535,7 @@ export const getAppointmentReport: GetAppointmentReport<GetAppointmentReportInpu
       entity: 'Report',
       entityId: salonId,
       action: 'VIEW',
-      before: null,
+      before: Prisma.DbNull,
       after: { type: 'appointments', startDate, endDate, groupBy },
     },
   });
@@ -586,7 +587,7 @@ export const getFinancialReport: GetFinancialReport<GetFinancialReportInput, any
       },
     },
     include: {
-      paymentMethod: true,
+      method: true,
       sale: {
         select: {
           id: true,
@@ -600,13 +601,13 @@ export const getFinancialReport: GetFinancialReport<GetFinancialReportInput, any
   // Calculate totals
   const totalPayments = payments.length;
   const totalRevenue = payments.reduce((sum, p) => sum + p.amount, 0);
-  const approvedPayments = payments.filter(p => p.paymentStatus === 'APPROVED');
+  const approvedPayments = payments.filter(p => p.status === 'PAID');
   const approvedRevenue = approvedPayments.reduce((sum, p) => sum + p.amount, 0);
 
   // Group by payment method
   const byPaymentMethod: any = {};
   payments.forEach(payment => {
-    const methodName = payment.paymentMethod.name;
+    const methodName = payment.method.name;
     if (!byPaymentMethod[methodName]) {
       byPaymentMethod[methodName] = {
         count: 0,
@@ -661,7 +662,7 @@ export const getFinancialReport: GetFinancialReport<GetFinancialReportInput, any
       entity: 'Report',
       entityId: salonId,
       action: 'VIEW',
-      before: null,
+      before: Prisma.DbNull,
       after: { type: 'financial', startDate, endDate, groupBy },
     },
   });
@@ -680,3 +681,4 @@ export const getFinancialReport: GetFinancialReport<GetFinancialReportInput, any
     groupedData,
   };
 };
+

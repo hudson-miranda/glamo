@@ -1,4 +1,4 @@
-import { seedRbacPermissionsAndRoles } from '../rbac/seed';
+import { seedRbacPermissionsAndRoles } from '../../rbac/seed';
 
 /**
  * Seeds the database with Glamo-specific data.

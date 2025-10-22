@@ -1,4 +1,5 @@
 import { HttpError } from 'wasp/server';
+import { Prisma } from '@prisma/client';
 import type { 
   ListClients, 
   GetClient, 
@@ -255,7 +256,7 @@ export const createClient: CreateClient<CreateClientInput, any> = async (
       entity: 'Client',
       entityId: client.id,
       action: 'CREATE',
-      before: null,
+      before: Prisma.DbNull,
       after: { name, email, phone, cpf, cnpj },
     },
   });
@@ -410,7 +411,7 @@ export const deleteClient: DeleteClient<DeleteClientInput, any> = async (
         name: existingClient.name,
         email: existingClient.email,
       },
-      after: null,
+      after: Prisma.DbNull,
     },
   });
 

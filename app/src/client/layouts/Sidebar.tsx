@@ -103,7 +103,7 @@ export function Sidebar({ className }: { className?: string }) {
           return (
             <Link
               key={item.href}
-              to={item.href}
+              to={item.href as any}
               className='flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground'
             >
               <Icon className='h-5 w-5' />

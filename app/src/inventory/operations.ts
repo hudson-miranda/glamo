@@ -1,4 +1,5 @@
 import { HttpError } from 'wasp/server';
+import { Prisma } from '@prisma/client';
 import type { 
   ListProducts,
   GetProduct,
@@ -301,7 +302,7 @@ export const listProducts: ListProducts<ListProductsInput, ListProductsOutput> =
       entity: 'Product',
       entityId: salonId,
       action: 'LIST',
-      before: null,
+      before: Prisma.DbNull,
       after: { filters: { search, categoryId, brandId, supplierId, lowStock } },
     },
   });
@@ -374,8 +375,8 @@ export const getProduct: GetProduct<GetProductInput, any> = async (
       entity: 'Product',
       entityId: productId,
       action: 'VIEW',
-      before: null,
-      after: null,
+      before: Prisma.DbNull,
+      after: Prisma.DbNull,
     },
   });
 
@@ -536,7 +537,7 @@ export const createProduct: CreateProduct<CreateProductInput, any> = async (
       entity: 'Product',
       entityId: product.id,
       action: 'CREATE',
-      before: null,
+      before: Prisma.DbNull,
       after: { name, costPrice, salePrice, initialStock },
     },
   });
@@ -712,7 +713,7 @@ export const deleteProduct: DeleteProduct<DeleteProductInput, any> = async (
       entityId: productId,
       action: 'DELETE',
       before: { name: product.name },
-      after: null,
+      after: Prisma.DbNull,
     },
   });
 
@@ -884,7 +885,7 @@ export const createProductCategory: CreateProductCategory<CreateProductCategoryI
       entity: 'ProductCategory',
       entityId: category.id,
       action: 'CREATE',
-      before: null,
+      before: Prisma.DbNull,
       after: { name },
     },
   });
@@ -970,7 +971,7 @@ export const deleteProductCategory: DeleteProductCategory<DeleteProductCategoryI
       entityId: categoryId,
       action: 'DELETE',
       before: { name: category.name },
-      after: null,
+      after: Prisma.DbNull,
     },
   });
 
@@ -1036,7 +1037,7 @@ export const createProductBrand: CreateProductBrand<CreateProductBrandInput, any
       entity: 'ProductBrand',
       entityId: brand.id,
       action: 'CREATE',
-      before: null,
+      before: Prisma.DbNull,
       after: { name },
     },
   });
@@ -1122,7 +1123,7 @@ export const deleteProductBrand: DeleteProductBrand<DeleteProductBrandInput, any
       entityId: brandId,
       action: 'DELETE',
       before: { name: brand.name },
-      after: null,
+      after: Prisma.DbNull,
     },
   });
 
@@ -1195,7 +1196,7 @@ export const createSupplier: CreateSupplier<CreateSupplierInput, any> = async (
       entity: 'Supplier',
       entityId: supplier.id,
       action: 'CREATE',
-      before: null,
+      before: Prisma.DbNull,
       after: { name: data.name },
     },
   });
@@ -1281,9 +1282,10 @@ export const deleteSupplier: DeleteSupplier<DeleteSupplierInput, any> = async (
       entityId: supplierId,
       action: 'DELETE',
       before: { name: supplier.name },
-      after: null,
+      after: Prisma.DbNull,
     },
   });
 
   return deletedSupplier;
 };
+

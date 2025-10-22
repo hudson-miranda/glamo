@@ -61,16 +61,16 @@ export async function calculateReconciliation(
 
   // Calculate totals
   const openingBalance = session.openingBalance;
-  const totalPayments = payments.reduce((sum, p) => sum + p.amount, 0);
+  const totalPayments = payments.reduce((sum: number, p: any) => sum + p.amount, 0);
   
   // Calculate movement totals
   const totalSangria = session.movements
-    .filter(m => m.type === 'SANGRIA')
-    .reduce((sum, m) => sum + m.amount, 0);
+    .filter((m: any) => m.type === 'SANGRIA')
+    .reduce((sum: number, m: any) => sum + m.amount, 0);
   
   const totalSuprimento = session.movements
-    .filter(m => m.type === 'SUPRIMENTO')
-    .reduce((sum, m) => sum + m.amount, 0);
+    .filter((m: any) => m.type === 'SUPRIMENTO')
+    .reduce((sum: number, m: any) => sum + m.amount, 0);
 
   // Calculate expected closing balance
   const expectedClosingBalance = openingBalance + totalPayments + totalSuprimento - totalSangria;
@@ -83,7 +83,7 @@ export async function calculateReconciliation(
     count: number;
   }>();
 
-  payments.forEach(payment => {
+  payments.forEach((payment: any) => {
     const methodId = payment.paymentMethodId;
     const methodName = payment.paymentMethod.name;
     const methodType = payment.paymentMethod.type;

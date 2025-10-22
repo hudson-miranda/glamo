@@ -1,5 +1,5 @@
-import { DashboardLayout } from '../layouts/DashboardLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { DashboardLayout } from '../../layouts/DashboardLayout';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Users, Calendar, DollarSign, TrendingUp } from 'lucide-react';
 
 export default function DashboardPage() {

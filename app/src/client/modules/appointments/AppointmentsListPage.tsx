@@ -29,7 +29,7 @@ export default function AppointmentsListPage() {
   const { activeSalonId } = useSalonContext();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
+  const [statusFilter, setStatusFilter] = useState<"CANCELLED" | "PENDING" | "CONFIRMED" | "IN_SERVICE" | "DONE" | undefined>(undefined);
 
   const { data, isLoading, error } = useQuery(listAppointments, {
     salonId: activeSalonId || '',

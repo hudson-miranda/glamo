@@ -7,23 +7,25 @@ import { Badge } from '../../../components/ui/badge';
 import { EmptyState } from '../../../components/ui/empty-state';
 import { Bell, CheckCheck, Loader2 } from 'lucide-react';
 import { useAuth } from 'wasp/client/auth';
+import { useSalonContext } from '../../hooks/useSalonContext';
 import { toast } from '../../hooks/useToast';
 
 export default function NotificationsPage() {
   const { data: user } = useAuth();
+  const { activeSalonId } = useSalonContext();
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
 
   const { data, isLoading, error, refetch } = useQuery(listNotifications, {
-    userId: user?.id || '',
+    salonId: activeSalonId || '',
     page: 1,
     perPage: 50,
   }, {
-    enabled: !!user?.id,
+    enabled: !!activeSalonId,
   });
 
   const handleMarkAsRead = async (notificationId: string) => {
     try {
-      await markNotificationRead({ notificationId });
+      await markNotificationRead({ notificationId, salonId: activeSalonId || '' });
       toast({
         title: 'Success',
         description: 'Notification marked as read',
@@ -40,7 +42,7 @@ export default function NotificationsPage() {
 
   const handleMarkAllAsRead = async () => {
     try {
-      await markAllNotificationsRead({ userId: user?.id || '' });
+      await markAllNotificationsRead({ salonId: activeSalonId || '' });
       toast({
         title: 'Success',
         description: 'All notifications marked as read',
@@ -72,7 +74,7 @@ export default function NotificationsPage() {
               Stay updated with your salon activities
             </p>
           </div>
-          {data?.unreadCount > 0 && (
+          {(data?.unreadCount || 0) > 0 && (
             <Button onClick={handleMarkAllAsRead} variant='outline'>
               <CheckCheck className='mr-2 h-4 w-4' />
               Mark All as Read
