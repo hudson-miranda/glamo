@@ -1,6 +1,7 @@
 import type { Salon, User, UserSalon } from 'wasp/entities';
 import type { GetUserSalons, CreateSalon, SwitchActiveSalon } from 'wasp/server/operations';
 import { HttpError } from 'wasp/server';
+import { Prisma } from '@prisma/client';
 
 /**
  * List all salons the user belongs to
@@ -118,10 +119,10 @@ export const createSalon: CreateSalon<CreateSalonInput, Salon> = async (args, co
   await context.entities.Log.create({
     data: {
       userId: context.user.id,
-      entityType: 'Salon',
+      entity: 'Salon',
       entityId: salon.id,
       action: 'CREATE',
-      afterState: JSON.stringify(salon),
+      after: Prisma.DbNull,
     },
   });
 

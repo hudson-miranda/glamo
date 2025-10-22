@@ -18,6 +18,14 @@ import { Plus, Search, Scissors, Edit, Trash2 } from 'lucide-react';
 import { useSalonContext } from '../../hooks/useSalonContext';
 
 export default function ServicesListPage() {
+  return (
+    <DashboardLayout>
+      <ServicesListContent />
+    </DashboardLayout>
+  );
+}
+
+function ServicesListContent() {
   const { activeSalonId } = useSalonContext();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -39,7 +47,6 @@ export default function ServicesListPage() {
   };
 
   return (
-    <DashboardLayout>
       <div className='space-y-6'>
         {/* Header */}
         <div className='flex items-center justify-between'>
@@ -191,6 +198,5 @@ export default function ServicesListPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
   );
 }

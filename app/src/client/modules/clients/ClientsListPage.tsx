@@ -19,6 +19,14 @@ import { useSalonContext } from '../../hooks/useSalonContext';
 import { Link } from 'wasp/client/router';
 
 export default function ClientsListPage() {
+  return (
+    <DashboardLayout>
+      <ClientsListContent />
+    </DashboardLayout>
+  );
+}
+
+function ClientsListContent() {
   const { activeSalonId } = useSalonContext();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -33,7 +41,6 @@ export default function ClientsListPage() {
   });
 
   return (
-    <DashboardLayout>
       <div className='space-y-6'>
         {/* Header */}
         <div className='flex items-center justify-between'>
@@ -166,6 +173,5 @@ export default function ClientsListPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
   );
 }

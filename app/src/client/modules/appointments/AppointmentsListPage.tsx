@@ -26,6 +26,14 @@ const statusColors: Record<string, 'default' | 'secondary' | 'success' | 'warnin
 };
 
 export default function AppointmentsListPage() {
+  return (
+    <DashboardLayout>
+      <AppointmentsListContent />
+    </DashboardLayout>
+  );
+}
+
+function AppointmentsListContent() {
   const { activeSalonId } = useSalonContext();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -56,7 +64,6 @@ export default function AppointmentsListPage() {
   };
 
   return (
-    <DashboardLayout>
       <div className='space-y-6'>
         {/* Header */}
         <div className='flex items-center justify-between'>
@@ -231,6 +238,5 @@ export default function AppointmentsListPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
   );
 }
