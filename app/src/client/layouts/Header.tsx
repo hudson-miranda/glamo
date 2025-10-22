@@ -1,6 +1,7 @@
 import { useAuth } from 'wasp/client/auth';
 import { logout } from 'wasp/client/auth';
-import { Bell, ChevronDown, Building2, LogOut, User } from 'lucide-react';
+import { useQuery, getUserSalons, switchActiveSalon } from 'wasp/client/operations';
+import { Bell, ChevronDown, Building2, LogOut, User, Plus } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,10 +15,17 @@ import { Avatar, AvatarFallback } from '../../components/ui/avatar';
 import { useSalonContext } from '../hooks/useSalonContext';
 import { Link } from 'wasp/client/router';
 import DarkModeSwitcher from '../components/DarkModeSwitcher';
+import { useToast } from '../hooks/useToast';
+import { useState } from 'react';
 
 export function Header() {
   const { data: user } = useAuth();
-  const { activeSalonId, userSalons } = useSalonContext();
+  const { activeSalonId, setActiveSalonId, setUserSalons } = useSalonContext();
+  const { toast } = useToast();
+  const [isSwitching, setIsSwitching] = useState(false);
+  
+  // Fetch user's salons
+  const { data: salons = [], isLoading } = useQuery(getUserSalons);
 
   const initials = user?.email
     ? user.email
@@ -26,37 +34,87 @@ export function Header() {
         .toUpperCase()
     : 'U';
 
+  // Find active salon name
+  const activeSalon = salons.find(s => s.isActive);
+  const activeSalonName = activeSalon?.name || 'Select Salon';
+
+  // Handle salon switch
+  const handleSalonSwitch = async (salonId: string) => {
+    if (salonId === activeSalonId) return;
+    
+    setIsSwitching(true);
+    try {
+      await switchActiveSalon({ salonId });
+      setActiveSalonId(salonId);
+      toast({
+        title: 'Salon switched',
+        description: 'Your active salon has been updated',
+      });
+      // Reload page to refresh all queries with new salon context
+      window.location.reload();
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: error.message || 'Failed to switch salon',
+      });
+    } finally {
+      setIsSwitching(false);
+    }
+  };
+
   return (
     <header className='flex h-16 items-center justify-between border-b bg-background px-6'>
       <div className='flex items-center space-x-4'>
         {/* Salon Switcher */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant='outline' className='min-w-[200px] justify-between'>
+            <Button 
+              variant='outline' 
+              className='min-w-[200px] justify-between'
+              disabled={isSwitching || isLoading}
+            >
               <div className='flex items-center space-x-2'>
                 <Building2 className='h-4 w-4' />
                 <span className='text-sm'>
-                  {activeSalonId ? 'Salon Name' : 'Select Salon'}
+                  {isSwitching ? 'Switching...' : activeSalonName}
                 </span>
               </div>
               <ChevronDown className='h-4 w-4 opacity-50' />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align='start' className='w-[200px]'>
+          <DropdownMenuContent align='start' className='w-[220px]'>
             <DropdownMenuLabel>Your Salons</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {userSalons.length > 0 ? (
-              userSalons.map((salon) => (
-                <DropdownMenuItem key={salon.id}>
-                  <Building2 className='mr-2 h-4 w-4' />
-                  <span>{salon.name}</span>
+            {salons.length > 0 ? (
+              <>
+                {salons.map((salon) => (
+                  <DropdownMenuItem 
+                    key={salon.id}
+                    onClick={() => handleSalonSwitch(salon.id)}
+                    className={salon.isActive ? 'bg-accent' : ''}
+                  >
+                    <Building2 className='mr-2 h-4 w-4' />
+                    <span>{salon.name}</span>
+                    {salon.isActive && (
+                      <span className='ml-auto text-xs text-primary'>Active</span>
+                    )}
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to='/onboarding/create-salon' className='flex items-center'>
+                    <Plus className='mr-2 h-4 w-4' />
+                    <span>Create New Salon</span>
+                  </Link>
                 </DropdownMenuItem>
-              ))
+              </>
             ) : (
-              <DropdownMenuItem disabled>
-                <span className='text-sm text-muted-foreground'>
-                  No salons available
-                </span>
+              <DropdownMenuItem asChild>
+                <Link to='/onboarding/create-salon' className='flex items-center'>
+                  <Plus className='mr-2 h-4 w-4' />
+                  <span>Create Your First Salon</span>
+                </Link>
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>
