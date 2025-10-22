@@ -13,7 +13,7 @@ import { Button } from '../../components/ui/button';
 import { Avatar, AvatarFallback } from '../../components/ui/avatar';
 import { useSalonContext } from '../hooks/useSalonContext';
 import { Link } from 'wasp/client/router';
-import { DarkModeSwitcher } from '../components/DarkModeSwitcher';
+import DarkModeSwitcher from '../components/DarkModeSwitcher';
 
 export function Header() {
   const { data: user } = useAuth();

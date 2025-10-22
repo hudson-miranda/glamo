@@ -1,4 +1,5 @@
 import { HttpError } from 'wasp/server';
+import { Prisma } from '@prisma/client';
 import type { 
   ListServices, 
   GetService, 
@@ -316,7 +317,7 @@ export const createService: CreateService<CreateServiceInput, any> = async (
       entity: 'Service',
       entityId: service.id,
       action: 'CREATE',
-      before: null,
+      before: Prisma.DbNull,
       after: {
         name: service.name,
         duration: service.duration,
@@ -624,7 +625,7 @@ export const createServiceVariant: CreateServiceVariant<CreateServiceVariantInpu
       entity: 'ServiceVariant',
       entityId: variant.id,
       action: 'CREATE',
-      before: null,
+      before: Prisma.DbNull,
       after: {
         serviceId,
         name: variant.name,
@@ -911,7 +912,7 @@ export const manageCommissionConfig: ManageCommissionConfig<ManageCommissionConf
         soloValue: service.commissionConfig.soloValue,
         withAssistantValue: service.commissionConfig.withAssistantValue,
         asAssistantValue: service.commissionConfig.asAssistantValue,
-      } : null,
+      } : Prisma.DbNull,
       after: {
         soloValue: commissionConfig.soloValue,
         withAssistantValue: commissionConfig.withAssistantValue,
@@ -922,3 +923,4 @@ export const manageCommissionConfig: ManageCommissionConfig<ManageCommissionConf
 
   return commissionConfig;
 };
+

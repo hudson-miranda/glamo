@@ -34,6 +34,7 @@ function generateMockUserData(): MockUserData {
     email: faker.internet.email({ firstName, lastName }),
     username: faker.internet.userName({ firstName, lastName }),
     createdAt,
+    updatedAt: createdAt,
     isAdmin: false,
     credits,
     subscriptionStatus,
@@ -41,5 +42,20 @@ function generateMockUserData(): MockUserData {
     paymentProcessorUserId: hasUserPaidOnStripe ? `cus_test_${faker.string.uuid()}` : null,
     datePaid: hasUserPaidOnStripe ? faker.date.between({ from: createdAt, to: timePaid }) : null,
     subscriptionPlan: subscriptionStatus ? faker.helpers.arrayElement(getSubscriptionPaymentPlanIds()) : null,
+    // Glamo-specific fields
+    name: faker.person.fullName({ firstName, lastName }),
+    phone: faker.phone.number(),
+    phone2: null,
+    phoneType: 'MOBILE',
+    phoneType2: null,
+    address: faker.location.streetAddress(),
+    addressNumber: faker.location.buildingNumber(),
+    complement: null,
+    city: faker.location.city(),
+    state: faker.location.state(),
+    zipCode: faker.location.zipCode(),
+    birthDate: faker.date.birthdate(),
+    activeSalonId: null,
+    deletedAt: null,
   };
 }

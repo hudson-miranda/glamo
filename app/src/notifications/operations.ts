@@ -1,4 +1,5 @@
 import { HttpError } from 'wasp/server';
+import { Prisma } from '@prisma/client';
 import type { 
   ListNotifications, 
   CreateNotification, 
@@ -175,7 +176,7 @@ export const createNotification: CreateNotification<CreateNotificationInput, any
       entity: 'Notification',
       entityId: notification.id,
       action: 'CREATE',
-      before: null,
+      before: Prisma.DbNull,
       after: {
         userId,
         title,
@@ -272,7 +273,7 @@ export const markAllNotificationsRead: MarkAllNotificationsRead<
       entity: 'Notification',
       entityId: salonId, // Use salonId as the entity ID for bulk operations
       action: 'MARK_ALL_READ',
-      before: null,
+      before: Prisma.DbNull,
       after: { count: result.count },
     },
   });
@@ -341,7 +342,7 @@ export async function createSystemNotification(
       entity: 'Notification',
       entityId: notification.id,
       action: 'CREATE_SYSTEM',
-      before: null,
+      before: Prisma.DbNull,
       after: {
         userId,
         title,
@@ -354,3 +355,4 @@ export async function createSystemNotification(
 
   return notification;
 }
+

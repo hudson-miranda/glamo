@@ -1,4 +1,5 @@
 import { HttpError } from 'wasp/server';
+import { Prisma } from '@prisma/client';
 import type { 
   ListCashSessions,
   GetCashSession,
@@ -8,7 +9,7 @@ import type {
   GetDailyCashReport
 } from 'wasp/server/operations';
 import { requirePermission } from '../rbac/requirePermission';
-import { calculateReconciliation } from './reconciliation';
+import { calculateReconciliation, ReconciliationResult } from './reconciliation';
 
 // ============================================================================
 // Types
@@ -133,7 +134,7 @@ export const listCashSessions: ListCashSessions<ListCashSessionsInput, ListCashS
       entity: 'CashRegisterSession',
       entityId: salonId,
       action: 'LIST',
-      before: null,
+      before: Prisma.DbNull,
       after: { filters: { startDate, endDate, userId, reconciled } },
     },
   });
@@ -198,7 +199,7 @@ export const getCashSession: GetCashSession<GetCashSessionInput, any> = async (
   }
 
   // Calculate reconciliation details if session is closed
-  let reconciliation = null;
+  let reconciliation: ReconciliationResult | null = null;
   if (session.closedAt && session.closingBalance !== null) {
     reconciliation = await calculateReconciliation(sessionId, context);
   }
@@ -210,8 +211,8 @@ export const getCashSession: GetCashSession<GetCashSessionInput, any> = async (
       entity: 'CashRegisterSession',
       entityId: sessionId,
       action: 'VIEW',
-      before: null,
-      after: null,
+      before: Prisma.DbNull,
+      after: Prisma.DbNull,
     },
   });
 
@@ -279,7 +280,7 @@ export const getDailyCashReport: GetDailyCashReport<GetDailyCashReportInput, any
       },
     },
     include: {
-      paymentMethod: true,
+      method: true,
       sale: {
         select: {
           id: true,
@@ -310,7 +311,7 @@ export const getDailyCashReport: GetDailyCashReport<GetDailyCashReportInput, any
   const paymentsByMethod: { [key: string]: { name: string; total: number; count: number } } = {};
   
   payments.forEach(payment => {
-    const methodName = payment.paymentMethod.name;
+    const methodName = payment.method.name;
     if (!paymentsByMethod[methodName]) {
       paymentsByMethod[methodName] = {
         name: methodName,
@@ -397,7 +398,7 @@ export const openCashSession: OpenCashSession<OpenCashSessionInput, any> = async
       entity: 'CashRegisterSession',
       entityId: session.id,
       action: 'OPEN',
-      before: null,
+      before: Prisma.DbNull,
       after: { openingBalance },
     },
   });
@@ -573,10 +574,11 @@ export const addCashMovement: AddCashMovement<AddCashMovementInput, any> = async
       entity: 'CashMovement',
       entityId: movement.id,
       action: 'CREATE',
-      before: null,
+      before: Prisma.DbNull,
       after: { sessionId, type, amount, notes },
     },
   });
 
   return movement;
 };
+

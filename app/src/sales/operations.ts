@@ -1,4 +1,5 @@
 import { HttpError } from 'wasp/server';
+import { Prisma } from '@prisma/client';
 import type { 
   ListSales,
   GetSale,
@@ -189,7 +190,9 @@ export const listSales: ListSales<ListSalesInput, ListSalesOutput> = async (
           select: {
             id: true,
             code: true,
-            discount: true,
+            discountValue: true,
+            discountPercentage: true,
+            discountType: true,
           },
         },
         saleServices: {
@@ -232,7 +235,7 @@ export const listSales: ListSales<ListSalesInput, ListSalesOutput> = async (
           select: {
             id: true,
             amount: true,
-            paymentStatus: true,
+            status: true,
           },
         },
       },
@@ -250,7 +253,7 @@ export const listSales: ListSales<ListSalesInput, ListSalesOutput> = async (
       entity: 'Sale',
       entityId: salonId,
       action: 'LIST',
-      before: null,
+      before: Prisma.DbNull,
       after: { filters: { startDate, endDate, clientId, employeeId, status } },
     },
   });
@@ -325,10 +328,10 @@ export const getSale: GetSale<GetSaleInput, any> = async (
       },
       payments: {
         include: {
-          paymentMethod: true,
+          method: true,
           creditPayments: {
             include: {
-              clientCredit: true,
+              credit: true,
             },
           },
         },
@@ -351,8 +354,8 @@ export const getSale: GetSale<GetSaleInput, any> = async (
       entity: 'Sale',
       entityId: saleId,
       action: 'VIEW',
-      before: null,
-      after: null,
+      before: Prisma.DbNull,
+      after: Prisma.DbNull,
     },
   });
 
@@ -396,7 +399,7 @@ export const listClientCredits: ListClientCredits<ListClientCreditsInput, any> =
       creditPayments: {
         select: {
           id: true,
-          amount: true,
+          amountUsed: true,
           payment: {
             select: {
               id: true,
@@ -411,7 +414,7 @@ export const listClientCredits: ListClientCredits<ListClientCreditsInput, any> =
 
   // Calculate balance for each credit
   const creditsWithBalance = credits.map(credit => {
-    const usedAmount = credit.creditPayments.reduce((sum, cp) => sum + cp.amount, 0);
+    const usedAmount = credit.creditPayments.reduce((sum, cp) => sum + cp.amountUsed, 0);
     const balance = credit.amount - usedAmount;
     return {
       ...credit,
@@ -483,19 +486,19 @@ export const createSale: CreateSale<CreateSaleInput, any> = async (
       where: { id: voucherId },
     });
 
-    if (!voucher || voucher.salonId !== salonId) {
+    if (!voucher) {
       throw new HttpError(400, 'Voucher not found');
     }
 
-    if (voucher.expiresAt && voucher.expiresAt < new Date()) {
+    if (voucher.expirationDate && voucher.expirationDate < new Date()) {
       throw new HttpError(400, 'Voucher has expired');
     }
 
-    if (voucher.usageLimit && voucher.usageCount >= voucher.usageLimit) {
+    if (voucher.usageLimit && voucher.usedCount >= voucher.usageLimit) {
       throw new HttpError(400, 'Voucher usage limit reached');
     }
 
-    voucherDiscount = voucher.discount;
+    voucherDiscount = voucher.discountValue || 0;
   }
 
   // Calculate totals
@@ -503,7 +506,7 @@ export const createSale: CreateSale<CreateSaleInput, any> = async (
   let discountTotal = voucherDiscount;
 
   // Prepare sale services
-  const saleServicesData = [];
+  const saleServicesData: any[] = [];
   for (const item of services) {
     const service = await context.entities.Service.findUnique({
       where: { id: item.serviceId },
@@ -542,7 +545,7 @@ export const createSale: CreateSale<CreateSaleInput, any> = async (
   }
 
   // Prepare sale products
-  const saleProductsData = [];
+  const saleProductsData: any[] = [];
   for (const item of products) {
     const product = await context.entities.Product.findUnique({
       where: { id: item.productId },
@@ -574,7 +577,7 @@ export const createSale: CreateSale<CreateSaleInput, any> = async (
   }
 
   // Prepare sale packages
-  const salePackagesData = [];
+  const salePackagesData: any[] = [];
   for (const item of packages) {
     const pkg = await context.entities.Package.findUnique({
       where: { id: item.packageId },
@@ -584,7 +587,7 @@ export const createSale: CreateSale<CreateSaleInput, any> = async (
       throw new HttpError(400, `Package ${item.packageId} not found`);
     }
 
-    const originalPrice = pkg.price;
+    const originalPrice = pkg.totalPrice;
     const discount = item.discount || 0;
     const finalPrice = originalPrice - discount;
 
@@ -635,7 +638,7 @@ export const createSale: CreateSale<CreateSaleInput, any> = async (
     await context.entities.Voucher.update({
       where: { id: voucherId },
       data: {
-        usageCount: { increment: 1 },
+        usedCount: { increment: 1 },
       },
     });
   }
@@ -647,7 +650,7 @@ export const createSale: CreateSale<CreateSaleInput, any> = async (
       entity: 'Sale',
       entityId: sale.id,
       action: 'CREATE',
-      before: null,
+      before: Prisma.DbNull,
       after: {
         salonId,
         clientId,
@@ -789,14 +792,14 @@ export const closeSale: CloseSale<CloseSaleInput, any> = async (
   }
 
   // Process payments in a transaction
-  const paymentRecords = [];
+  const paymentRecords: any[] = [];
   for (const payment of payments) {
     // Validate payment method
     const paymentMethod = await context.entities.PaymentMethod.findUnique({
       where: { id: payment.paymentMethodId },
     });
 
-    if (!paymentMethod || paymentMethod.salonId !== salonId) {
+    if (!paymentMethod) {
       throw new HttpError(400, `Payment method ${payment.paymentMethodId} not found`);
     }
 
@@ -804,10 +807,10 @@ export const closeSale: CloseSale<CloseSaleInput, any> = async (
     const paymentRecord = await context.entities.Payment.create({
       data: {
         saleId: sale.id,
-        paymentMethodId: payment.paymentMethodId,
+        methodId: payment.paymentMethodId,
         userId: context.user.id,
         amount: payment.amount,
-        paymentStatus: 'APPROVED',
+        status: 'PAID',
       },
     });
 
@@ -830,7 +833,7 @@ export const closeSale: CloseSale<CloseSaleInput, any> = async (
       for (const credit of clientCredits) {
         if (remainingCreditToUse <= 0) break;
 
-        const usedAmount = credit.creditPayments.reduce((sum, cp) => sum + cp.amount, 0);
+        const usedAmount = credit.creditPayments.reduce((sum, cp) => sum + cp.amountUsed, 0);
         const availableBalance = credit.amount - usedAmount;
 
         if (availableBalance > 0) {
@@ -839,8 +842,8 @@ export const closeSale: CloseSale<CloseSaleInput, any> = async (
           await context.entities.CreditPayment.create({
             data: {
               paymentId: paymentRecord.id,
-              clientCreditId: credit.id,
-              amount: amountToUse,
+              creditId: credit.id,
+              amountUsed: amountToUse,
             },
           });
 
@@ -886,7 +889,7 @@ export const closeSale: CloseSale<CloseSaleInput, any> = async (
   const closedSale = await context.entities.Sale.update({
     where: { id: saleId },
     data: {
-      status: 'CLOSED',
+      status: 'PAID',
       updatedByUserId: context.user.id,
     },
     include: {
@@ -949,8 +952,8 @@ export const cancelSale: CancelSale<CancelSaleInput, any> = async (
     throw new HttpError(400, 'Sale is already cancelled');
   }
 
-  // Reverse stock movements if sale was closed
-  if (sale.status === 'CLOSED') {
+  // Reverse stock movements if sale was paid
+  if (sale.status === 'PAID') {
     for (const saleProduct of sale.saleProducts) {
       const product = saleProduct.product;
       
@@ -1032,7 +1035,7 @@ export const addClientCredit: AddClientCredit<AddClientCreditInput, any> = async
       where: { id: paymentMethodId },
     });
 
-    if (!paymentMethod || paymentMethod.salonId !== salonId) {
+    if (!paymentMethod) {
       throw new HttpError(400, 'Payment method not found');
     }
   }
@@ -1042,9 +1045,10 @@ export const addClientCredit: AddClientCredit<AddClientCreditInput, any> = async
     data: {
       clientId,
       professionalId: context.user.id,
+      salonId: context.user.activeSalonId!,
       amount,
       origin,
-      paymentMethodId,
+      paymentMethod: paymentMethodId,
       notes,
     },
     include: {
@@ -1070,10 +1074,11 @@ export const addClientCredit: AddClientCredit<AddClientCreditInput, any> = async
       entity: 'ClientCredit',
       entityId: credit.id,
       action: 'CREATE',
-      before: null,
+      before: Prisma.DbNull,
       after: { clientId, amount, origin },
     },
   });
 
   return credit;
 };
+

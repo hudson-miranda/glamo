@@ -1,4 +1,5 @@
 import { HttpError } from 'wasp/server';
+import { Prisma } from '@prisma/client';
 import type {
   ListAppointments,
   GetAppointment,
@@ -486,7 +487,7 @@ export const createAppointment: CreateAppointment<CreateAppointmentInput, any> =
       entity: 'Appointment',
       entityId: appointment.id,
       action: 'CREATE',
-      before: null,
+      before: Prisma.DbNull,
       after: {
         clientId,
         professionalId,

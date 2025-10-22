@@ -124,7 +124,7 @@ export default function ClientsListPage() {
                           <Badge variant='success'>Active</Badge>
                         </TableCell>
                         <TableCell className='text-right'>
-                          <Link to={`/clients/${client.id}`}>
+                          <Link to={`/clients/${client.id}` as any}>
                             <Button variant='ghost' size='sm'>
                               View
                             </Button>
