@@ -8,6 +8,14 @@ import { useQuery, listClients, listAppointments } from 'wasp/client/operations'
 import { Link } from 'wasp/client/router';
 
 export default function DashboardPage() {
+  return (
+    <DashboardLayout>
+      <DashboardContent />
+    </DashboardLayout>
+  );
+}
+
+function DashboardContent() {
   const { activeSalonId } = useSalonContext();
 
   // Fetch real data
@@ -36,7 +44,7 @@ export default function DashboardPage() {
   );
 
   // Calculate stats
-  const totalClients = clientsData?.totalCount || 0;
+  const totalClients = clientsData?.total || 0;
   
   // Filter today's appointments
   const today = new Date();
@@ -44,7 +52,7 @@ export default function DashboardPage() {
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
   
-  const todayAppointments = appointmentsData?.data?.filter((apt: any) => {
+  const todayAppointments = appointmentsData?.appointments?.filter((apt: any) => {
     const aptDate = new Date(apt.date);
     return aptDate >= today && aptDate < tomorrow;
   }) || [];
@@ -79,7 +87,6 @@ export default function DashboardPage() {
   const isLoading = isLoadingClients || isLoadingAppointments;
 
   return (
-    <DashboardLayout>
       <div className='space-y-6'>
         <div>
           <h1 className='text-3xl font-bold tracking-tight'>Dashboard</h1>
@@ -201,6 +208,5 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
   );
 }

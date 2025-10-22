@@ -18,6 +18,14 @@ import { useSalonContext } from '../../hooks/useSalonContext';
 import { useAuth } from 'wasp/client/auth';
 
 export default function CashRegisterPage() {
+  return (
+    <DashboardLayout>
+      <CashRegisterContent />
+    </DashboardLayout>
+  );
+}
+
+function CashRegisterContent() {
   const { data: user } = useAuth();
   const { activeSalonId } = useSalonContext();
   const [page, setPage] = useState(1);
@@ -53,7 +61,6 @@ export default function CashRegisterPage() {
   );
 
   return (
-    <DashboardLayout>
       <div className='space-y-6'>
         {/* Header */}
         <div className='flex items-center justify-between'>
@@ -234,6 +241,5 @@ export default function CashRegisterPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
   );
 }

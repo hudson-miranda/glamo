@@ -12,10 +12,17 @@ import {
 import { useSalonContext } from '../../hooks/useSalonContext';
 
 export default function ReportsPage() {
+  return (
+    <DashboardLayout>
+      <ReportsContent />
+    </DashboardLayout>
+  );
+}
+
+function ReportsContent() {
   const { activeSalonId } = useSalonContext();
 
   return (
-    <DashboardLayout>
       <div className='space-y-6'>
         {/* Header */}
         <div className='flex items-center justify-between'>
@@ -155,6 +162,5 @@ export default function ReportsPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
   );
 }

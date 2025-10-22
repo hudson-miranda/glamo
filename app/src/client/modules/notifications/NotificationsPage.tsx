@@ -11,6 +11,14 @@ import { useSalonContext } from '../../hooks/useSalonContext';
 import { toast } from '../../hooks/useToast';
 
 export default function NotificationsPage() {
+  return (
+    <DashboardLayout>
+      <NotificationsContent />
+    </DashboardLayout>
+  );
+}
+
+function NotificationsContent() {
   const { data: user } = useAuth();
   const { activeSalonId } = useSalonContext();
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
@@ -64,7 +72,6 @@ export default function NotificationsPage() {
       : notifications;
 
   return (
-    <DashboardLayout>
       <div className='space-y-6'>
         {/* Header */}
         <div className='flex items-center justify-between'>
@@ -169,6 +176,5 @@ export default function NotificationsPage() {
           )}
         </div>
       </div>
-    </DashboardLayout>
   );
 }

@@ -23,6 +23,14 @@ const statusColors: Record<string, 'default' | 'secondary' | 'success' | 'warnin
 };
 
 export default function SalesListPage() {
+  return (
+    <DashboardLayout>
+      <SalesListContent />
+    </DashboardLayout>
+  );
+}
+
+function SalesListContent() {
   const { activeSalonId } = useSalonContext();
   const [page, setPage] = useState(1);
 
@@ -52,7 +60,6 @@ export default function SalesListPage() {
   };
 
   return (
-    <DashboardLayout>
       <div className='space-y-6'>
         {/* Header */}
         <div className='flex items-center justify-between'>
@@ -181,6 +188,5 @@ export default function SalesListPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
   );
 }
