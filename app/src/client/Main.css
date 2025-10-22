@@ -115,16 +115,16 @@
     --card-subtle-foreground: 0 0% 9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-    --primary: 210 100% 13%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 44 100% 62%;
+    --primary-foreground: 0 0% 0%;
     --secondary: 32 100% 37%;
     --secondary-foreground: 0 0% 9%;
     --secondary-muted: 32 75% 78%;
     --secondary-muted-foreground: 0 0% 3.9%;
     --muted: 0 0% 96.1%;
     --muted-foreground: 0 0% 45.1%;
-    --accent: 33 74% 62%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 44 100% 62%;
+    --accent-foreground: 0 0% 0%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --success: 141 71% 48%;
@@ -133,46 +133,49 @@
     --warning-foreground: 0 0% 98%;
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
+    --ring: 44 100% 62%;
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 210 50% 5%;
+    --background: 0 0% 7%;
     --foreground: 0 0% 98%;
-    --card: 210 50% 5%;
+    --card: 0 0% 10%;
     --card-foreground: 0 0% 98%;
     --card-accent: 31 57% 93%;
     --card-accent-foreground: 0 0% 3.9%;
-    --card-subtle: 233 24% 15%;
+    --card-subtle: 0 0% 12%;
     --card-subtle-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
+    --popover: 0 0% 10%;
     --popover-foreground: 0 0% 98%;
-    --primary: 31 57% 93%;
-    --primary-foreground: 0 0% 9%;
+    --primary: 44 100% 62%;
+    --primary-foreground: 0 0% 0%;
     --secondary: 209 91% 61%;
     --secondary-foreground: 0 0% 98%;
     --secondary-muted: 210 67% 94%;
     --secondary-muted-foreground: 0 0% 3.9%;
-    --muted: 210 100% 13%;
+    --muted: 0 0% 15%;
     --muted-foreground: 0 0% 63.9%;
-    --accent: 31 57% 93%;
-    --accent-foreground: 210 100% 13%;
+    --accent: 44 100% 62%;
+    --accent-foreground: 0 0% 0%;
     --destructive: 0 62.8% 63%;
     --destructive-foreground: 0 0% 98%;
     --success: 141 71% 48%;
     --success-foreground: 0 0% 98%;
     --warning: 36 100% 50%;
     --warning-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 44 100% 62%;
   }
 }
 
 @layer base {
   * {
     @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth;
   }
   body {
     @apply bg-background text-foreground;

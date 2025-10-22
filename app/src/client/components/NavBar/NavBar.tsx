@@ -60,12 +60,12 @@ export default function NavBar({ navigationItems }: { navigationItems: Navigatio
               >
                 <NavLogo isScrolled={isScrolled} />
                 <span
-                  className={cn('font-semibold leading-6 text-foreground transition-all duration-300', {
-                    'ml-2 text-sm': !isScrolled,
-                    'ml-2 text-xs': isScrolled,
+                  className={cn('font-bold leading-6 bg-gradient-to-r from-[#F5C542] to-yellow-500 bg-clip-text text-transparent transition-all duration-300', {
+                    'ml-2 text-xl': !isScrolled,
+                    'ml-2 text-lg': isScrolled,
                   })}
                 >
-                  Your SaaS
+                  Glamo
                 </span>
               </WaspRouterLink>
 
