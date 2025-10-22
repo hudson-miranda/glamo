@@ -1,4 +1,5 @@
-import { Link } from 'wasp/client/router';
+import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from 'wasp/client/auth';
 import {
   Home,
@@ -11,9 +12,12 @@ import {
   CreditCard,
   BarChart3,
   Settings,
+  ChevronLeft,
+  ChevronRight,
   LucideIcon,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { Button } from '../../components/ui/button';
 
 interface NavItem {
   title: string;
@@ -79,48 +83,102 @@ const navItems: NavItem[] = [
 
 export function Sidebar({ className }: { className?: string }) {
   const { data: user } = useAuth();
+  const location = useLocation();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   // TODO: Filter navigation items based on user permissions
   const visibleNavItems = navItems;
 
+  const isActive = (href: string) => {
+    return location.pathname === href || location.pathname.startsWith(href + '/');
+  };
+
   return (
     <div
       className={cn(
-        'flex h-full w-64 flex-col bg-card border-r',
+        'flex h-full flex-col bg-card border-r transition-all duration-300',
+        isCollapsed ? 'w-16' : 'w-64',
         className
       )}
     >
-      <div className='flex h-16 items-center border-b px-6'>
-        <Link to='/dashboard' className='flex items-center space-x-2'>
+      {/* Header */}
+      <div className='flex h-16 items-center justify-between border-b px-4'>
+        <Link 
+          to='/dashboard' 
+          className={cn(
+            'flex items-center space-x-2 transition-opacity',
+            isCollapsed && 'opacity-0 pointer-events-none'
+          )}
+        >
           <Scissors className='h-6 w-6 text-primary' />
           <span className='text-xl font-bold'>Glamo</span>
         </Link>
+        
+        {isCollapsed && (
+          <Link to='/dashboard' className='flex items-center justify-center w-full'>
+            <Scissors className='h-6 w-6 text-primary' />
+          </Link>
+        )}
       </div>
 
-      <nav className='flex-1 space-y-1 px-3 py-4'>
+      {/* Navigation */}
+      <nav className='flex-1 space-y-1 px-2 py-4'>
         {visibleNavItems.map((item) => {
           const Icon = item.icon;
+          const active = isActive(item.href);
+          
           return (
             <Link
               key={item.href}
               to={item.href as any}
-              className='flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground'
+              className={cn(
+                'flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200',
+                isCollapsed ? 'justify-center' : 'space-x-3',
+                active
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+              )}
+              title={isCollapsed ? item.title : undefined}
             >
-              <Icon className='h-5 w-5' />
-              <span>{item.title}</span>
+              <Icon className='h-5 w-5 flex-shrink-0' />
+              {!isCollapsed && <span>{item.title}</span>}
             </Link>
           );
         })}
       </nav>
 
-      <div className='border-t p-4'>
+      {/* Footer */}
+      <div className='border-t p-2 space-y-2'>
         <Link
           to='/account'
-          className='flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground'
+          className={cn(
+            'flex items-center rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground',
+            isCollapsed ? 'justify-center' : 'space-x-3'
+          )}
+          title={isCollapsed ? 'Settings' : undefined}
         >
-          <Settings className='h-5 w-5' />
-          <span>Settings</span>
+          <Settings className='h-5 w-5 flex-shrink-0' />
+          {!isCollapsed && <span>Settings</span>}
         </Link>
+        
+        <Button
+          variant='ghost'
+          size='sm'
+          className={cn(
+            'w-full',
+            isCollapsed ? 'px-0' : ''
+          )}
+          onClick={() => setIsCollapsed(!isCollapsed)}
+        >
+          {isCollapsed ? (
+            <ChevronRight className='h-4 w-4' />
+          ) : (
+            <>
+              <ChevronLeft className='mr-2 h-4 w-4' />
+              Collapse
+            </>
+          )}
+        </Button>
       </div>
     </div>
   );
