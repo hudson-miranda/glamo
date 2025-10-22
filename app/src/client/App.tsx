@@ -6,6 +6,7 @@ import NavBar from './components/NavBar/NavBar';
 import { demoNavigationitems, marketingNavigationItems } from './components/NavBar/constants';
 import CookieConsentBanner from './components/cookie-consent/Banner';
 import { ErrorBoundary } from './providers/ErrorBoundary';
+import { Toaster } from '../components/ui/toaster';
 
 /**
  * use this component to wrap all child components
@@ -66,6 +67,7 @@ export default function App() {
         )}
       </div>
       <CookieConsentBanner />
+      <Toaster />
     </ErrorBoundary>
   );
 }
