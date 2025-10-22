@@ -1,54 +1,125 @@
+import { motion } from 'framer-motion';
 import { Link as WaspRouterLink, routes } from 'wasp/client/router';
-import openSaasBannerDark from '../../client/static/open-saas-banner-dark.png';
-import openSaasBannerLight from '../../client/static/open-saas-banner-light.png';
 import { Button } from '../../components/ui/button';
 
 export default function Hero() {
   return (
-    <div className='relative pt-14 w-full'>
+    <div className='relative pt-20 w-full min-h-screen flex items-center'>
       <TopGradient />
       <BottomGradient />
-      <div className='md:p-24'>
-        <div className='mx-auto max-w-8xl px-6 lg:px-8'>
-          <div className='lg:mb-18 mx-auto max-w-3xl text-center'>
-            <h1 className='text-5xl font-bold text-foreground sm:text-6xl'>
-              Some <span className='italic'>cool</span> words about{' '}
-              <span className='text-gradient-primary'>your product</span>
-            </h1>
-            <p className='mt-6 mx-auto max-w-2xl text-lg leading-8 text-muted-foreground'>
-              With some more exciting words about your product!
-            </p>
-            <div className='mt-10 flex items-center justify-center gap-x-6'>
-              <Button size='lg' variant='outline' asChild>
-                <WaspRouterLink to={routes.PricingPageRoute.to}>Learn More</WaspRouterLink>
-              </Button>
-              <Button size='lg' variant='default' asChild>
+      <div className='w-full'>
+        <div className='mx-auto max-w-7xl px-6 lg:px-8'>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className='lg:mb-18 mx-auto max-w-4xl text-center'
+          >
+            {/* Logo Animation */}
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className='mb-8'
+            >
+              <div className='inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20'>
+                <span className='text-2xl'>✨</span>
+                <span className='text-sm font-medium text-primary'>Sistema de Gestão Inteligente</span>
+              </div>
+            </motion.div>
+
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className='text-5xl font-bold text-foreground sm:text-7xl mb-6'
+            >
+              Transforme seu salão com{' '}
+              <span className='bg-gradient-to-r from-[#F5C542] via-yellow-500 to-[#F5C542] bg-clip-text text-transparent'>
+                Glamo
+              </span>
+            </motion.h1>
+            
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className='mt-6 mx-auto max-w-2xl text-xl leading-8 text-muted-foreground'
+            >
+              Gestão completa, automação inteligente e controle financeiro em tempo real. 
+              Tudo que você precisa para elevar seu negócio a outro nível.
+            </motion.p>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className='mt-10 flex flex-col sm:flex-row items-center justify-center gap-4'
+            >
+              <Button 
+                size='lg' 
+                className='w-full sm:w-auto bg-gradient-to-r from-[#F5C542] to-yellow-500 hover:from-yellow-500 hover:to-[#F5C542] text-black font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl'
+                asChild
+              >
                 <WaspRouterLink to={routes.SignupRoute.to}>
-                  Get Started <span aria-hidden='true'>→</span>
+                  Comece Agora Grátis <span aria-hidden='true'>→</span>
                 </WaspRouterLink>
               </Button>
+              <Button 
+                size='lg' 
+                variant='outline' 
+                className='w-full sm:w-auto border-2 hover:bg-muted/20 transition-all duration-300'
+                asChild
+              >
+                <WaspRouterLink to='#demo'>Ver Demonstração</WaspRouterLink>
+              </Button>
+            </motion.div>
+
+            {/* Trust indicators */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className='mt-12 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground'
+            >
+              <div className='flex items-center gap-2'>
+                <span className='text-[#F5C542]'>✓</span>
+                <span>Sem cartão de crédito</span>
+              </div>
+              <div className='flex items-center gap-2'>
+                <span className='text-[#F5C542]'>✓</span>
+                <span>14 dias grátis</span>
+              </div>
+              <div className='flex items-center gap-2'>
+                <span className='text-[#F5C542]'>✓</span>
+                <span>Cancele quando quiser</span>
+              </div>
+            </motion.div>
+          </motion.div>
+
+          {/* Animated Dashboard Preview */}
+          <motion.div 
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className='mt-20 relative'
+          >
+            <div className='relative mx-auto max-w-5xl'>
+              {/* Glow effect */}
+              <div className='absolute inset-0 bg-gradient-to-r from-[#F5C542]/20 via-yellow-500/20 to-[#F5C542]/20 blur-3xl -z-10' />
+              
+              {/* Dashboard mockup placeholder */}
+              <div className='rounded-2xl bg-card border border-border shadow-2xl overflow-hidden'>
+                <div className='aspect-video bg-gradient-to-br from-muted/30 to-muted/10 flex items-center justify-center'>
+                  <div className='text-center p-8'>
+                    <div className='text-6xl mb-4'>💼</div>
+                    <p className='text-muted-foreground'>Dashboard do Glamo</p>
+                    <p className='text-sm text-muted-foreground mt-2'>Interface intuitiva e moderna</p>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className='mt-14 flow-root sm:mt-14'>
-            <div className='hidden md:flex m-2 justify-center rounded-xl lg:-m-4 lg:rounded-2xl lg:p-4'>
-              <img
-                src={openSaasBannerLight}
-                alt='App screenshot'
-                width={1000}
-                height={530}
-                loading='lazy'
-                className='rounded-md shadow-2xl ring-1 ring-gray-900/10 dark:hidden'
-              />
-              <img
-                src={openSaasBannerDark}
-                alt='App screenshot'
-                width={1000}
-                height={530}
-                loading='lazy'
-                className='rounded-md shadow-2xl ring-1 ring-gray-900/10 hidden dark:block'
-              />
-            </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>
