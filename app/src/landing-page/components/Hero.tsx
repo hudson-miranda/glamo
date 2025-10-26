@@ -71,7 +71,7 @@ export default function Hero() {
                 className='w-full sm:w-auto border-2 hover:bg-muted/20 transition-all duration-300'
                 asChild
               >
-                <WaspRouterLink to='#demo'>Ver Demonstração</WaspRouterLink>
+                <WaspRouterLink to='/demo-app'>Ver Demonstração</WaspRouterLink>
               </Button>
             </motion.div>
 

@@ -1,4 +1,4 @@
-const ANNOUNCEMENT_URL = 'https://github.com/wasp-lang/wasp';
+const ANNOUNCEMENT_URL = 'http://localhost:3000/signup';
 
 export function Announcement() {
   return (
@@ -9,7 +9,7 @@ export function Announcement() {
         rel='noopener noreferrer'
         className='hidden lg:block cursor-pointer hover:opacity-90 hover:drop-shadow transition-opacity'
       >
-        Support Open-Source Software!
+        Começe Agora!
       </a>
       <div className='hidden lg:block self-stretch w-0.5 bg-primary-foreground/20'></div>
       <a
@@ -18,7 +18,7 @@ export function Announcement() {
         rel='noopener noreferrer'
         className='hidden lg:block cursor-pointer rounded-full bg-background/20 px-2.5 py-1 text-xs hover:bg-background/30 transition-colors tracking-wider'
       >
-        Star Our Repo on Github ⭐️ →
+        14 Dias Grátis ⭐️ →
       </a>
       <a
         href={ANNOUNCEMENT_URL}
@@ -26,7 +26,7 @@ export function Announcement() {
         rel='noopener noreferrer'
         className='lg:hidden cursor-pointer rounded-full bg-background/20 px-2.5 py-1 text-xs hover:bg-background/30 transition-colors'
       >
-        ⭐️ Star the Our Repo and Support Open-Source! ⭐️
+        ⭐️ Começe Agora com 14 Dias Grátis! ⭐️
       </a>
     </div>
   );
