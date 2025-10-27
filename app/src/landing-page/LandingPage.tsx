@@ -1,29 +1,26 @@
-import ContactForm from './components/ContactForm';
-import FAQ from './components/FAQ';
-import FeaturesGrid from './components/FeaturesGrid';
-import Footer from './components/Footer';
+// landing-page/LandingPage.tsx
 import Hero from './components/Hero';
+import FeaturesGrid from './components/FeaturesGrid';
 import HowItWorks from './components/HowItWorks';
-import ScrollProgress from './components/ScrollProgress';
-import Testimonials from './components/Testimonials';
 import WhyDifferent from './components/WhyDifferent';
-import { faqs, features, footerNavigation, testimonials } from './contentSections';
+import Testimonials from './components/Testimonials';
+import FAQ from './components/FAQ';
+import ContactForm from './components/ContactForm';
+import Footer from './components/Footer';
+import ScrollProgress from './components/ScrollProgress';
 
 export default function LandingPage() {
   return (
-    <div className='bg-background text-foreground overflow-x-hidden'>
+    <div className="landing-page">
       <ScrollProgress />
-      <main className='isolate'>
-        <Hero />
-        <FeaturesGrid features={features} />
-        <HowItWorks />
-        <WhyDifferent />
-        <Testimonials testimonials={testimonials} />
-        <FAQ faqs={faqs} />
-        <ContactForm />
-      </main>
-      <Footer footerNavigation={footerNavigation} />
+      <Hero />
+      <FeaturesGrid />
+      <HowItWorks />
+      <WhyDifferent />
+      <Testimonials />
+      <FAQ />
+      <ContactForm />
+      <Footer />
     </div>
   );
 }
-

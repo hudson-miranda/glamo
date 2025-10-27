@@ -1,150 +1,292 @@
+// components/WhyDifferent.tsx - MELHORADO
 import { motion } from 'framer-motion';
-import { BarChart3, Brain, Clock, Sparkles } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardTitle } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
+import { useState, useEffect, useRef } from 'react';
 
-const differentials = [
+interface Differentiator {
+  title: string;
+  description: string;
+  icon: string;
+  stats: {
+    value: string;
+    label: string;
+  };
+  comparison: {
+    others: string;
+    glamo: string;
+  };
+}
+
+const differentiators: Differentiator[] = [
   {
-    icon: Brain,
-    title: 'Sistema Inteligente de Gestão',
-    description: 'IA que aprende com seu negócio e sugere melhorias automaticamente',
-    features: ['Previsão de demanda', 'Alertas inteligentes', 'Sugestões personalizadas'],
+    title: 'IA Integrada',
+    description: 'Única plataforma com inteligência artificial nativa que aprende com seu negócio',
+    icon: '🤖',
+    stats: {
+      value: '40%',
+      label: 'Mais eficiência'
+    },
+    comparison: {
+      others: 'Agendamento manual e repetitivo',
+      glamo: 'IA sugere horários, serviços e otimiza agenda automaticamente'
+    }
   },
   {
-    icon: BarChart3,
-    title: 'Análises e Relatórios Automáticos',
-    description: 'Insights em tempo real sobre seu negócio sem esforço manual',
-    features: ['Dashboards interativos', 'Relatórios customizados', 'Métricas em tempo real'],
+    title: 'Tudo-em-Um',
+    description: 'Não precisa de 5 ferramentas diferentes. Tudo integrado em uma única plataforma',
+    icon: '🎯',
+    stats: {
+      value: 'R$ 500',
+      label: 'Economia mensal'
+    },
+    comparison: {
+      others: 'Múltiplas assinaturas e integrações complexas',
+      glamo: 'Agendamento + Pagamento + CRM + Marketing em um só lugar'
+    }
   },
   {
-    icon: Clock,
-    title: 'Controle Total em Tempo Real',
-    description: 'Acompanhe caixa, estoque e equipe de qualquer lugar',
-    features: ['Sincronização instantânea', 'Multi-dispositivo', 'Notificações push'],
+    title: 'Suporte Brasileiro',
+    description: 'Equipe local que entende seu negócio e responde em minutos, não dias',
+    icon: '🇧🇷',
+    stats: {
+      value: '< 5min',
+      label: 'Tempo de resposta'
+    },
+    comparison: {
+      others: 'Suporte em inglês, tickets demorados',
+      glamo: 'WhatsApp direto, suporte em português, respostas rápidas'
+    }
   },
   {
-    icon: Sparkles,
-    title: 'Experiência Visual Premium',
-    description: 'Interface moderna e intuitiva que sua equipe vai adorar usar',
-    features: ['Design minimalista', 'Mobile-first', 'Acessibilidade total'],
-  },
+    title: 'Preço Justo',
+    description: 'Sem taxas escondidas, sem surpresas. Você cresce, nós crescemos juntos',
+    icon: '💰',
+    stats: {
+      value: '0%',
+      label: 'Taxa sobre vendas'
+    },
+    comparison: {
+      others: 'Taxas de 5-10% sobre cada venda',
+      glamo: 'Mensalidade fixa, sem taxas sobre transações'
+    }
+  }
 ];
 
 export default function WhyDifferent() {
+  const [inView, setInView] = useState(false);
+  const ref = useRef<HTMLElement>(null);
+  const [activeTab, setActiveTab] = useState(0);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className='py-24 sm:py-32 bg-muted/30' id='diferenciais'>
-      <div className='mx-auto max-w-7xl px-6 lg:px-8'>
+    <section ref={ref} className="py-24 bg-gradient-to-b from-gray-900 to-black text-white relative overflow-hidden">
+      {/* Animated background */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl opacity-20 animate-pulse" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-pink-500 rounded-full filter blur-3xl opacity-20 animate-pulse" />
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className='mx-auto max-w-2xl text-center mb-16'
+          className="text-center mb-20"
         >
-          <h2 className='text-base font-semibold leading-7 text-[#F5C542]'>Diferenciais</h2>
-          <p className='mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl'>
-            Por que o Glamo é diferente
-          </p>
-          <p className='mt-6 text-lg leading-8 text-muted-foreground'>
-            Não é apenas mais um software de gestão. É a evolução que seu salão merece.
+          <span className="inline-block px-4 py-2 bg-purple-500/20 text-purple-300 rounded-full text-sm font-semibold mb-4 border border-purple-500/30">
+            POR QUE GLAMO?
+          </span>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            Não somos mais um sistema.
+            <br />
+            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Somos seu parceiro de crescimento.
+            </span>
+          </h2>
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+            Enquanto outros oferecem ferramentas, nós oferecemos resultados
           </p>
         </motion.div>
 
-        <div className='grid grid-cols-1 gap-8 md:grid-cols-2'>
-          {differentials.map((item, index) => (
-            <motion.div
-              key={item.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <Card className='h-full border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-xl group overflow-hidden relative'>
-                <CardContent className='p-8'>
-                  {/* Icon */}
-                  <motion.div
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    transition={{ type: 'spring', stiffness: 300 }}
-                    className='inline-flex p-4 rounded-xl bg-gradient-to-br from-[#F5C542] to-yellow-500 mb-6 shadow-lg'
-                  >
-                    <item.icon className='h-8 w-8 text-white' />
-                  </motion.div>
-
-                  {/* Content */}
-                  <CardTitle className='text-xl mb-3 group-hover:text-primary transition-colors'>
-                    {item.title}
-                  </CardTitle>
-                  <CardDescription className='text-base mb-6 leading-relaxed'>
-                    {item.description}
-                  </CardDescription>
-
-                  {/* Features list */}
-                  <ul className='space-y-3'>
-                    {item.features.map((feature, idx) => (
-                      <motion.li
-                        key={feature}
-                        initial={{ opacity: 0, x: -10 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.3, delay: index * 0.1 + idx * 0.05 }}
-                        className='flex items-center gap-3 text-sm text-muted-foreground'
-                      >
-                        <div className='flex-shrink-0 w-5 h-5 rounded-full bg-[#F5C542]/20 flex items-center justify-center'>
-                          <span className='text-[#F5C542] text-xs'>✓</span>
-                        </div>
-                        {feature}
-                      </motion.li>
-                    ))}
-                  </ul>
-                </CardContent>
-
-                {/* Animated background gradient */}
-                <motion.div
-                  className='absolute inset-0 bg-gradient-to-br from-[#F5C542]/0 via-[#F5C542]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none'
-                  animate={{
-                    backgroundPosition: ['0% 0%', '100% 100%'],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    repeatType: 'reverse',
-                  }}
-                />
-              </Card>
-            </motion.div>
+        {/* Comparison Grid */}
+        <div className="grid lg:grid-cols-2 gap-8 mb-16">
+          {differentiators.map((diff, index) => (
+            <DifferentiatorCard
+              key={index}
+              differentiator={diff}
+              index={index}
+              inView={inView}
+            />
           ))}
         </div>
 
-        {/* CTA Section */}
+        {/* Interactive Comparison Table */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className='mt-16 text-center'
+          initial={{ opacity: 0, y: 30 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10"
         >
-          <Card className='max-w-3xl mx-auto border-2 border-primary/30 bg-gradient-to-br from-card to-primary/5'>
-            <CardContent className='p-8 md:p-12'>
-              <h3 className='text-2xl font-bold text-foreground mb-4'>
-                Pronto para transformar seu salão?
-              </h3>
-              <p className='text-muted-foreground mb-8 text-lg'>
-                Comece gratuitamente e veja a diferença que o Glamo pode fazer
-              </p>
-              <Button
-                size='lg'
-                className='bg-gradient-to-r from-[#F5C542] to-yellow-500 hover:from-yellow-500 hover:to-[#F5C542] text-black font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl'
+          <h3 className="text-3xl font-bold text-center mb-8">
+            Comparação Lado a Lado
+          </h3>
+
+          {/* Tabs */}
+          <div className="flex flex-wrap gap-4 justify-center mb-8">
+            {differentiators.map((diff, index) => (
+              <button
+                key={index}
+                onClick={() => setActiveTab(index)}
+                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+                  activeTab === index
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/50'
+                    : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                }`}
               >
-                Experimente agora gratuitamente
-                <span className='ml-2'>→</span>
-              </Button>
-              <p className='text-sm text-muted-foreground mt-4'>
-                Sem cartão de crédito • 14 dias grátis • Cancele quando quiser
+                <span className="mr-2">{diff.icon}</span>
+                {diff.title}
+              </button>
+            ))}
+          </div>
+
+          {/* Comparison Content */}
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="grid md:grid-cols-2 gap-6"
+          >
+            {/* Others */}
+            <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
+                  <svg className="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+                <h4 className="text-xl font-bold text-red-400">Outras Plataformas</h4>
+              </div>
+              <p className="text-gray-300 leading-relaxed">
+                {differentiators[activeTab].comparison.others}
               </p>
-            </CardContent>
-          </Card>
+            </div>
+
+            {/* Glamo */}
+            <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                  <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h4 className="text-xl font-bold text-purple-300">Glamo</h4>
+              </div>
+              <p className="text-white leading-relaxed">
+                {differentiators[activeTab].comparison.glamo}
+              </p>
+            </div>
+          </motion.div>
+        </motion.div>
+
+        {/* Social Proof Stats */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 1 }}
+          className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8"
+        >
+          {[
+            { value: '2.500+', label: 'Profissionais ativos' },
+            { value: '98%', label: 'Satisfação' },
+            { value: '50K+', label: 'Agendamentos/mês' },
+            { value: '4.9/5', label: 'Avaliação média' }
+          ].map((stat, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={inView ? { opacity: 1, scale: 1 } : {}}
+              transition={{ duration: 0.5, delay: 1 + index * 0.1 }}
+              className="text-center"
+            >
+              <div className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+                {stat.value}
+              </div>
+              <div className="text-gray-400 text-sm">{stat.label}</div>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 1.2 }}
+          className="text-center mt-16"
+        >
+          <button className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-semibold text-lg hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105">
+            Experimente a Diferença
+          </button>
+          <p className="text-sm text-gray-400 mt-4">
+            ✨ 14 dias grátis • Cancele quando quiser
+          </p>
         </motion.div>
       </div>
-    </div>
+    </section>
+  );
+}
+
+function DifferentiatorCard({ differentiator, index, inView }: any) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.5, delay: index * 0.2 }}
+      whileHover={{ y: -8 }}
+      className="group bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-purple-500/50 transition-all duration-300"
+    >
+      {/* Icon & Stats */}
+      <div className="flex items-start justify-between mb-6">
+        <div className="text-6xl">{differentiator.icon}</div>
+        <div className="text-right">
+          <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            {differentiator.stats.value}
+          </div>
+          <div className="text-sm text-gray-400">{differentiator.stats.label}</div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <h3 className="text-2xl font-bold mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300">
+        {differentiator.title}
+      </h3>
+      <p className="text-gray-400 leading-relaxed">
+        {differentiator.description}
+      </p>
+
+      {/* Arrow indicator */}
+      <div className="mt-6 flex items-center gap-2 text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <span className="text-sm font-semibold">Saiba mais</span>
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      </div>
+    </motion.div>
   );
 }
