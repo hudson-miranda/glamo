@@ -1,4 +1,4 @@
-// components/HowItWorks.tsx - PADRONIZADO
+// components/HowItWorks.tsx - PADRONIZADO E OTIMIZADO
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 
@@ -59,36 +59,33 @@ const steps: Step[] = [
 
 export default function HowItWorks() {
   const [inView, setInView] = useState(false);
-  const ref = useRef<HTMLElement>(null);
   const [activeStep, setActiveStep] = useState(0);
+  const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-        }
+        if (entry.isIntersecting) setInView(true);
       },
       { threshold: 0.1 }
     );
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
+    if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
 
   return (
-    <section ref={ref} className="py-24 bg-gradient-to-b from-gray-900 to-black text-white relative overflow-hidden">
-      {/* Animated background */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl opacity-20 animate-pulse" />
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-pink-500 rounded-full filter blur-3xl opacity-20 animate-pulse" />
+    <section
+      ref={ref}
+      className="relative py-24 bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white overflow-hidden"
+    >
+      {/* Fundo animado (sem cortes) */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-10 right-1/4 w-[28rem] h-[28rem] bg-purple-500 rounded-full blur-3xl opacity-20 animate-pulse" />
+        <div className="absolute -bottom-10 left-1/4 w-[28rem] h-[28rem] bg-pink-500 rounded-full blur-3xl opacity-20 animate-pulse" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        {/* Header */}
+        {/* Cabeçalho */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -110,7 +107,7 @@ export default function HowItWorks() {
           </p>
         </motion.div>
 
-        {/* Steps Grid */}
+        {/* Grid de passos */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
           {steps.map((step, index) => (
             <StepCard
@@ -124,16 +121,17 @@ export default function HowItWorks() {
           ))}
         </div>
 
-        {/* Active Step Details */}
+        {/* Detalhes do passo ativo */}
         <motion.div
           key={activeStep}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
           className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 max-w-4xl mx-auto"
+          aria-live="polite"
         >
           <div className="flex items-start gap-6">
-            <div className="text-6xl">{steps[activeStep].icon}</div>
+            <div className="text-6xl" aria-hidden="true">{steps[activeStep].icon}</div>
             <div className="flex-1">
               <h3 className="text-3xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                 {steps[activeStep].title}
@@ -147,11 +145,17 @@ export default function HowItWorks() {
                     key={i}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: i * 0.1 }}
+                    transition={{ duration: 0.3, delay: i * 0.06 }}
                     className="flex items-center gap-3"
                   >
                     <div className="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center flex-shrink-0">
-                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg
+                        className="w-4 h-4 text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        aria-hidden="true"
+                      >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
@@ -182,7 +186,19 @@ export default function HowItWorks() {
   );
 }
 
-function StepCard({ step, index, inView, isActive, onClick }: any) {
+function StepCard({
+  step,
+  index,
+  inView,
+  isActive,
+  onClick
+}: {
+  step: Step;
+  index: number;
+  inView: boolean;
+  isActive: boolean;
+  onClick: () => void;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
@@ -190,33 +206,44 @@ function StepCard({ step, index, inView, isActive, onClick }: any) {
       transition={{ duration: 0.5, delay: index * 0.1 }}
       onClick={onClick}
       className={`group cursor-pointer bg-white/5 backdrop-blur-sm rounded-2xl p-6 border transition-all duration-300 ${
-        isActive 
-          ? 'border-purple-500/50 shadow-xl shadow-purple-500/20' 
-          : 'border-white/10 hover:border-purple-500/30'
+        isActive
+          ? 'border-purple-500/50 shadow-xl shadow-purple-500/20 scale-[1.02]'
+          : 'border-white/10 hover:border-purple-500/30 hover:scale-105'
       }`}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') onClick();
+      }}
+      aria-pressed={isActive}
+      aria-label={`Selecionar passo ${step.number}: ${step.title}`}
     >
-      {/* Number */}
-      <div className="text-6xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4 opacity-50">
+      {/* Número */}
+      <div className="text-6xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4 opacity-50 select-none">
         {step.number}
       </div>
 
-      {/* Icon */}
-      <div className="text-5xl mb-4">{step.icon}</div>
+      {/* Ícone */}
+      <div className="text-5xl mb-4 select-none" aria-hidden="true">
+        {step.icon}
+      </div>
 
-      {/* Content */}
-      <h3 className="text-xl font-bold mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300">
+      {/* Conteúdo */}
+      <h3 className="text-xl font-bold mb-2 text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300">
         {step.title}
       </h3>
       <p className="text-gray-400 text-sm leading-relaxed">
         {step.description}
       </p>
 
-      {/* Arrow indicator */}
-      <div className={`mt-4 flex items-center gap-2 text-purple-400 transition-opacity duration-300 ${
-        isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-      }`}>
+      {/* Indicador */}
+      <div
+        className={`mt-4 flex items-center gap-2 text-purple-400 transition-opacity duration-300 ${
+          isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+        }`}
+      >
         <span className="text-sm font-semibold">Ver detalhes</span>
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </div>

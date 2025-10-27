@@ -1,6 +1,6 @@
-// components/FAQ.tsx - PADRONIZADO
+// components/FAQ.tsx - PADRONIZADO E OTIMIZADO
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, KeyboardEvent } from 'react';
 
 interface FAQItem {
   id: number;
@@ -170,49 +170,48 @@ interface FAQProps {
 export default function FAQ({ faqs: faqsProp }: FAQProps = {}) {
   const faqsData = faqsProp || faqs;
   const [inView, setInView] = useState(false);
-  const ref = useRef<HTMLElement>(null);
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-        }
+        if (entry.isIntersecting) setInView(true);
       },
       { threshold: 0.1 }
     );
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
+    if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
 
-  const filteredFAQs = faqsData.filter(faq => {
+  const filteredFAQs = faqsData.filter((faq) => {
     const matchesCategory = activeCategory === 'Todos' || faq.category === activeCategory;
-    const matchesSearch = faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
+    const q = searchQuery.toLowerCase();
+    const matchesSearch =
+      faq.question.toLowerCase().includes(q) ||
+      faq.answer.toLowerCase().includes(q);
     return matchesCategory && matchesSearch;
   });
 
   const toggleFAQ = (id: number) => {
-    setOpenFAQ(openFAQ === id ? null : id);
+    setOpenFAQ((prev) => (prev === id ? null : id));
   };
 
   return (
-    <section ref={ref} className="py-24 bg-gradient-to-b from-gray-900 to-black text-white relative overflow-hidden">
-      {/* Animated background */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl opacity-20 animate-pulse" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-pink-500 rounded-full filter blur-3xl opacity-20 animate-pulse" />
+    <section
+      ref={ref}
+      className="relative py-24 bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white overflow-hidden"
+    >
+      {/* Fundo animado (sem cortes) */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-10 left-1/4 w-[28rem] h-[28rem] bg-purple-500 rounded-full blur-3xl opacity-20 animate-pulse" />
+        <div className="absolute -bottom-10 right-1/4 w-[28rem] h-[28rem] bg-pink-500 rounded-full blur-3xl opacity-20 animate-pulse" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        {/* Header */}
+        {/* Cabeçalho */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -233,7 +232,7 @@ export default function FAQ({ faqs: faqsProp }: FAQProps = {}) {
             Tudo que você precisa saber sobre o Glamo
           </p>
 
-          {/* Search bar */}
+          {/* Busca */}
           <div className="max-w-2xl mx-auto">
             <div className="relative">
               <input
@@ -242,12 +241,14 @@ export default function FAQ({ faqs: faqsProp }: FAQProps = {}) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-6 py-4 pl-14 rounded-full bg-white/5 backdrop-blur-sm border-2 border-white/10 focus:border-purple-500/50 focus:outline-none text-lg transition-colors duration-300 text-white placeholder-gray-400"
+                aria-label="Buscar perguntas frequentes"
               />
               <svg
-                className="absolute left-5 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400"
+                className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
+                aria-hidden="true"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -255,29 +256,34 @@ export default function FAQ({ faqs: faqsProp }: FAQProps = {}) {
           </div>
         </motion.div>
 
-        {/* Category filters */}
+        {/* Filtros de categoria */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.2 }}
           className="flex flex-wrap gap-3 justify-center mb-12"
         >
-          {faqCategories.map((category, index) => (
-            <button
-              key={index}
-              onClick={() => setActiveCategory(category)}
-              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                activeCategory === category
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/50'
-                  : 'bg-white/10 text-gray-400 hover:bg-white/20 border border-white/10'
-              }`}
-            >
-              {category}
-            </button>
-          ))}
+          {faqCategories.map((category, index) => {
+            const isActive = activeCategory === category;
+            return (
+              <button
+                key={index}
+                onClick={() => setActiveCategory(category)}
+                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500/50 ${
+                  isActive
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/50'
+                    : 'bg-white/10 text-gray-400 hover:bg-white/20 border border-white/10'
+                }`}
+                aria-pressed={isActive}
+                aria-label={`Filtrar por categoria: ${category}`}
+              >
+                {category}
+              </button>
+            );
+          })}
         </motion.div>
 
-        {/* FAQ List */}
+        {/* Lista de FAQs */}
         <div className="max-w-4xl mx-auto">
           {filteredFAQs.length > 0 ? (
             <div className="space-y-4">
@@ -309,7 +315,7 @@ export default function FAQ({ faqs: faqsProp }: FAQProps = {}) {
           )}
         </div>
 
-        {/* Still have questions CTA */}
+        {/* CTA final */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -336,7 +342,26 @@ export default function FAQ({ faqs: faqsProp }: FAQProps = {}) {
   );
 }
 
-function FAQItemComponent({ faq, index, inView, isOpen, onToggle }: any) {
+function FAQItemComponent({
+  faq,
+  index,
+  inView,
+  isOpen,
+  onToggle
+}: {
+  faq: FAQItem;
+  index: number;
+  inView: boolean;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  const onKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onToggle();
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -348,22 +373,27 @@ function FAQItemComponent({ faq, index, inView, isOpen, onToggle }: any) {
     >
       <button
         onClick={onToggle}
-        className="w-full p-6 flex items-start gap-4 text-left"
+        onKeyDown={onKeyDown}
+        className="w-full p-6 flex items-start gap-4 text-left focus:outline-none focus:ring-2 focus:ring-purple-500/40 rounded-2xl"
+        aria-expanded={isOpen}
+        aria-controls={`faq-panel-${faq.id}`}
       >
-        <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
-          isOpen 
-            ? 'bg-gradient-to-r from-purple-500 to-pink-500' 
-            : 'bg-white/10'
-        }`}>
+        <div
+          className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
+            isOpen ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-white/10'
+          }`}
+          aria-hidden="true"
+        >
           <motion.svg
             animate={{ rotate: isOpen ? 180 : 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.25 }}
             className={`w-6 h-6 ${isOpen ? 'text-white' : 'text-gray-400'}`}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7 7" />
+            {/* Ícone corrigido (seta para baixo) */}
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </motion.svg>
         </div>
         <div className="flex-1">
@@ -372,38 +402,51 @@ function FAQItemComponent({ faq, index, inView, isOpen, onToggle }: any) {
               {faq.category}
             </span>
           </div>
-          <h3 className={`text-lg font-bold transition-colors duration-300 ${
-            isOpen ? 'text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text' : 'text-white'
-          }`}>
+          <h3
+            className={`text-lg font-bold transition-colors duration-300 ${
+              isOpen
+                ? 'text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text'
+                : 'text-white'
+            }`}
+          >
             {faq.question}
           </h3>
         </div>
       </button>
 
-      <AnimatePresence>
+      <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div
+            id={`faq-panel-${faq.id}`}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.28 }}
             className="overflow-hidden"
+            role="region"
+            aria-label={`Resposta: ${faq.question}`}
           >
             <div className="px-6 pb-6 pl-20">
               <p className="text-gray-300 leading-relaxed mb-4">
                 {faq.answer}
               </p>
-              
+
               {faq.relatedLinks && faq.relatedLinks.length > 0 && (
                 <div className="flex flex-wrap gap-3">
-                  {faq.relatedLinks.map((link: { text: string; url: string }, idx: number) => (
+                  {faq.relatedLinks.map((link, idx) => (
                     <a
                       key={idx}
                       href={link.url}
-                      className="inline-flex items-center gap-2 text-sm text-purple-400 hover:text-purple-300 font-semibold transition-colors duration-300"
+                      className="inline-flex items-center gap-2 text-sm text-purple-400 hover:text-purple-300 font-semibold transition-colors duration-300 underline-offset-4 hover:underline"
                     >
                       {link.text}
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        aria-hidden="true"
+                      >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </a>

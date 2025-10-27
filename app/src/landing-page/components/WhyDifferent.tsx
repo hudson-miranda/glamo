@@ -1,4 +1,4 @@
-// components/WhyDifferent.tsx - MELHORADO
+// components/WhyDifferent.tsx - PADRONIZADO E OTIMIZADO
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 
@@ -73,36 +73,33 @@ const differentiators: Differentiator[] = [
 
 export default function WhyDifferent() {
   const [inView, setInView] = useState(false);
-  const ref = useRef<HTMLElement>(null);
   const [activeTab, setActiveTab] = useState(0);
+  const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-        }
+        if (entry.isIntersecting) setInView(true);
       },
       { threshold: 0.1 }
     );
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
+    if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
 
   return (
-    <section ref={ref} className="py-24 bg-gradient-to-b from-gray-900 to-black text-white relative overflow-hidden">
-      {/* Animated background */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl opacity-20 animate-pulse" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-pink-500 rounded-full filter blur-3xl opacity-20 animate-pulse" />
+    <section
+      ref={ref}
+      className="relative py-24 bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white overflow-hidden"
+    >
+      {/* Fundo animado (sem cortes) */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-10 left-1/4 w-[28rem] h-[28rem] bg-purple-500 rounded-full blur-3xl opacity-20 animate-pulse" />
+        <div className="absolute -bottom-10 right-1/4 w-[28rem] h-[28rem] bg-pink-500 rounded-full blur-3xl opacity-20 animate-pulse" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        {/* Header */}
+        {/* Cabeçalho */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -124,7 +121,7 @@ export default function WhyDifferent() {
           </p>
         </motion.div>
 
-        {/* Comparison Grid */}
+        {/* Cartões de diferenciais */}
         <div className="grid lg:grid-cols-2 gap-8 mb-16">
           {differentiators.map((diff, index) => (
             <DifferentiatorCard
@@ -136,7 +133,7 @@ export default function WhyDifferent() {
           ))}
         </div>
 
-        {/* Interactive Comparison Table */}
+        {/* Tabela de comparação interativa */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -147,37 +144,40 @@ export default function WhyDifferent() {
             Comparação Lado a Lado
           </h3>
 
-          {/* Tabs */}
+          {/* Abas */}
           <div className="flex flex-wrap gap-4 justify-center mb-8">
             {differentiators.map((diff, index) => (
               <button
                 key={index}
                 onClick={() => setActiveTab(index)}
-                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500/50 ${
                   activeTab === index
                     ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/50'
                     : 'bg-white/10 text-gray-400 hover:bg-white/20'
                 }`}
+                aria-pressed={activeTab === index}
+                aria-label={`Selecionar comparação: ${diff.title}`}
               >
-                <span className="mr-2">{diff.icon}</span>
+                <span className="mr-2" aria-hidden="true">{diff.icon}</span>
                 {diff.title}
               </button>
             ))}
           </div>
 
-          {/* Comparison Content */}
+          {/* Conteúdo da comparação */}
           <motion.div
             key={activeTab}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
             className="grid md:grid-cols-2 gap-6"
+            aria-live="polite"
           >
-            {/* Others */}
+            {/* Outras plataformas */}
             <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
-                  <svg className="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </div>
@@ -192,7 +192,7 @@ export default function WhyDifferent() {
             <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
@@ -205,10 +205,10 @@ export default function WhyDifferent() {
           </motion.div>
         </motion.div>
 
-        {/* Social Proof Stats */}
+        {/* Métricas sociais */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={inView ? { opacity: 1, scale: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 1 }}
           className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8"
         >
@@ -252,18 +252,28 @@ export default function WhyDifferent() {
   );
 }
 
-function DifferentiatorCard({ differentiator, index, inView }: any) {
+function DifferentiatorCard({
+  differentiator,
+  index,
+  inView
+}: {
+  differentiator: Differentiator;
+  index: number;
+  inView: boolean;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay: index * 0.2 }}
-      whileHover={{ y: -8 }}
+      transition={{ duration: 0.5, delay: index * 0.15 }}
+      whileHover={{ y: -6 }}
       className="group bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-purple-500/50 transition-all duration-300"
+      role="article"
+      aria-label={`Diferencial: ${differentiator.title}`}
     >
-      {/* Icon & Stats */}
+      {/* Ícone & Métrica */}
       <div className="flex items-start justify-between mb-6">
-        <div className="text-6xl">{differentiator.icon}</div>
+        <div className="text-6xl select-none" aria-hidden="true">{differentiator.icon}</div>
         <div className="text-right">
           <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
             {differentiator.stats.value}
@@ -272,7 +282,7 @@ function DifferentiatorCard({ differentiator, index, inView }: any) {
         </div>
       </div>
 
-      {/* Content */}
+      {/* Conteúdo */}
       <h3 className="text-2xl font-bold mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300">
         {differentiator.title}
       </h3>
@@ -280,10 +290,10 @@ function DifferentiatorCard({ differentiator, index, inView }: any) {
         {differentiator.description}
       </p>
 
-      {/* Arrow indicator */}
+      {/* Indicador */}
       <div className="mt-6 flex items-center gap-2 text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <span className="text-sm font-semibold">Saiba mais</span>
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </div>
