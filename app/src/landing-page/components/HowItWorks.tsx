@@ -1,134 +1,225 @@
+// components/HowItWorks.tsx - PADRONIZADO
 import { motion } from 'framer-motion';
-import { Calendar, CheckCircle, DollarSign, TrendingUp } from 'lucide-react';
-import { Card, CardContent } from '../../components/ui/card';
+import { useState, useEffect, useRef } from 'react';
 
-const steps = [
+interface Step {
+  number: string;
+  title: string;
+  description: string;
+  icon: string;
+  details: string[];
+}
+
+const steps: Step[] = [
   {
-    icon: Calendar,
-    title: 'Cliente agenda serviço',
-    description: 'Agendamento online simples e rápido, com confirmação automática',
-    color: 'from-blue-500 to-cyan-500',
+    number: '01',
+    title: 'Cadastro Rápido',
+    description: 'Crie sua conta em menos de 2 minutos',
+    icon: '🚀',
+    details: [
+      'Sem burocracia ou documentação complexa',
+      'Configure seu perfil e serviços',
+      'Personalize cores e logo da sua marca'
+    ]
   },
   {
-    icon: CheckCircle,
-    title: 'Profissional confirma',
-    description: 'Notificações em tempo real para a equipe gerenciar a agenda',
-    color: 'from-purple-500 to-pink-500',
+    number: '02',
+    title: 'Configure Serviços',
+    description: 'Adicione seus serviços, preços e horários',
+    icon: '⚙️',
+    details: [
+      'Cadastre serviços ilimitados',
+      'Defina duração e valores',
+      'Configure horários de atendimento'
+    ]
   },
   {
-    icon: DollarSign,
-    title: 'Sistema registra e calcula',
-    description: 'Comissões automáticas e controle de pagamentos inteligente',
-    color: 'from-[#F5C542] to-yellow-500',
+    number: '03',
+    title: 'Compartilhe Link',
+    description: 'Envie seu link personalizado para clientes',
+    icon: '🔗',
+    details: [
+      'Link único e profissional',
+      'Compartilhe no WhatsApp, Instagram',
+      'QR Code para impressão'
+    ]
   },
   {
-    icon: TrendingUp,
-    title: 'Financeiro consolida',
-    description: 'Relatórios automáticos e insights em tempo real do seu negócio',
-    color: 'from-green-500 to-emerald-500',
-  },
+    number: '04',
+    title: 'Receba Agendamentos',
+    description: 'Clientes agendam 24/7, você só confirma',
+    icon: '📅',
+    details: [
+      'Notificações em tempo real',
+      'Confirmação automática por WhatsApp',
+      'Lembretes para reduzir faltas'
+    ]
+  }
 ];
 
 export default function HowItWorks() {
+  const [inView, setInView] = useState(false);
+  const ref = useRef<HTMLElement>(null);
+  const [activeStep, setActiveStep] = useState(0);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className='py-24 sm:py-32' id='como-funciona'>
-      <div className='mx-auto max-w-7xl px-6 lg:px-8'>
+    <section ref={ref} className="py-24 bg-gradient-to-b from-gray-900 to-black text-white relative overflow-hidden">
+      {/* Animated background */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl opacity-20 animate-pulse" />
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-pink-500 rounded-full filter blur-3xl opacity-20 animate-pulse" />
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className='mx-auto max-w-2xl text-center mb-16'
+          className="text-center mb-20"
         >
-          <h2 className='text-base font-semibold leading-7 text-[#F5C542]'>Como Funciona</h2>
-          <p className='mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl'>
-            Simples, rápido e eficiente
-          </p>
-          <p className='mt-6 text-lg leading-8 text-muted-foreground'>
-            Entenda como o Glamo automatiza seu salão em 4 passos simples
+          <span className="inline-block px-4 py-2 bg-purple-500/20 text-purple-300 rounded-full text-sm font-semibold mb-4 border border-purple-500/30">
+            COMO FUNCIONA
+          </span>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            Simples como deve ser.
+            <br />
+            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Poderoso como você precisa.
+            </span>
+          </h2>
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+            Em 4 passos simples, você está pronto para receber agendamentos
           </p>
         </motion.div>
 
-        <div className='relative'>
-          {/* Connection line */}
-          <div className='hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-border to-transparent -translate-y-1/2' />
-
-          <div className='grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4'>
-            {steps.map((step, index) => (
-              <motion.div
-                key={step.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className='relative'
-              >
-                <Card className='relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg group'>
-                  <CardContent className='p-6'>
-                    {/* Step number */}
-                    <div className='absolute top-4 right-4 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary'>
-                      {index + 1}
-                    </div>
-
-                    {/* Icon */}
-                    <motion.div
-                      whileHover={{ scale: 1.1, rotate: 5 }}
-                      transition={{ type: 'spring', stiffness: 300 }}
-                      className={`inline-flex p-3 rounded-lg bg-gradient-to-br ${step.color} mb-4`}
-                    >
-                      <step.icon className='h-6 w-6 text-white' />
-                    </motion.div>
-
-                    {/* Content */}
-                    <h3 className='text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors'>
-                      {step.title}
-                    </h3>
-                    <p className='text-sm text-muted-foreground leading-relaxed'>{step.description}</p>
-                  </CardContent>
-
-                  {/* Hover glow effect */}
-                  <div className='absolute inset-0 bg-gradient-to-r from-[#F5C542]/0 via-[#F5C542]/5 to-[#F5C542]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none' />
-                </Card>
-
-                {/* Animated arrow for desktop */}
-                {index < steps.length - 1 && (
-                  <motion.div
-                    initial={{ opacity: 0, x: -10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: index * 0.1 + 0.3 }}
-                    className='hidden lg:block absolute top-1/2 -right-4 -translate-y-1/2 z-10'
-                  >
-                    <div className='text-primary'>→</div>
-                  </motion.div>
-                )}
-              </motion.div>
-            ))}
-          </div>
+        {/* Steps Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+          {steps.map((step, index) => (
+            <StepCard
+              key={index}
+              step={step}
+              index={index}
+              inView={inView}
+              isActive={activeStep === index}
+              onClick={() => setActiveStep(index)}
+            />
+          ))}
         </div>
+
+        {/* Active Step Details */}
+        <motion.div
+          key={activeStep}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 max-w-4xl mx-auto"
+        >
+          <div className="flex items-start gap-6">
+            <div className="text-6xl">{steps[activeStep].icon}</div>
+            <div className="flex-1">
+              <h3 className="text-3xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                {steps[activeStep].title}
+              </h3>
+              <p className="text-xl text-gray-400 mb-6">
+                {steps[activeStep].description}
+              </p>
+              <ul className="space-y-3">
+                {steps[activeStep].details.map((detail, i) => (
+                  <motion.li
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: i * 0.1 }}
+                    className="flex items-center gap-3"
+                  >
+                    <div className="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <span className="text-gray-300">{detail}</span>
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </motion.div>
 
         {/* CTA */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className='mt-16 text-center'
+          initial={{ opacity: 0, y: 30 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="text-center mt-16"
         >
-          <p className='text-lg text-muted-foreground mb-4'>
-            Veja na prática como funciona
+          <button className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-semibold text-lg hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105">
+            Começar Agora
+          </button>
+          <p className="text-sm text-gray-400 mt-4">
+            ✨ Configuração em menos de 5 minutos
           </p>
-          <motion.a
-            href='#demo'
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className='inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-[#F5C542] to-yellow-500 text-black font-semibold hover:shadow-lg transition-all duration-300'
-          >
-            Solicitar Demonstração
-            <span>→</span>
-          </motion.a>
         </motion.div>
       </div>
-    </div>
+    </section>
+  );
+}
+
+function StepCard({ step, index, inView, isActive, onClick }: any) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      onClick={onClick}
+      className={`group cursor-pointer bg-white/5 backdrop-blur-sm rounded-2xl p-6 border transition-all duration-300 ${
+        isActive 
+          ? 'border-purple-500/50 shadow-xl shadow-purple-500/20' 
+          : 'border-white/10 hover:border-purple-500/30'
+      }`}
+    >
+      {/* Number */}
+      <div className="text-6xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4 opacity-50">
+        {step.number}
+      </div>
+
+      {/* Icon */}
+      <div className="text-5xl mb-4">{step.icon}</div>
+
+      {/* Content */}
+      <h3 className="text-xl font-bold mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300">
+        {step.title}
+      </h3>
+      <p className="text-gray-400 text-sm leading-relaxed">
+        {step.description}
+      </p>
+
+      {/* Arrow indicator */}
+      <div className={`mt-4 flex items-center gap-2 text-purple-400 transition-opacity duration-300 ${
+        isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+      }`}>
+        <span className="text-sm font-semibold">Ver detalhes</span>
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      </div>
+    </motion.div>
   );
 }
