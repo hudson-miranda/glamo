@@ -1,4 +1,4 @@
-// components/Hero.tsx - PADRONIZADO
+// components/Hero.tsx - PADRONIZADO E OTIMIZADO
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 
@@ -24,9 +24,12 @@ export default function Hero() {
   }, []);
 
   return (
-    <section ref={ref} className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-black text-white overflow-hidden">
-      {/* Animated background */}
-      <div className="absolute inset-0">
+    <section 
+      ref={ref} 
+      className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white overflow-hidden"
+    >
+      {/* Animated background - Ajustado para não cortar */}
+      <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl opacity-20 animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-500 rounded-full filter blur-3xl opacity-20 animate-pulse" />
       </div>

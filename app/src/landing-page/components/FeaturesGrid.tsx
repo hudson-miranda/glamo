@@ -1,4 +1,4 @@
-// components/FeaturesGrid.tsx - PADRONIZADO
+// components/FeaturesGrid.tsx - PADRONIZADO E OTIMIZADO
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 
@@ -14,7 +14,7 @@ interface Feature {
   icon: string;
   title: string;
   description: string;
-  color: string;
+  color: string; // tailwind gradient: "from-... to-..."
   benefits: string[];
 }
 
@@ -70,7 +70,7 @@ const features: Feature[] = [
   {
     icon: '📊',
     title: 'Analytics Avançado',
-    description: 'Dashboards em tempo real com todas as métricas do seu negócio',
+    description: 'Dashboards em tempo real com todas as métrricas do seu negócio',
     color: 'from-orange-500 to-red-500',
     benefits: [
       'Faturamento em tempo real',
@@ -167,36 +167,33 @@ const features: Feature[] = [
 
 export default function FeaturesGrid() {
   const [inView, setInView] = useState(false);
-  const ref = useRef<HTMLElement>(null);
   const [selectedFeature, setSelectedFeature] = useState<number | null>(null);
+  const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
+    const obs = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-        }
+        if (entry.isIntersecting) setInView(true);
       },
       { threshold: 0.1 }
     );
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
-    return () => observer.disconnect();
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
   }, []);
 
   return (
-    <section ref={ref} className="py-24 bg-gradient-to-b from-black to-gray-900 text-white relative overflow-hidden">
-      {/* Animated background */}
-      <div className="absolute inset-0">
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl opacity-20 animate-pulse" />
-        <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-pink-500 rounded-full filter blur-3xl opacity-20 animate-pulse" />
+    <section
+      ref={ref}
+      className="relative py-24 bg-gradient-to-b from-black via-black to-gray-900 text-white overflow-hidden"
+    >
+      {/* Fundo animado (sem cortes) */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/4 right-1/4 w-[28rem] h-[28rem] bg-purple-500 rounded-full blur-3xl opacity-20 animate-pulse" />
+        <div className="absolute bottom-1/4 left-1/4 w-[28rem] h-[28rem] bg-pink-500 rounded-full blur-3xl opacity-20 animate-pulse" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        {/* Header */}
+        {/* Cabeçalho */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -218,7 +215,7 @@ export default function FeaturesGrid() {
           </p>
         </motion.div>
 
-        {/* Features Grid */}
+        {/* Grid de features */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
           {features.map((feature, index) => (
             <FeatureCard
@@ -227,12 +224,14 @@ export default function FeaturesGrid() {
               index={index}
               inView={inView}
               isSelected={selectedFeature === index}
-              onClick={() => setSelectedFeature(selectedFeature === index ? null : index)}
+              onClick={() =>
+                setSelectedFeature(selectedFeature === index ? null : index)
+              }
             />
           ))}
         </div>
 
-        {/* Selected Feature Details */}
+        {/* Detalhe do item selecionado */}
         {selectedFeature !== null && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -241,7 +240,9 @@ export default function FeaturesGrid() {
             className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 max-w-4xl mx-auto"
           >
             <div className="flex items-start gap-6">
-              <div className={`w-20 h-20 bg-gradient-to-r ${features[selectedFeature].color} rounded-2xl flex items-center justify-center text-4xl flex-shrink-0`}>
+              <div
+                className={`w-20 h-20 bg-gradient-to-r ${features[selectedFeature].color} rounded-2xl flex items-center justify-center text-4xl flex-shrink-0`}
+              >
                 {features[selectedFeature].icon}
               </div>
               <div className="flex-1">
@@ -260,9 +261,21 @@ export default function FeaturesGrid() {
                       transition={{ duration: 0.3, delay: i * 0.05 }}
                       className="flex items-center gap-3"
                     >
-                      <div className={`w-6 h-6 bg-gradient-to-r ${features[selectedFeature].color} rounded-full flex items-center justify-center flex-shrink-0`}>
-                        <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <div
+                        className={`w-6 h-6 bg-gradient-to-r ${features[selectedFeature].color} rounded-full flex items-center justify-center flex-shrink-0`}
+                      >
+                        <svg
+                          className="w-4 h-4 text-white"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
                       </div>
                       <span className="text-gray-300">{benefit}</span>
@@ -273,16 +286,27 @@ export default function FeaturesGrid() {
               <button
                 onClick={() => setSelectedFeature(null)}
                 className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors duration-300"
+                aria-label="Fechar detalhes da funcionalidade"
               >
-                <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
           </motion.div>
         )}
 
-        {/* CTA */}
+        {/* CTA final */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -301,7 +325,13 @@ export default function FeaturesGrid() {
   );
 }
 
-function FeatureCard({ feature, index, inView, isSelected, onClick }: {
+function FeatureCard({
+  feature,
+  index,
+  inView,
+  isSelected,
+  onClick
+}: {
   feature: Feature;
   index: number;
   inView: boolean;
@@ -315,20 +345,27 @@ function FeatureCard({ feature, index, inView, isSelected, onClick }: {
       transition={{ duration: 0.5, delay: index * 0.05 }}
       onClick={onClick}
       className={`group cursor-pointer bg-white/5 backdrop-blur-sm rounded-2xl p-6 border transition-all duration-300 ${
-        isSelected 
-          ? 'border-purple-500/50 shadow-xl shadow-purple-500/20 scale-105' 
+        isSelected
+          ? 'border-purple-500/50 shadow-xl shadow-purple-500/20 scale-105'
           : 'border-white/10 hover:border-purple-500/30 hover:scale-105'
       }`}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') onClick();
+      }}
+      aria-pressed={isSelected}
+      aria-label={`Abrir detalhes de ${feature.title}`}
     >
-      <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-xl flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform duration-300`}>
+      <div
+        className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-xl flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform duration-300`}
+      >
         {feature.icon}
       </div>
       <h3 className="text-xl font-bold mb-2 text-white group-hover:text-purple-300 transition-colors duration-300">
         {feature.title}
       </h3>
-      <p className="text-gray-400 text-sm">
-        {feature.description}
-      </p>
+      <p className="text-gray-400 text-sm">{feature.description}</p>
     </motion.div>
   );
 }

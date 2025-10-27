@@ -1,9 +1,14 @@
+// app/src/landing-page/components/constants.ts
 import type { NavigationItem } from './NavBar';
 
 export const marketingNavigationItems: NavigationItem[] = [
-  { name: 'Features', to: '/#features' },
+  { name: 'Recursos', to: '/#features' },
+  { name: 'Como funciona', to: '/#como-funciona' },
+  { name: 'Por que diferente', to: '/#por-que-diferente' },
+  { name: 'Depoimentos', to: '/#depoimentos' },
+  { name: 'FAQ', to: '/#faq' },
+  { name: 'Contato', to: '/#contato' },
 ] as const;
 
-// For authenticated users, we don't show top navigation items
-// as they'll use the sidebar navigation instead
+// Usuários autenticados usam a navegação lateral
 export const demoNavigationitems: NavigationItem[] = [] as const;
