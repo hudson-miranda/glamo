@@ -206,7 +206,7 @@ function renderNavigationItems(
   const menuStyles = cn({
     'block rounded-lg px-3 py-2 text-sm font-medium leading-7 text-foreground hover:bg-accent hover:text-accent-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40':
       !!setMobileMenuOpen,
-    'text-sm font-normal leading-6 text-foreground duration-300 ease-in-out hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40 rounded-sm':
+    'text-sm font-semibold leading-6 text-foreground duration-300 ease-in-out hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40 rounded-sm':
       !setMobileMenuOpen,
   });
 

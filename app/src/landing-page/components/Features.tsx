@@ -74,7 +74,7 @@ export default function Features() {
       className="relative py-24 bg-black text-white overflow-hidden"
     >
       {/* Glow Effects de fundo */}
-      <GlowEffect position="top-right" size="xl" color="purple" animated />
+      <GlowEffect position="top-right" size="xl" color="neon" animated />
       <GlowEffect position="bottom-left" size="xl" color="neon" animated />
 
       <div className="container mx-auto px-4 relative z-10">

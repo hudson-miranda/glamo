@@ -133,7 +133,7 @@ export default function CTASection() {
           opacity: [0.3, 0.5, 0.3]
         }}
         transition={{ duration: 5, repeat: Infinity, delay: 1 }}
-        className="absolute bottom-1/4 right-10 w-32 h-32 bg-purple-500 rounded-full blur-3xl"
+        className="absolute bottom-1/4 right-10 w-32 h-32 bg-neon-500 rounded-full blur-3xl"
       />
     </section>
   );

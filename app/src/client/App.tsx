@@ -54,7 +54,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <div className='min-h-screen bg-background text-foreground'>
+      <div className='min-h-screen bg-black text-foreground'>
         {isAdminDashboard || isDashboardPage ? (
           <Outlet />
         ) : (

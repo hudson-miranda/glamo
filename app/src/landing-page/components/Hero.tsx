@@ -35,7 +35,7 @@ export default function Hero() {
     >
       {/* Glow Effects de fundo */}
       <GlowEffect position="top-left" size="xl" color="neon" animated />
-      <GlowEffect position="bottom-right" size="xl" color="purple" animated />
+      <GlowEffect position="bottom-right" size="xl" color="neon" animated />
 
       <div className="container mx-auto px-4 py-20 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
