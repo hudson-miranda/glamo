@@ -1,6 +1,11 @@
-// components/Hero.tsx - PADRONIZADO E OTIMIZADO
+// components/Hero.tsx - REFATORADO COM DESIGN SYSTEM NEON
 import { motion } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import { Button } from '../../client/components/ui/Button';
+import { GradientText } from '../../client/components/ui/GradientText';
+import { Badge } from '../../client/components/ui/Badge';
+import { GlowEffect } from '../../client/components/ui/GlowEffect';
+import { useRef, useState, useEffect } from 'react';
+import { Link } from 'wasp/client/router';
 
 export default function Hero() {
   const [inView, setInView] = useState(false);
@@ -26,13 +31,11 @@ export default function Hero() {
   return (
     <section 
       ref={ref} 
-      className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white overflow-hidden"
+      className="relative min-h-screen flex items-center justify-center bg-black text-white overflow-hidden pt-20"
     >
-      {/* Animated background - Ajustado para não cortar */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl opacity-20 animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-500 rounded-full filter blur-3xl opacity-20 animate-pulse" />
-      </div>
+      {/* Glow Effects de fundo */}
+      <GlowEffect position="top-left" size="xl" color="neon" animated />
+      <GlowEffect position="bottom-right" size="xl" color="purple" animated />
 
       <div className="container mx-auto px-4 py-20 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -42,30 +45,29 @@ export default function Hero() {
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6 }}
           >
-            <span className="inline-block px-4 py-2 bg-purple-500/20 text-purple-300 rounded-full text-sm font-semibold mb-6 border border-purple-500/30">
+            <Badge variant="glow" className="mb-6">
               🚀 A Revolução do Agendamento
-            </span>
+            </Badge>
             
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Transforme seu
+              Seamless solution
               <br />
-              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Negócio de Beleza
-              </span>
+              <GradientText variant="neon" as="span" className="text-5xl md:text-7xl font-bold">
+                with magic!
+              </GradientText>
             </h1>
 
-            <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-              A plataforma completa com IA que automatiza agendamentos, 
-              pagamentos e marketing. Mais tempo para você, mais resultados 
-              para seu negócio.
+            <p className="text-xl text-zinc-400 mb-8 leading-relaxed">
+              Let's be the project management platform that aims for teams to
+              be structured and become aware of their projects.
             </p>
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-6 mb-8">
               {[
-                { value: '2.500+', label: 'Profissionais' },
-                { value: '50K+', label: 'Agendamentos/mês' },
-                { value: '4.9/5', label: 'Avaliação' }
+                { value: '⭐⭐⭐⭐⭐', label: '5 Stars Rating' },
+                { value: '5.9M+', label: 'Total Users' },
+                { value: '10+', label: 'Products' }
               ].map((stat, index) => (
                 <motion.div
                   key={index}
@@ -73,10 +75,10 @@ export default function Hero() {
                   animate={inView ? { opacity: 1, scale: 1 } : {}}
                   transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
                 >
-                  <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  <div className="text-xl md:text-2xl font-bold text-neon-500">
                     {stat.value}
                   </div>
-                  <div className="text-sm text-gray-400">{stat.label}</div>
+                  <div className="text-sm text-zinc-400">{stat.label}</div>
                 </motion.div>
               ))}
             </div>
@@ -88,20 +90,22 @@ export default function Hero() {
               transition={{ duration: 0.6, delay: 0.6 }}
               className="flex flex-col sm:flex-row gap-4"
             >
-              <button className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-semibold text-lg hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105">
-                Começar Grátis
-              </button>
-              <button className="px-8 py-4 bg-white/10 text-white rounded-full font-semibold text-lg border border-white/30 hover:bg-white/20 transition-all duration-300">
-                Ver Demo
-              </button>
+              <Link to="/signup">
+                <Button variant="primary-glow" size="lg">
+                  Get Free Demo
+                </Button>
+              </Link>
+              <Button variant="secondary" size="lg">
+                Watch Demo
+              </Button>
             </motion.div>
 
-            <p className="text-sm text-gray-400 mt-6">
-              ✨ 14 dias grátis • Sem cartão de crédito • Cancele quando quiser
+            <p className="text-sm text-zinc-400 mt-6">
+              ✨ 14 days free trial • No credit card required • Cancel anytime
             </p>
           </motion.div>
 
-          {/* Right side - Visual */}
+          {/* Right side - Dashboard Mockup */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
@@ -109,56 +113,64 @@ export default function Hero() {
             className="relative"
           >
             {/* Dashboard mockup */}
-            <div className="relative bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10">
-              <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-2xl p-6 border border-purple-500/30">
-                {/* Mock calendar */}
-                <div className="grid grid-cols-7 gap-2 mb-4">
-                  {['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map((day, i) => (
-                    <div key={i} className="text-center text-xs text-gray-400 font-semibold">
-                      {day}
+            <div className="relative glass-card p-8 border border-zinc-800/50">
+              <div className="bg-gradient-to-br from-neon-500/10 to-purple-500/10 rounded-2xl p-6 border border-neon-500/30">
+                {/* Mock stats cards */}
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="glass-card p-4 border border-zinc-800/50">
+                    <div className="text-sm text-zinc-400 mb-1">My Balance</div>
+                    <div className="text-2xl font-bold text-neon-500">$5476</div>
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className="text-green-400 text-xs">↑ 12%</span>
+                      <span className="text-xs text-zinc-500">vs last month</span>
                     </div>
-                  ))}
-                  {Array.from({ length: 28 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className={`aspect-square rounded-lg flex items-center justify-center text-sm ${
-                        i % 7 === 3 || i % 7 === 5
-                          ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold'
-                          : 'bg-white/10 text-gray-400'
-                      }`}
-                    >
-                      {i + 1}
+                  </div>
+                  <div className="glass-card p-4 border border-zinc-800/50">
+                    <div className="text-sm text-zinc-400 mb-1">Total Sales</div>
+                    <div className="text-2xl font-bold text-white">$12,143</div>
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className="text-green-400 text-xs">↑ 8%</span>
+                      <span className="text-xs text-zinc-500">this week</span>
                     </div>
-                  ))}
+                  </div>
                 </div>
 
-                {/* Mock appointments */}
+                {/* Mock chart area */}
+                <div className="glass-card p-4 border border-zinc-800/50 mb-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-sm font-semibold text-white">My Progress</span>
+                    <span className="text-xs text-zinc-400">Weekly</span>
+                  </div>
+                  <div className="flex items-end gap-1 h-24">
+                    {[60, 80, 45, 90, 70, 85, 95].map((height, i) => (
+                      <div key={i} className="flex-1 bg-gradient-to-t from-neon-500 to-neon-400 rounded-t" style={{ height: `${height}%` }}></div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Mock transactions */}
                 <div className="space-y-3">
                   {[
-                    { time: '09:00', service: 'Corte + Barba', client: 'João Silva' },
-                    { time: '11:30', service: 'Coloração', client: 'Maria Santos' },
-                    { time: '14:00', service: 'Manicure', client: 'Ana Costa' }
-                  ].map((apt, i) => (
+                    { name: 'Product ttile', amount: '+$230', status: 'New' },
+                    { name: 'Product ttile', amount: '+$180', status: 'Sold' },
+                  ].map((tx, i) => (
                     <motion.div
                       key={i}
                       initial={{ opacity: 0, x: -20 }}
                       animate={inView ? { opacity: 1, x: 0 } : {}}
                       transition={{ duration: 0.5, delay: 1 + i * 0.1 }}
-                      className="bg-white/10 rounded-xl p-4 border border-white/20"
+                      className="glass-card p-4 border border-zinc-800/50 flex items-center justify-between"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold">
-                          {apt.time.split(':')[0]}
+                        <div className="w-10 h-10 bg-gradient-to-br from-neon-500 to-purple-500 rounded-lg"></div>
+                        <div>
+                          <div className="font-semibold text-white text-sm">{tx.name}</div>
+                          <div className="text-xs text-zinc-400">Description lorem...</div>
                         </div>
-                        <div className="flex-1">
-                          <div className="font-semibold text-white">{apt.service}</div>
-                          <div className="text-sm text-gray-400">{apt.client}</div>
-                        </div>
-                        <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
-                          <svg className="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-neon-500">{tx.amount}</div>
+                        <Badge variant="neon" className="text-xs px-2 py-0.5 mt-1">{tx.status}</Badge>
                       </div>
                     </motion.div>
                   ))}
@@ -169,26 +181,26 @@ export default function Hero() {
               <motion.div
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 3, repeat: Infinity }}
-                className="absolute -top-6 -right-6 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-4 shadow-xl"
+                className="absolute -top-6 -right-6 glass-neon p-4 shadow-glow-lg"
               >
-                <div className="text-2xl font-bold text-white">+40%</div>
-                <div className="text-xs text-white/80">Eficiência</div>
+                <div className="text-2xl font-bold text-neon-500">+40%</div>
+                <div className="text-xs text-zinc-400">Efficiency</div>
               </motion.div>
 
               <motion.div
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
-                className="absolute -bottom-6 -left-6 bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20"
+                className="absolute -bottom-6 -left-6 glass-card p-4 border border-neon-500/30"
               >
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <div className="w-8 h-8 bg-gradient-to-br from-neon-500 to-purple-500 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                   </div>
                   <div>
-                    <div className="text-sm font-bold text-white">IA Ativa</div>
-                    <div className="text-xs text-gray-400">Otimizando agenda</div>
+                    <div className="text-sm font-bold text-white">AI Active</div>
+                    <div className="text-xs text-zinc-400">Optimizing</div>
                   </div>
                 </div>
               </motion.div>
@@ -207,9 +219,9 @@ export default function Hero() {
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-2"
+          className="w-6 h-10 border-2 border-zinc-700 rounded-full flex items-start justify-center p-2"
         >
-          <div className="w-1 h-2 bg-white rounded-full" />
+          <div className="w-1 h-2 bg-neon-500 rounded-full" />
         </motion.div>
       </motion.div>
     </section>

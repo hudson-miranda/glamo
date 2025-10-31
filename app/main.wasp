@@ -297,9 +297,27 @@ page NotFoundPage {
 //#endregion
 
 //#region Contact Form Messages
-// TODO: 
-// add functionality to allow users to send messages to admin
-// and make them accessible via the admin dashboard
+// Contact form operations for landing page and admin dashboard
+action createContactMessage {
+  fn: import { createContactMessage } from "@src/contact/operations",
+  entities: [ContactFormMessage, User]
+}
+
+query getContactMessages {
+  fn: import { getContactMessages } from "@src/contact/operations",
+  entities: [ContactFormMessage, User]
+}
+
+action updateContactMessageStatus {
+  fn: import { updateContactMessageStatus } from "@src/contact/operations",
+  entities: [ContactFormMessage, User]
+}
+
+action markContactMessageAsRead {
+  fn: import { markContactMessageAsRead } from "@src/contact/operations",
+  entities: [ContactFormMessage, User]
+}
+
 route AdminMessagesRoute { path: "/admin/messages", to: AdminMessagesPage }
 page AdminMessagesPage {
   authRequired: true,

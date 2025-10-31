@@ -1,42 +1,33 @@
-// components/ContactForm.tsx - PADRONIZADO E OTIMIZADO
+// components/ContactForm.tsx - PADRONIZADO E OTIMIZADO COM BACKEND FUNCIONAL
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
+import { createContactMessage } from 'wasp/client/operations';
+import { Button } from '../../client/components/ui/Button';
+import { Card } from '../../client/components/ui/Card';
+import { GlowEffect } from '../../client/components/ui/GlowEffect';
+import { useToast } from '../../client/hooks/useToast';
+import { createContactMessageSchema, type CreateContactMessageInput } from '../../contact/types';
+import { z } from 'zod';
 
 interface FormData {
   name: string;
   email: string;
-  phone: string;
-  businessType: string;
   message: string;
-  consent: boolean;
 }
 
 interface FormErrors {
   [key: string]: string;
 }
 
-const businessTypes = [
-  'Salão de Beleza',
-  'Barbearia',
-  'Clínica de Estética',
-  'Manicure/Pedicure',
-  'Studio de Sobrancelhas',
-  'Spa',
-  'Clínica Médica',
-  'Outro'
-];
-
 export default function ContactForm() {
   const [inView, setInView] = useState(false);
   const ref = useRef<HTMLElement>(null);
+  const { toast } = useToast();
 
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
-    phone: '',
-    businessType: '',
-    message: '',
-    consent: false
+    message: ''
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -53,102 +44,95 @@ export default function ContactForm() {
     return () => observer.disconnect();
   }, []);
 
-  // Helpers
-  const formatPhoneBR = (raw: string) => {
-    const digits = raw.replace(/\D/g, '').slice(0, 11); // DDD + 9 dígitos
-    const part1 = digits.slice(0, 2);
-    const part2 = digits.length > 6 ? digits.slice(2, 7) : digits.slice(2, 6);
-    const part3 = digits.length > 6 ? digits.slice(7, 11) : digits.slice(6, 10);
-    if (digits.length <= 2) return part1 ? `(${part1}` : '';
-    if (digits.length <= 6) return `(${part1}) ${part2}`;
-    return `(${part1}) ${part2}-${part3}`;
-  };
-
   const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
-
-    if (!formData.name.trim()) newErrors.name = 'Nome é obrigatório';
-
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email é obrigatório';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Email inválido';
-    }
-
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'Telefone é obrigatório';
-    } else {
-      const digits = formData.phone.replace(/\D/g, '');
-      // Aceita 10 ou 11 dígitos (fixo ou celular), DDD válido (não inicia com 0)
-      if (!/^[1-9]\d{1}\d{8,9}$/.test(digits)) {
-        newErrors.phone = 'Telefone inválido';
+    try {
+      createContactMessageSchema.parse(formData);
+      setErrors({});
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const newErrors: FormErrors = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            newErrors[err.path[0].toString()] = err.message;
+          }
+        });
+        setErrors(newErrors);
       }
+      return false;
     }
-
-    if (!formData.businessType) newErrors.businessType = 'Selecione o tipo de negócio';
-    if (!formData.consent) newErrors.consent = 'Você precisa aceitar os termos';
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    
+    if (!validateForm()) {
+      toast({
+        title: 'Erro de validação',
+        description: 'Por favor, corrija os campos destacados.',
+        variant: 'destructive',
+      });
+      return;
+    }
 
     setIsSubmitting(true);
     try {
-      // Simula envio (substituir com sua API)
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Exemplo de chamada real:
-      // const response = await fetch('/api/contact', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData),
-      // });
-      // if (!response.ok) throw new Error('Falha no envio');
-
+      await createContactMessage(formData);
+      
       setSubmitSuccess(true);
+      toast({
+        title: 'Mensagem enviada! ✅',
+        description: 'Recebemos sua mensagem e entraremos em contato em breve.',
+      });
+      
+      // Reset form
       setFormData({
         name: '',
         email: '',
-        phone: '',
-        businessType: '',
-        message: '',
-        consent: false
+        message: ''
       });
       setErrors({});
+      
       // Esconde mensagem após 5s
-      const t = setTimeout(() => setSubmitSuccess(false), 5000);
-      return () => clearTimeout(t);
-    } catch (error) {
+      setTimeout(() => setSubmitSuccess(false), 5000);
+    } catch (error: any) {
       console.error('Error submitting form:', error);
-      setErrors({ submit: 'Erro ao enviar formulário. Tente novamente.' });
+      
+      let errorMessage = 'Erro ao enviar formulário. Tente novamente.';
+      
+      // Parse error message from backend
+      if (error?.message) {
+        if (error.message.includes('rate limit') || error.message.includes('Muitas tentativas')) {
+          errorMessage = 'Você enviou muitas mensagens. Por favor, aguarde antes de tentar novamente.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setErrors({ submit: errorMessage });
+      toast({
+        title: 'Erro ao enviar',
+        description: errorMessage,
+        variant: 'destructive',
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value, type } = e.target;
-    const checked = (e.target as HTMLInputElement).checked;
+    const { name, value } = e.target;
 
-    let newValue = type === 'checkbox' ? checked : value;
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
-    if (name === 'phone') {
-      newValue = formatPhoneBR(String(value));
-    }
-
-    setFormData((prev) => ({ ...prev, [name]: newValue as any }));
-
+    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => {
-        const ne = { ...prev };
-        delete ne[name];
-        return ne;
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
       });
     }
   };
@@ -156,13 +140,13 @@ export default function ContactForm() {
   return (
     <section
       ref={ref}
-      className="relative py-24 bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white overflow-hidden"
+      className="relative py-24 bg-gradient-to-b from-black via-zinc-950 to-black text-white overflow-hidden"
       aria-labelledby="contact-heading"
     >
-      {/* Fundo animado (sem cortes) */}
+      {/* Fundo animado neon green */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 right-0 w-[28rem] h-[28rem] bg-purple-500 rounded-full blur-3xl opacity-20 animate-pulse" />
-        <div className="absolute bottom-0 left-0 w-[28rem] h-[28rem] bg-pink-500 rounded-full blur-3xl opacity-20 animate-pulse" />
+        <GlowEffect position="top-right" size="xl" animated />
+        <GlowEffect position="bottom-left" size="lg" animated />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -173,17 +157,17 @@ export default function ContactForm() {
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6 }}
           >
-            <span className="inline-block px-4 py-2 bg-purple-500/20 text-purple-300 rounded-full text-sm font-semibold mb-4 border border-purple-500/30">
+            <span className="inline-block px-4 py-2 bg-neon-500/10 text-neon-500 rounded-full text-sm font-semibold mb-4 border border-neon-500/30">
               FALE CONOSCO
             </span>
             <h2 id="contact-heading" className="text-4xl md:text-5xl font-bold mb-6">
               Vamos conversar sobre
               <br />
-              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-neon-500 to-neon-400 bg-clip-text text-transparent">
                 seu negócio
               </span>
             </h2>
-            <p className="text-xl text-gray-400 mb-8">
+            <p className="text-xl text-zinc-400 mb-8">
               Preencha o formulário e nossa equipe entrará em contato em até 1 hora útil
             </p>
 
@@ -222,16 +206,16 @@ export default function ContactForm() {
             </div>
 
             {/* Trust badges */}
-            <div className="mt-12 pt-8 border-t border-white/10">
-              <p className="text-sm text-gray-400 mb-4">Confiado por:</p>
+            <div className="mt-12 pt-8 border-t border-zinc-800">
+              <p className="text-sm text-zinc-400 mb-4">Confiado por:</p>
               <div className="flex flex-wrap gap-4 items-center">
-                <div className="px-4 py-2 bg-white/10 rounded-lg text-sm font-semibold text-gray-300">
+                <div className="px-4 py-2 bg-zinc-800/50 rounded-lg text-sm font-semibold text-zinc-300 border border-zinc-700">
                   🔒 LGPD Compliant
                 </div>
-                <div className="px-4 py-2 bg-white/10 rounded-lg text-sm font-semibold text-gray-300">
+                <div className="px-4 py-2 bg-zinc-800/50 rounded-lg text-sm font-semibold text-zinc-300 border border-zinc-700">
                   ⭐ 4.9/5 Rating
                 </div>
-                <div className="px-4 py-2 bg-white/10 rounded-lg text-sm font-semibold text-gray-300">
+                <div className="px-4 py-2 bg-zinc-800/50 rounded-lg text-sm font-semibold text-zinc-300 border border-zinc-700">
                   👥 2.500+ Clientes
                 </div>
               </div>
@@ -244,7 +228,7 @@ export default function ContactForm() {
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div className="bg-white/5 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/10">
+            <Card variant="glass-neon" glow className="p-8">
               {/* Mensagem de sucesso */}
               <div aria-live="polite" aria-atomic="true">
                 {submitSuccess ? (
@@ -254,29 +238,29 @@ export default function ContactForm() {
                     className="text-center py-12"
                     role="status"
                   >
-                    <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-green-500/30">
-                      <svg className="w-10 h-10 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <div className="w-20 h-20 bg-neon-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-neon-500/30">
+                      <svg className="w-10 h-10 text-neon-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
                     <h3 className="text-2xl font-bold mb-3">
                       Mensagem enviada!
                     </h3>
-                    <p className="text-gray-400 mb-6">
+                    <p className="text-zinc-400 mb-6">
                       Recebemos sua mensagem e entraremos em contato em breve.
                     </p>
-                    <button
+                    <Button
+                      variant="primary-glow"
                       onClick={() => setSubmitSuccess(false)}
-                      className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105"
                     >
                       Enviar outra mensagem
-                    </button>
+                    </Button>
                   </motion.div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                     {/* Nome */}
                     <div>
-                      <label htmlFor="name" className="block text-sm font-semibold text-gray-300 mb-2">
+                      <label htmlFor="name" className="block text-sm font-semibold text-zinc-300 mb-2">
                         Nome completo *
                       </label>
                       <input
@@ -286,10 +270,12 @@ export default function ContactForm() {
                         autoComplete="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className={`w-full px-4 py-3 rounded-xl bg-white/5 border-2 transition-colors duration-300 text-white placeholder-gray-500 focus:outline-none ${
-                          errors.name ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-purple-500/50'
+                        className={`w-full px-4 py-3 rounded-xl bg-zinc-900/50 border-2 transition-all duration-300 text-white placeholder-zinc-500 focus:outline-none ${
+                          errors.name 
+                            ? 'border-red-500 focus:border-red-500' 
+                            : 'border-zinc-700 focus:border-neon-500/50 hover:border-zinc-600'
                         }`}
-                        placeholder="Seu nome"
+                        placeholder="Seu nome completo"
                         aria-invalid={!!errors.name}
                         aria-describedby={errors.name ? 'name-error' : undefined}
                       />
@@ -300,7 +286,7 @@ export default function ContactForm() {
 
                     {/* Email */}
                     <div>
-                      <label htmlFor="email" className="block text-sm font-semibold text-gray-300 mb-2">
+                      <label htmlFor="email" className="block text-sm font-semibold text-zinc-300 mb-2">
                         Email *
                       </label>
                       <input
@@ -310,8 +296,10 @@ export default function ContactForm() {
                         autoComplete="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className={`w-full px-4 py-3 rounded-xl bg-white/5 border-2 transition-colors duration-300 text-white placeholder-gray-500 focus:outline-none ${
-                          errors.email ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-purple-500/50'
+                        className={`w-full px-4 py-3 rounded-xl bg-zinc-900/50 border-2 transition-all duration-300 text-white placeholder-zinc-500 focus:outline-none ${
+                          errors.email 
+                            ? 'border-red-500 focus:border-red-500' 
+                            : 'border-zinc-700 focus:border-neon-500/50 hover:border-zinc-600'
                         }`}
                         placeholder="seu@email.com"
                         aria-invalid={!!errors.email}
@@ -322,103 +310,30 @@ export default function ContactForm() {
                       )}
                     </div>
 
-                    {/* Telefone */}
-                    <div>
-                      <label htmlFor="phone" className="block text-sm font-semibold text-gray-300 mb-2">
-                        Telefone/WhatsApp *
-                      </label>
-                      <input
-                        type="tel"
-                        id="phone"
-                        name="phone"
-                        inputMode="tel"
-                        autoComplete="tel"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 rounded-xl bg-white/5 border-2 transition-colors duration-300 text-white placeholder-gray-500 focus:outline-none ${
-                          errors.phone ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-purple-500/50'
-                        }`}
-                        placeholder="(11) 99999-9999"
-                        aria-invalid={!!errors.phone}
-                        aria-describedby={errors.phone ? 'phone-error' : undefined}
-                      />
-                      {errors.phone && (
-                        <p id="phone-error" className="mt-1 text-sm text-red-400" role="alert">{errors.phone}</p>
-                      )}
-                    </div>
-
-                    {/* Tipo de negócio */}
-                    <div>
-                      <label htmlFor="businessType" className="block text-sm font-semibold text-gray-300 mb-2">
-                        Tipo de negócio *
-                      </label>
-                      <select
-                        id="businessType"
-                        name="businessType"
-                        value={formData.businessType}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 rounded-xl bg-white/5 border-2 transition-colors duration-300 text-white focus:outline-none ${
-                          errors.businessType ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-purple-500/50'
-                        }`}
-                        aria-invalid={!!errors.businessType}
-                        aria-describedby={errors.businessType ? 'businessType-error' : undefined}
-                      >
-                        <option value="" className="bg-gray-900">Selecione...</option>
-                        {businessTypes.map((type, index) => (
-                          <option key={index} value={type} className="bg-gray-900">
-                            {type}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.businessType && (
-                        <p id="businessType-error" className="mt-1 text-sm text-red-400" role="alert">{errors.businessType}</p>
-                      )}
-                    </div>
-
                     {/* Mensagem */}
                     <div>
-                      <label htmlFor="message" className="block text-sm font-semibold text-gray-300 mb-2">
-                        Mensagem (opcional)
+                      <label htmlFor="message" className="block text-sm font-semibold text-zinc-300 mb-2">
+                        Mensagem *
                       </label>
                       <textarea
                         id="message"
                         name="message"
                         value={formData.message}
                         onChange={handleChange}
-                        rows={4}
-                        className="w-full px-4 py-3 rounded-xl bg-white/5 border-2 border-white/10 focus:border-purple-500/50 focus:outline-none transition-colors duration-300 resize-none text-white placeholder-gray-500"
-                        placeholder="Conte-nos mais sobre suas necessidades..."
+                        rows={5}
+                        className={`w-full px-4 py-3 rounded-xl bg-zinc-900/50 border-2 transition-all duration-300 resize-none text-white placeholder-zinc-500 focus:outline-none ${
+                          errors.message 
+                            ? 'border-red-500 focus:border-red-500' 
+                            : 'border-zinc-700 focus:border-neon-500/50 hover:border-zinc-600'
+                        }`}
+                        placeholder="Conte-nos sobre suas necessidades e como podemos ajudar..."
+                        aria-invalid={!!errors.message}
+                        aria-describedby={errors.message ? 'message-error' : undefined}
                       />
-                    </div>
-
-                    {/* Consentimento */}
-                    <fieldset>
-                      <label className="flex items-start gap-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          name="consent"
-                          checked={formData.consent}
-                          onChange={handleChange}
-                          className="mt-1 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                          aria-invalid={!!errors.consent}
-                          aria-describedby={errors.consent ? 'consent-error' : undefined}
-                        />
-                        <span className="text-sm text-gray-400">
-                          Aceito receber comunicações do Glamo e concordo com a{' '}
-                          <a href="/privacy" className="text-purple-400 hover:text-purple-300 hover:underline">
-                            Política de Privacidade
-                          </a>
-                          {' '}e{' '}
-                          <a href="/terms" className="text-purple-400 hover:text-purple-300 hover:underline">
-                            Termos de Uso
-                          </a>
-                          . *
-                        </span>
-                      </label>
-                      {errors.consent && (
-                        <p id="consent-error" className="mt-1 text-sm text-red-400" role="alert">{errors.consent}</p>
+                      {errors.message && (
+                        <p id="message-error" className="mt-1 text-sm text-red-400" role="alert">{errors.message}</p>
                       )}
-                    </fieldset>
+                    </div>
 
                     {/* Erro de envio */}
                     {errors.submit && (
@@ -428,31 +343,24 @@ export default function ContactForm() {
                     )}
 
                     {/* Botão de envio */}
-                    <button
+                    <Button
                       type="submit"
-                      disabled={isSubmitting}
-                      className="w-full px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-semibold text-lg hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
+                      variant="primary-glow"
+                      size="lg"
+                      isLoading={isSubmitting}
+                      className="w-full"
                     >
-                      {isSubmitting ? (
-                        <span className="flex items-center justify-center gap-3">
-                          <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Enviando...
-                        </span>
-                      ) : (
-                        'Enviar Mensagem'
-                      )}
-                    </button>
+                      {isSubmitting ? 'Enviando...' : 'Enviar Mensagem'}
+                    </Button>
 
-                    <p className="text-xs text-center text-gray-500">
-                      Responderemos em até 1 hora útil
+                    <p className="text-xs text-center text-zinc-500">
+                      ✓ Responderemos em até 1 hora útil<br/>
+                      ✓ Seus dados estão protegidos pela LGPD
                     </p>
                   </form>
                 )}
               </div>
-            </div>
+            </Card>
           </motion.div>
         </div>
       </div>
@@ -474,14 +382,14 @@ function ContactMethod({
   return (
     <a
       href={link}
-      className="flex items-center gap-4 p-4 bg-white/5 backdrop-blur-sm rounded-xl hover:bg-white/10 border border-white/10 hover:border-purple-500/30 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-purple-500/40"
+      className="flex items-center gap-4 p-4 bg-zinc-900/50 backdrop-blur-sm rounded-xl hover:bg-zinc-800/50 border border-zinc-700 hover:border-neon-500/30 hover:shadow-glow-sm transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-neon-500/40"
     >
-      <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300">
+      <div className="w-12 h-12 bg-gradient-to-br from-neon-500 to-neon-600 rounded-xl flex items-center justify-center text-black group-hover:scale-110 group-hover:shadow-glow-md transition-all duration-300">
         {icon}
       </div>
       <div>
-        <p className="text-sm text-gray-400">{title}</p>
-        <p className="font-semibold text-white">{value}</p>
+        <p className="text-sm text-zinc-400">{title}</p>
+        <p className="font-semibold text-white group-hover:text-neon-500 transition-colors">{value}</p>
       </div>
     </a>
   );
