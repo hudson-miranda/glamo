@@ -20,6 +20,20 @@ export default {
         transparent: 'transparent',
         'black-2': '#010101',
 
+        // Neon Green Design System
+        neon: {
+          50: '#e6fff5',
+          100: '#b3ffe0',
+          200: '#80ffcc',
+          300: '#4dffb8',
+          400: '#1affa3',
+          500: '#00FF94', // Primary neon green
+          600: '#00cc76',
+          700: '#009959',
+          800: '#00663b',
+          900: '#00331e',
+        },
+
         // Pure ShadCN color system only
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
@@ -259,10 +273,34 @@ export default {
         switcher:
           '0px 2px 4px rgba(0, 0, 0, 0.2), inset 0px 2px 2px #FFFFFF, inset 0px -1px 1px rgba(0, 0, 0, 0.1)',
         'switch-1': '0px 0px 5px rgba(0, 0, 0, 0.15)',
+        
+        // Neon glow effects
+        'glow-sm': '0 0 10px rgba(0, 255, 148, 0.3), 0 0 20px rgba(0, 255, 148, 0.1)',
+        'glow-md': '0 0 15px rgba(0, 255, 148, 0.4), 0 0 30px rgba(0, 255, 148, 0.2), 0 0 45px rgba(0, 255, 148, 0.1)',
+        'glow-lg': '0 0 20px rgba(0, 255, 148, 0.5), 0 0 40px rgba(0, 255, 148, 0.3), 0 0 60px rgba(0, 255, 148, 0.2)',
+        'glow-xl': '0 0 30px rgba(0, 255, 148, 0.6), 0 0 60px rgba(0, 255, 148, 0.4), 0 0 90px rgba(0, 255, 148, 0.3)',
+        'glow-neon': '0 0 5px rgba(0, 255, 148, 0.5), 0 0 10px rgba(0, 255, 148, 0.4), 0 0 15px rgba(0, 255, 148, 0.3), 0 0 20px rgba(0, 255, 148, 0.2)',
+        
+        // Glassmorphism
+        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+        'glass-sm': '0 4px 16px 0 rgba(0, 0, 0, 0.25)',
       },
       dropShadow: {
         1: '0px 1px 0px #E2E8F0',
         2: '0px 1px 4px rgba(0, 0, 0, 0.12)',
+        'glow-sm': '0 0 10px rgba(0, 255, 148, 0.5)',
+        'glow-md': '0 0 15px rgba(0, 255, 148, 0.6)',
+        'glow-lg': '0 0 20px rgba(0, 255, 148, 0.7)',
+      },
+      backdropBlur: {
+        xs: '2px',
+        sm: '4px',
+        DEFAULT: '8px',
+        md: '12px',
+        lg: '16px',
+        xl: '24px',
+        '2xl': '40px',
+        '3xl': '64px',
       },
       keyframes: {
         rotating: {
@@ -273,6 +311,48 @@ export default {
             transform: 'rotate(0deg)',
           },
         },
+        'pulse-glow': {
+          '0%, 100%': {
+            boxShadow: '0 0 20px rgba(0, 255, 148, 0.4), 0 0 40px rgba(0, 255, 148, 0.2)',
+          },
+          '50%': {
+            boxShadow: '0 0 30px rgba(0, 255, 148, 0.6), 0 0 60px rgba(0, 255, 148, 0.4)',
+          },
+        },
+        'float': {
+          '0%, 100%': {
+            transform: 'translateY(0px)',
+          },
+          '50%': {
+            transform: 'translateY(-10px)',
+          },
+        },
+        'glow-pulse': {
+          '0%, 100%': {
+            opacity: '1',
+          },
+          '50%': {
+            opacity: '0.5',
+          },
+        },
+        'slide-in': {
+          '0%': {
+            transform: 'translateX(-100%)',
+            opacity: '0',
+          },
+          '100%': {
+            transform: 'translateX(0)',
+            opacity: '1',
+          },
+        },
+        'fade-in': {
+          '0%': {
+            opacity: '0',
+          },
+          '100%': {
+            opacity: '1',
+          },
+        },
       },
       animation: {
         'ping-once': 'ping 5s cubic-bezier(0, 0, 0.2, 1)',
@@ -280,6 +360,11 @@ export default {
         'spin-1.5': 'spin 1.5s linear infinite',
         'spin-2': 'spin 2s linear infinite',
         'spin-3': 'spin 3s linear infinite',
+        'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+        float: 'float 3s ease-in-out infinite',
+        'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
+        'slide-in': 'slide-in 0.5s ease-out',
+        'fade-in': 'fade-in 0.5s ease-out',
       },
       borderRadius: {
         lg: 'var(--radius)',
