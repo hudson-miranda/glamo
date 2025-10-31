@@ -18,7 +18,7 @@ export function Announcement({
     <div
       role="region"
       aria-label="Anúncio"
-      className="relative flex justify-center items-center gap-3 p-3 w-full bg-gradient-to-r from-purple-600 to-pink-600 text-primary-foreground text-center"
+      className="relative flex justify-center items-center gap-3 p-3 w-full bg-gradient-to-r from-green-500 to-emerald-500 text-primary-foreground text-center"
     >
       <a
         href={url}

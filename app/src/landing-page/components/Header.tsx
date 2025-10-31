@@ -160,7 +160,7 @@ function MobileNavLink({
     <a
       href={href}
       onClick={onClick}
-      className="block px-4 py-2 text-gray-700 font-medium hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-300"
+      className="block px-4 py-2 text-gray-700 font-medium hover:text-purple-600 hover:bg-neon-50 rounded-lg transition-all duration-300"
     >
       {children}
     </a>

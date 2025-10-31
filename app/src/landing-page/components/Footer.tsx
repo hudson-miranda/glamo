@@ -71,7 +71,7 @@ export default function Footer({ footerNavigation }: FooterProps = {}) {
   return (
     <footer className="bg-black text-white border-t border-white/10 relative overflow-hidden">
       {/* sutil glow no topo para transição com a seção anterior */}
-      <div className="pointer-events-none absolute inset-x-0 -top-12 h-24 bg-gradient-to-b from-purple-500/10 to-transparent blur-2xl" />
+      <div className="pointer-events-none absolute inset-x-0 -top-12 h-24 bg-gradient-to-b from-neon-500/10 to-transparent blur-2xl" />
 
       <div className="container mx-auto px-4 py-16 relative">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
