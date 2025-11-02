@@ -1,0 +1,53 @@
+/**
+ * CSS overrides para os formulários de autenticação do Wasp
+ * Estes estilos customizam elementos que não podem ser alterados via props
+ */
+
+/* Ocultar textos em inglês e substituir por português */
+[data-auth-form] h2::before {
+  content: none;
+}
+
+/* Customizar o texto "Or continue with" para ter contraste adequado */
+[data-auth-form] [role="separator"]:not(:empty),
+[data-auth-form] .divider:not(:empty),
+.auth-form-divider:not(:empty) {
+  color: #6b7280 !important; /* gray-500 - garante contraste */
+  background-color: transparent !important;
+}
+
+/* Garantir que o separador tenha cor visível em dark mode */
+.dark [data-auth-form] [role="separator"]:not(:empty),
+.dark [data-auth-form] .divider:not(:empty),
+.dark .auth-form-divider:not(:empty) {
+  color: #9ca3af !important; /* gray-400 */
+}
+
+/* Melhorar o contraste do texto do divisor */
+[data-auth-form] .or-continue-with,
+[data-auth-form] [class*="divider"] span,
+[data-auth-form] [class*="separator"] span {
+  color: #6b7280 !important; /* gray-500 */
+  font-weight: 500;
+}
+
+.dark [data-auth-form] .or-continue-with,
+.dark [data-auth-form] [class*="divider"] span,
+.dark [data-auth-form] [class*="separator"] span {
+  color: #9ca3af !important; /* gray-400 */
+}
+
+/* Garantir que as linhas do divisor sejam visíveis */
+[data-auth-form] [role="separator"]::before,
+[data-auth-form] [role="separator"]::after,
+[data-auth-form] .divider::before,
+[data-auth-form] .divider::after {
+  background-color: #e5e7eb !important; /* gray-200 */
+}
+
+.dark [data-auth-form] [role="separator"]::before,
+.dark [data-auth-form] [role="separator"]::after,
+.dark [data-auth-form] .divider::before,
+.dark [data-auth-form] .divider::after {
+  background-color: #374151 !important; /* gray-700 */
+}
