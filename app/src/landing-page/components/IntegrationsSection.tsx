@@ -1,4 +1,4 @@
-// components/IntegrationsSection.tsx - NOVO COMPONENTE COM DESIGN SYSTEM NEON
+// components/IntegrationsSection.tsx - NOVO COMPONENTE COM DESIGN SYSTEM BRAND (Soft Purple)
 import { motion } from 'framer-motion';
 import { Card } from '../../client/components/ui/Card';
 import { GradientText } from '../../client/components/ui/GradientText';
@@ -46,8 +46,8 @@ export default function IntegrationsSection() {
       className="relative py-24 bg-black text-white overflow-hidden"
     >
       {/* Glow Effects de fundo */}
-      <GlowEffect position="top-left" size="xl" color="neon" animated />
-      <GlowEffect position="bottom-right" size="xl" color="neon" animated />
+      <GlowEffect position="top-left" size="xl" color="brand" animated />
+      <GlowEffect position="bottom-right" size="xl" color="brand" animated />
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Cabeçalho */}
@@ -61,7 +61,7 @@ export default function IntegrationsSection() {
             INTEGRATIONS
           </Badge>
           <h2 className="text-4xl md:text-6xl font-bold mb-4">
-            <GradientText variant="neon" as="span" className="text-4xl md:text-6xl font-bold">
+            <GradientText variant="brand" as="span" className="text-4xl md:text-6xl font-bold">
               I lost popular integration apps
             </GradientText>
           </h2>
@@ -90,11 +90,11 @@ export default function IntegrationsSection() {
           className="text-center mt-16"
         >
           <p className="text-zinc-400 mb-4">
-            <span className="text-neon-500 font-bold">+100 integrations</span> available
+            <span className="text-brand-500 font-bold">+100 integrations</span> available
           </p>
           <a
             href="#"
-            className="inline-flex items-center gap-2 text-neon-500 hover:text-neon-400 font-semibold transition-colors duration-300 underline-offset-4 hover:underline"
+            className="inline-flex items-center gap-2 text-brand-500 hover:text-brand-400 font-semibold transition-colors duration-300 underline-offset-4 hover:underline"
           >
             See all apps
             <svg

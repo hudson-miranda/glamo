@@ -188,7 +188,7 @@ export default function FeaturesGrid() {
     >
       {/* Fundo animado (sem cortes) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 right-1/4 w-[28rem] h-[28rem] bg-neon-500 rounded-full blur-3xl opacity-20 animate-pulse" />
+        <div className="absolute top-1/4 right-1/4 w-[28rem] h-[28rem] bg-brand-500 rounded-full blur-3xl opacity-20 animate-pulse" />
         <div className="absolute bottom-1/4 left-1/4 w-[28rem] h-[28rem] bg-pink-500 rounded-full blur-3xl opacity-20 animate-pulse" />
       </div>
 
@@ -200,13 +200,13 @@ export default function FeaturesGrid() {
           transition={{ duration: 0.6 }}
           className="text-center mb-20"
         >
-          <span className="inline-block px-4 py-2 bg-neon-500/20 text-purple-300 rounded-full text-sm font-semibold mb-4 border border-neon-500/30">
+          <span className="inline-block px-4 py-2 bg-brand-500/20 text-purple-300 rounded-full text-sm font-semibold mb-4 border border-brand-500/30">
             FUNCIONALIDADES
           </span>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
             Tudo que você precisa.
             <br />
-            <span className="bg-gradient-to-r from-neon-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-brand-400 to-pink-400 bg-clip-text text-transparent">
               Em um único lugar.
             </span>
           </h2>

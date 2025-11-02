@@ -1,4 +1,4 @@
-// components/Features.tsx - REFATORADO COM DESIGN SYSTEM NEON
+// components/Features.tsx - REFATORADO COM DESIGN SYSTEM BRAND (Soft Purple)
 import { motion } from 'framer-motion';
 import { Card } from '../../client/components/ui/Card';
 import { GradientText } from '../../client/components/ui/GradientText';
@@ -73,11 +73,9 @@ export default function Features() {
       ref={ref}
       className="relative py-24 bg-black text-white overflow-hidden"
     >
-      {/* Glow Effects de fundo */}
-      <GlowEffect position="top-right" size="xl" color="neon" animated />
-      <GlowEffect position="bottom-left" size="xl" color="neon" animated />
-
-      <div className="container mx-auto px-4 relative z-10">
+      {/* Efeitos de fundo */}
+      <GlowEffect position="top-right" size="xl" color="brand" animated />
+      <GlowEffect position="bottom-left" size="xl" color="brand" animated />      <div className="container mx-auto px-4 relative z-10">
         {/* Cabeçalho */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -90,7 +88,7 @@ export default function Features() {
           </Badge>
           <h2 className="text-4xl md:text-6xl font-bold mb-4">
             Choose from over{' '}
-            <GradientText variant="neon" as="span" className="text-4xl md:text-6xl font-bold">
+            <GradientText variant="brand" as="span" className="text-4xl md:text-6xl font-bold">
               10+ cutting-edge products
             </GradientText>
           </h2>
@@ -146,7 +144,7 @@ function FeatureCard({
       transition={{ duration: 0.5, delay: index * 0.1 }}
     >
       <Card
-        variant="glass-neon"
+        variant="glass-brand"
         hover
         glow
         className="group cursor-pointer h-full"
@@ -158,7 +156,7 @@ function FeatureCard({
         >
           {feature.icon}
         </div>
-        <h3 className="text-xl font-bold mb-2 text-white group-hover:text-neon-500 transition-colors duration-300">
+        <h3 className="text-xl font-bold mb-2 text-white group-hover:text-brand-500 transition-colors duration-300">
           {feature.title}
         </h3>
         <p className="text-zinc-400 text-sm leading-relaxed">

@@ -1,4 +1,4 @@
-// components/PricingSection.tsx - NOVO COMPONENTE COM DESIGN SYSTEM NEON
+// components/PricingSection.tsx - NOVO COMPONENTE COM DESIGN SYSTEM BRAND (Soft Purple)
 import { motion } from 'framer-motion';
 import { Card } from '../../client/components/ui/Card';
 import { GradientText } from '../../client/components/ui/GradientText';
@@ -97,8 +97,8 @@ export default function PricingSection() {
       className="relative py-24 bg-black text-white overflow-hidden"
     >
       {/* Glow Effects de fundo */}
-      <GlowEffect position="top-left" size="xl" color="neon" animated />
-      <GlowEffect position="bottom-right" size="xl" color="neon" animated />
+      <GlowEffect position="top-left" size="xl" color="brand" animated />
+      <GlowEffect position="bottom-right" size="xl" color="brand" animated />
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Cabeçalho */}
@@ -113,7 +113,7 @@ export default function PricingSection() {
           </Badge>
           <h2 className="text-4xl md:text-6xl font-bold mb-4">
             The best in the class{' '}
-            <GradientText variant="neon" as="span" className="text-4xl md:text-6xl font-bold">
+            <GradientText variant="brand" as="span" className="text-4xl md:text-6xl font-bold">
               product for you today!
             </GradientText>
           </h2>
@@ -180,26 +180,28 @@ function PricingCard({
       transition={{ duration: 0.5, delay: index * 0.15 }}
       className={`relative ${plan.highlighted ? 'md:-mt-8 md:mb-8' : ''}`}
     >
-      {plan.badge && (
-        <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-          <Badge variant="glow">{plan.badge}</Badge>
-        </div>
-      )}
 
       <Card
-        variant={plan.highlighted ? 'glass-neon' : 'glass'}
+        variant={plan.highlighted ? 'glass-brand' : 'glass'}
         hover
         glow={plan.highlighted}
         className={`h-full flex flex-col relative ${
-          plan.highlighted ? 'border-2 border-neon-500/50 shadow-glow-lg' : ''
+          plan.highlighted ? 'border-2 border-brand-500/50 shadow-glow-lg' : ''
         }`}
       >
+        {/* Badge */}
+        {plan.badge && (
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+          <Badge variant="mostpopular">{plan.badge}</Badge>
+        </div>
+      )}
+
         {/* Plan Header */}
         <div className="mb-6">
           <h3 className="text-2xl font-bold mb-2 text-white">{plan.name}</h3>
           <p className="text-sm text-zinc-400 mb-6">{plan.description}</p>
           <div className="flex items-baseline gap-2">
-            <span className={`text-5xl font-bold ${plan.highlighted ? 'text-neon-500' : 'text-white'}`}>
+            <span className={`text-5xl font-bold ${plan.highlighted ? 'text-brand-500' : 'text-white'}`}>
               {plan.price}
             </span>
             <span className="text-zinc-400">/ {plan.period}</span>
@@ -218,7 +220,7 @@ function PricingCard({
             >
               <svg
                 className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
-                  plan.highlighted ? 'text-neon-500' : 'text-zinc-400'
+                  plan.highlighted ? 'text-brand-500' : 'text-zinc-400'
                 }`}
                 fill="none"
                 viewBox="0 0 24 24"

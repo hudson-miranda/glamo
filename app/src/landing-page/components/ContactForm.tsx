@@ -140,10 +140,10 @@ export default function ContactForm() {
   return (
     <section
       ref={ref}
-      className="relative py-24 bg-gradient-to-b from-black via-zinc-950 to-black text-white overflow-hidden"
+      className="relative py-24 bg-gradient-to-b from-white via-purple-50/20 to-white dark:from-black dark:via-zinc-950 dark:to-black text-gray-900 dark:text-white overflow-hidden"
       aria-labelledby="contact-heading"
     >
-      {/* Fundo animado neon green */}
+      {/* Fundo animado BRAND (Soft Purple) green */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <GlowEffect position="top-right" size="xl" animated />
         <GlowEffect position="bottom-left" size="lg" animated />
@@ -157,13 +157,13 @@ export default function ContactForm() {
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6 }}
           >
-            <span className="inline-block px-4 py-2 bg-neon-500/10 text-neon-500 rounded-full text-sm font-semibold mb-4 border border-neon-500/30">
+            <span className="inline-block px-4 py-2 bg-brand-500/10 text-brand-500 rounded-full text-sm font-semibold mb-4 border border-brand-500/30">
               FALE CONOSCO
             </span>
             <h2 id="contact-heading" className="text-4xl md:text-5xl font-bold mb-6">
               Vamos conversar sobre
               <br />
-              <span className="bg-gradient-to-r from-neon-500 to-neon-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-brand-500 to-brand-400 bg-clip-text text-transparent">
                 seu negócio
               </span>
             </h2>
@@ -228,7 +228,7 @@ export default function ContactForm() {
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <Card variant="glass-neon" glow className="p-8">
+            <Card variant="glass-brand" glow className="p-8">
               {/* Mensagem de sucesso */}
               <div aria-live="polite" aria-atomic="true">
                 {submitSuccess ? (
@@ -238,8 +238,8 @@ export default function ContactForm() {
                     className="text-center py-12"
                     role="status"
                   >
-                    <div className="w-20 h-20 bg-neon-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-neon-500/30">
-                      <svg className="w-10 h-10 text-neon-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <div className="w-20 h-20 bg-brand-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-brand-500/30">
+                      <svg className="w-10 h-10 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
@@ -273,7 +273,7 @@ export default function ContactForm() {
                         className={`w-full px-4 py-3 rounded-xl bg-zinc-900/50 border-2 transition-all duration-300 text-white placeholder-zinc-500 focus:outline-none ${
                           errors.name 
                             ? 'border-red-500 focus:border-red-500' 
-                            : 'border-zinc-700 focus:border-neon-500/50 hover:border-zinc-600'
+                            : 'border-zinc-700 focus:border-brand-500/50 hover:border-zinc-600'
                         }`}
                         placeholder="Seu nome completo"
                         aria-invalid={!!errors.name}
@@ -299,7 +299,7 @@ export default function ContactForm() {
                         className={`w-full px-4 py-3 rounded-xl bg-zinc-900/50 border-2 transition-all duration-300 text-white placeholder-zinc-500 focus:outline-none ${
                           errors.email 
                             ? 'border-red-500 focus:border-red-500' 
-                            : 'border-zinc-700 focus:border-neon-500/50 hover:border-zinc-600'
+                            : 'border-zinc-700 focus:border-brand-500/50 hover:border-zinc-600'
                         }`}
                         placeholder="seu@email.com"
                         aria-invalid={!!errors.email}
@@ -324,7 +324,7 @@ export default function ContactForm() {
                         className={`w-full px-4 py-3 rounded-xl bg-zinc-900/50 border-2 transition-all duration-300 resize-none text-white placeholder-zinc-500 focus:outline-none ${
                           errors.message 
                             ? 'border-red-500 focus:border-red-500' 
-                            : 'border-zinc-700 focus:border-neon-500/50 hover:border-zinc-600'
+                            : 'border-zinc-700 focus:border-brand-500/50 hover:border-zinc-600'
                         }`}
                         placeholder="Conte-nos sobre suas necessidades e como podemos ajudar..."
                         aria-invalid={!!errors.message}
@@ -382,14 +382,14 @@ function ContactMethod({
   return (
     <a
       href={link}
-      className="flex items-center gap-4 p-4 bg-zinc-900/50 backdrop-blur-sm rounded-xl hover:bg-zinc-800/50 border border-zinc-700 hover:border-neon-500/30 hover:shadow-glow-sm transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-neon-500/40"
+      className="flex items-center gap-4 p-4 bg-zinc-900/50 backdrop-blur-sm rounded-xl hover:bg-zinc-800/50 border border-zinc-700 hover:border-brand-500/30 hover:shadow-glow-sm transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-brand-500/40"
     >
-      <div className="w-12 h-12 bg-gradient-to-br from-neon-500 to-neon-600 rounded-xl flex items-center justify-center text-black group-hover:scale-110 group-hover:shadow-glow-md transition-all duration-300">
+      <div className="w-12 h-12 bg-gradient-to-br from-brand-500 to-brand-600 rounded-xl flex items-center justify-center text-black group-hover:scale-110 group-hover:shadow-glow-md transition-all duration-300">
         {icon}
       </div>
       <div>
         <p className="text-sm text-zinc-400">{title}</p>
-        <p className="font-semibold text-white group-hover:text-neon-500 transition-colors">{value}</p>
+        <p className="font-semibold text-white group-hover:text-brand-500 transition-colors">{value}</p>
       </div>
     </a>
   );

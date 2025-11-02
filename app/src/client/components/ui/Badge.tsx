@@ -4,13 +4,13 @@ import { cn } from '../../cn';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   children: React.ReactNode;
-  variant?: 'neon' | 'outline' | 'solid' | 'glow';
+  variant?: 'brand' | 'outline' | 'solid' | 'glow' | 'mostpopular';
   size?: 'sm' | 'md' | 'lg';
   dot?: boolean;
 }
 
 /**
- * Badge component with neon styling
+ * Badge component with brand styling (Soft Purple)
  * 
  * @example
  * ```tsx
@@ -21,7 +21,7 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 export const Badge: React.FC<BadgeProps> = ({
   className,
   children,
-  variant = 'neon',
+  variant = 'brand',
   size = 'md',
   dot = false,
   ...props
@@ -29,10 +29,11 @@ export const Badge: React.FC<BadgeProps> = ({
   const baseStyles = 'inline-flex items-center gap-1.5 rounded-full font-medium transition-all duration-300';
   
   const variants = {
-    'neon': 'bg-neon-500/10 text-neon-500 border border-neon-500/30',
-    'outline': 'bg-transparent text-neon-500 border border-neon-500',
-    'solid': 'bg-neon-500 text-black',
-    'glow': 'bg-neon-500/10 text-neon-500 border border-neon-500/30 shadow-glow-sm hover:shadow-glow-md',
+    'brand': 'bg-brand-500/10 text-brand-500 border border-brand-500/30',
+    'outline': 'bg-transparent text-brand-500 border border-brand-500',
+    'solid': 'bg-brand-500 text-black',
+    'glow': 'bg-brand-500/10 text-brand-500 border border-brand-500/30 shadow-glow-sm hover:shadow-glow-md',
+    'mostpopular': 'bg-black text-brand-500 border border-brand-500/30 shadow-glow-sm hover:shadow-glow-md',
   };
   
   const sizes = {
@@ -52,7 +53,7 @@ export const Badge: React.FC<BadgeProps> = ({
       {...props}
     >
       {dot && (
-        <span className="w-1.5 h-1.5 rounded-full bg-neon-500 animate-pulse" />
+        <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse" />
       )}
       {children}
     </span>
