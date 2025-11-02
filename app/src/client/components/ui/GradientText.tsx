@@ -4,7 +4,7 @@ import { cn } from '../../cn';
 
 export interface GradientTextProps extends React.HTMLAttributes<HTMLSpanElement> {
   children: React.ReactNode;
-  variant?: 'neon' | 'neon-diagonal' | 'primary' | 'primary-diagonal';
+  variant?: 'brand' | 'brand-diagonal' | 'primary' | 'primary-diagonal';
   as?: 'span' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p';
   animated?: boolean;
 }
@@ -14,7 +14,7 @@ export interface GradientTextProps extends React.HTMLAttributes<HTMLSpanElement>
  * 
  * @example
  * ```tsx
- * <GradientText variant="neon" as="h1" className="text-5xl font-bold">
+ * <GradientText variant="brand" as="h1" className="text-5xl font-bold">
  *   Amazing Title
  * </GradientText>
  * ```
@@ -22,14 +22,14 @@ export interface GradientTextProps extends React.HTMLAttributes<HTMLSpanElement>
 export const GradientText: React.FC<GradientTextProps> = ({
   className,
   children,
-  variant = 'neon',
+  variant = 'brand',
   as: Component = 'span',
   animated = false,
   ...props
 }) => {
   const variants = {
-    'neon': 'text-gradient-neon',
-    'neon-diagonal': 'text-gradient-neon-diagonal',
+    'brand': 'text-gradient-brand',
+    'brand-diagonal': 'text-gradient-brand-diagonal',
     'primary': 'text-gradient-primary',
     'primary-diagonal': 'text-gradient-primary-diagonal',
   };

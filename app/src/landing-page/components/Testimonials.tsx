@@ -1,4 +1,4 @@
-// components/Testimonials.tsx - REFATORADO COM DESIGN SYSTEM NEON
+// components/Testimonials.tsx - REFATORADO COM DESIGN SYSTEM BRAND (Soft Purple)
 import { motion } from 'framer-motion';
 import { Card } from '../../client/components/ui/Card';
 import { GradientText } from '../../client/components/ui/GradientText';
@@ -76,8 +76,8 @@ export default function Testimonials() {
       className="relative py-24 bg-black text-white overflow-hidden"
     >
       {/* Glow Effects de fundo */}
-      <GlowEffect position="top-right" size="xl" color="neon" animated />
-      <GlowEffect position="bottom-left" size="xl" color="neon" animated />
+      <GlowEffect position="top-right" size="xl" color="brand" animated />
+      <GlowEffect position="bottom-left" size="xl" color="brand" animated />
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Cabeçalho */}
@@ -92,7 +92,7 @@ export default function Testimonials() {
           </Badge>
           <h2 className="text-4xl md:text-6xl font-bold mb-4">
             Here's what our{' '}
-            <GradientText variant="neon" as="span" className="text-4xl md:text-6xl font-bold">
+            <GradientText variant="brand" as="span" className="text-4xl md:text-6xl font-bold">
               customer has to says
             </GradientText>
           </h2>
@@ -133,7 +133,7 @@ export default function Testimonials() {
               transition={{ duration: 0.5, delay: 1 + index * 0.1 }}
             >
               <Card variant="glass" className="text-center">
-                <div className="text-3xl font-bold text-neon-500 mb-2">
+                <div className="text-3xl font-bold text-brand-500 mb-2">
                   {stat.value}
                 </div>
                 <div className="text-sm text-zinc-400">{stat.label}</div>
@@ -161,14 +161,14 @@ function TestimonialCard({
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay: index * 0.15 }}
     >
-      <Card variant="glass-neon" hover glow className="h-full">
+      <Card variant="glass-brand" hover glow className="h-full">
         {/* Rating */}
         <div className="flex gap-1 mb-4" aria-label={`Rating ${testimonial.rating} out of 5`}>
           {Array.from({ length: 5 }).map((_, i) => (
             <svg
               key={i}
               className={`w-5 h-5 ${
-                i < testimonial.rating ? 'text-neon-500' : 'text-zinc-700'
+                i < testimonial.rating ? 'text-brand-500' : 'text-zinc-700'
               }`}
               fill="currentColor"
               viewBox="0 0 20 20"
@@ -186,7 +186,7 @@ function TestimonialCard({
 
         {/* Author */}
         <div className="flex items-center gap-3 mt-auto">
-          <div className="w-12 h-12 bg-gradient-to-br from-neon-500 to-purple-500 rounded-full flex items-center justify-center text-2xl">
+          <div className="w-12 h-12 bg-gradient-to-br from-brand-500 to-purple-500 rounded-full flex items-center justify-center text-2xl">
             {testimonial.avatar}
           </div>
           <div>

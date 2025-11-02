@@ -1,9 +1,9 @@
 
 /**
- * Neon Design System UI Components
+ * Brand Design System UI Components (Soft Purple + Graphite)
  * 
- * A collection of reusable UI components with glassmorphism and neon glow effects
- * based on the Glamo landing page design.
+ * A collection of reusable UI components with glassmorphism and brand glow effects
+ * for the Glamo landing page and application interface.
  */
 
 export { Button } from './Button';

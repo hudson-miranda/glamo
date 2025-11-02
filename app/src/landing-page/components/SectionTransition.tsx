@@ -43,24 +43,24 @@ export default function SectionTransition({
     <section className={`${gradientClass} relative overflow-hidden ${className}`}>
       {/* Separadores (glow sutil para unir seções vizinhas) */}
       {(divider === 'top' || divider === 'both') && (
-        <div className="pointer-events-none absolute inset-x-0 -top-12 h-24 bg-gradient-to-b from-neon-500/10 to-transparent blur-2xl" />
+        <div className="pointer-events-none absolute inset-x-0 -top-12 h-24 bg-gradient-to-b from-brand-500/10 to-transparent blur-2xl" />
       )}
       {(divider === 'bottom' || divider === 'both') && (
-        <div className="pointer-events-none absolute inset-x-0 -bottom-12 h-24 bg-gradient-to-t from-neon-500/10 to-transparent blur-2xl" />
+        <div className="pointer-events-none absolute inset-x-0 -bottom-12 h-24 bg-gradient-to-t from-brand-500/10 to-transparent blur-2xl" />
       )}
 
       {/* Decorações com blur - contidas dentro da seção, responsivas */}
       {(variant === 'with-blur-top' || variant === 'with-blur-both') && (
         <div className="absolute top-0 left-0 right-0 h-96 pointer-events-none">
-          <div className="absolute top-6 left-[12%] w-[18rem] h-[18rem] md:w-[24rem] md:h-[24rem] lg:w-[28rem] lg:h-[28rem] bg-neon-500 rounded-full blur-[100px] md:blur-[120px] opacity-20 animate-pulse-slow" />
-          <div className="absolute top-10 right-[12%] w-[16rem] h-[16rem] md:w-[22rem] md:h-[22rem] lg:w-[26rem] lg:h-[26rem] bg-neon-500 rounded-full blur-[100px] md:blur-[120px] opacity-20 animate-pulse-slow" />
+          <div className="absolute top-6 left-[12%] w-[18rem] h-[18rem] md:w-[24rem] md:h-[24rem] lg:w-[28rem] lg:h-[28rem] bg-brand-500 rounded-full blur-[100px] md:blur-[120px] opacity-20 animate-pulse-slow" />
+          <div className="absolute top-10 right-[12%] w-[16rem] h-[16rem] md:w-[22rem] md:h-[22rem] lg:w-[26rem] lg:h-[26rem] bg-brand-500 rounded-full blur-[100px] md:blur-[120px] opacity-20 animate-pulse-slow" />
         </div>
       )}
 
       {(variant === 'with-blur-bottom' || variant === 'with-blur-both') && (
         <div className="absolute bottom-0 left-0 right-0 h-96 pointer-events-none">
-          <div className="absolute bottom-10 left-[18%] w-[16rem] h-[16rem] md:w-[22rem] md:h-[22rem] lg:w-[26rem] lg:h-[26rem] bg-neon-500 rounded-full blur-[100px] md:blur-[120px] opacity-20 animate-pulse-slow" />
-          <div className="absolute bottom-6 right-[18%] w-[18rem] h-[18rem] md:w-[24rem] md:h-[24rem] lg:w-[28rem] lg:h-[28rem] bg-neon-500 rounded-full blur-[100px] md:blur-[120px] opacity-20 animate-pulse-slow" />
+          <div className="absolute bottom-10 left-[18%] w-[16rem] h-[16rem] md:w-[22rem] md:h-[22rem] lg:w-[26rem] lg:h-[26rem] bg-brand-500 rounded-full blur-[100px] md:blur-[120px] opacity-20 animate-pulse-slow" />
+          <div className="absolute bottom-6 right-[18%] w-[18rem] h-[18rem] md:w-[24rem] md:h-[24rem] lg:w-[28rem] lg:h-[28rem] bg-brand-500 rounded-full blur-[100px] md:blur-[120px] opacity-20 animate-pulse-slow" />
         </div>
       )}
 

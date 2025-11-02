@@ -1,4 +1,4 @@
-// landing-page/LandingPage.tsx - REFATORADO COM DESIGN SYSTEM NEON
+// landing-page/LandingPage.tsx - REFATORADO COM DESIGN SYSTEM BRAND (Soft Purple)
 import Hero from './components/Hero';
 import Features from './components/Features';
 import PricingSection from './components/PricingSection';

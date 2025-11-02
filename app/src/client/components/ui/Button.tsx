@@ -3,14 +3,14 @@ import React from 'react';
 import { cn } from '../../cn';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary-glow' | 'secondary' | 'ghost' | 'outline' | 'neon';
+  variant?: 'primary-glow' | 'secondary' | 'ghost' | 'outline' | 'brand';
   size?: 'sm' | 'md' | 'lg' | 'xl';
   children: React.ReactNode;
   isLoading?: boolean;
 }
 
 /**
- * Button component with neon design system variants
+ * Button component with brand design system (Soft Purple)
  * 
  * @example
  * ```tsx
@@ -20,14 +20,14 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
  */
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary-glow', size = 'md', children, isLoading, disabled, ...props }, ref) => {
-    const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-500 focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed';
+    const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed';
     
     const variants = {
-      'primary-glow': 'bg-neon-500 text-black hover:bg-neon-400 shadow-glow-md hover:shadow-glow-lg active:scale-95',
+      'primary-glow': 'bg-primary text-primary-foreground hover:bg-brand-600 shadow-glow-md hover:shadow-glow-lg active:scale-95',
       'secondary': 'bg-zinc-800 text-white hover:bg-zinc-700 border border-zinc-700 hover:border-zinc-600',
-      'ghost': 'bg-transparent text-foreground hover:bg-zinc-800/50 hover:text-neon-500',
-      'outline': 'bg-transparent text-neon-500 border-2 border-neon-500 hover:bg-neon-500/10 hover:shadow-glow-sm',
-      'neon': 'bg-transparent text-neon-500 border border-neon-500/30 hover:border-neon-500 shadow-glow-sm hover:shadow-glow-md backdrop-blur-sm',
+      'ghost': 'bg-transparent text-foreground hover:bg-zinc-800/50 hover:text-brand-500',
+      'outline': 'bg-transparent text-brand-500 border-2 border-brand-500 hover:bg-brand-500/10 hover:shadow-glow-sm',
+      'brand': 'bg-transparent text-brand-500 border border-brand-500/30 hover:border-brand-500 shadow-glow-sm hover:shadow-glow-md backdrop-blur-sm',
     };
     
     const sizes = {

@@ -1,4 +1,4 @@
-// components/FAQ.tsx - REFATORADO COM DESIGN SYSTEM NEON
+// components/FAQ.tsx - REFATORADO COM DESIGN SYSTEM BRAND (Soft Purple)
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '../../client/components/ui/Card';
 import { GradientText } from '../../client/components/ui/GradientText';
@@ -72,7 +72,7 @@ export default function FAQ() {
       className="relative py-24 bg-black text-white overflow-hidden"
     >
       {/* Glow Effects de fundo */}
-      <GlowEffect position="top-right" size="xl" color="neon" animated />
+      <GlowEffect position="top-right" size="xl" color="brand" animated />
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Cabeçalho */}
@@ -87,7 +87,7 @@ export default function FAQ() {
           </Badge>
           <h2 className="text-4xl md:text-6xl font-bold mb-4">
             Frequently Asked{' '}
-            <GradientText variant="neon" as="span" className="text-4xl md:text-6xl font-bold">
+            <GradientText variant="brand" as="span" className="text-4xl md:text-6xl font-bold">
               Questions
             </GradientText>
           </h2>
@@ -117,7 +117,7 @@ export default function FAQ() {
           transition={{ duration: 0.6, delay: 0.8 }}
           className="text-center"
         >
-          <Card variant="glass-neon" className="max-w-2xl mx-auto">
+          <Card variant="glass-brand" className="max-w-2xl mx-auto">
             <h3 className="text-3xl font-bold mb-4">
               Still have questions?
             </h3>
@@ -166,9 +166,9 @@ function FAQItemComponent({
       transition={{ duration: 0.5, delay: index * 0.08 }}
     >
       <Card
-        variant={isOpen ? 'glass-neon' : 'glass'}
+        variant={isOpen ? 'glass-brand' : 'glass'}
         className={`transition-all duration-300 ${
-          isOpen ? 'shadow-glow-md border-neon-500/50' : ''
+          isOpen ? 'shadow-glow-md border-brand-500/50' : ''
         }`}
       >
         <button
@@ -180,7 +180,7 @@ function FAQItemComponent({
         >
           <h3
             className={`text-lg font-bold transition-colors duration-300 ${
-              isOpen ? 'text-neon-500' : 'text-white'
+              isOpen ? 'text-brand-500' : 'text-white'
             }`}
           >
             {faq.question}
@@ -190,7 +190,7 @@ function FAQItemComponent({
             transition={{ duration: 0.3 }}
             className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
               isOpen
-                ? 'bg-gradient-to-br from-neon-500 to-purple-500'
+                ? 'bg-gradient-to-br from-brand-500 to-purple-500'
                 : 'bg-zinc-800'
             }`}
           >

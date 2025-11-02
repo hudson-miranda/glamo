@@ -3,7 +3,7 @@ import React from 'react';
 import { cn } from '../../cn';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'glass' | 'solid' | 'bordered' | 'glass-neon';
+  variant?: 'glass' | 'solid' | 'bordered' | 'glass-brand';
   hover?: boolean;
   glow?: boolean;
   children: React.ReactNode;
@@ -14,7 +14,7 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
  * 
  * @example
  * ```tsx
- * <Card variant="glass-neon" hover glow>
+ * <Card variant="glass-brand" hover glow>
  *   <h3>Amazing Feature</h3>
  *   <p>Description goes here</p>
  * </Card>
@@ -28,7 +28,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
       'glass': 'glass-card',
       'solid': 'bg-zinc-900 border border-zinc-800',
       'bordered': 'bg-zinc-900/50 border border-zinc-700',
-      'glass-neon': 'glass-neon',
+      'glass-brand': 'glass-brand',
     };
     
     const hoverStyles = hover ? 'hover:scale-[1.02] hover:-translate-y-1' : '';

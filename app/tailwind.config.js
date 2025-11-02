@@ -20,21 +20,22 @@ export default {
         transparent: 'transparent',
         'black-2': '#010101',
 
-        // Neon Green Design System
-        neon: {
-          50: '#e6fff5',
-          100: '#b3ffe0',
-          200: '#80ffcc',
-          300: '#4dffb8',
-          400: '#1affa3',
-          500: '#00FF94', // Primary neon green
-          600: '#00cc76',
-          700: '#009959',
-          800: '#00663b',
-          900: '#00331e',
+        // Brand (Soft Purple) Design System
+        brand: {
+          50: '#F4F2FF',
+          100: '#E9E6FF',
+          200: '#D5D0FF',
+          300: '#C1BAFF',
+          400: '#ADA5FB',
+          500: '#7C6FF0', // Primary brand purple
+          600: '#6B5CF6', // Slightly brighter royal
+          700: '#5B4EE0',
+          800: '#4A3FC2',
+          900: '#3A319E',
+          DEFAULT: '#7C6FF0',
         },
 
-        // Pure ShadCN color system only
+        // Pure ShadCN color system only (kept, now mapped to brand in CSS vars)
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
@@ -273,24 +274,26 @@ export default {
         switcher:
           '0px 2px 4px rgba(0, 0, 0, 0.2), inset 0px 2px 2px #FFFFFF, inset 0px -1px 1px rgba(0, 0, 0, 0.1)',
         'switch-1': '0px 0px 5px rgba(0, 0, 0, 0.15)',
-        
-        // Neon glow effects
-        'glow-sm': '0 0 10px rgba(0, 255, 148, 0.3), 0 0 20px rgba(0, 255, 148, 0.1)',
-        'glow-md': '0 0 15px rgba(0, 255, 148, 0.4), 0 0 30px rgba(0, 255, 148, 0.2), 0 0 45px rgba(0, 255, 148, 0.1)',
-        'glow-lg': '0 0 20px rgba(0, 255, 148, 0.5), 0 0 40px rgba(0, 255, 148, 0.3), 0 0 60px rgba(0, 255, 148, 0.2)',
-        'glow-xl': '0 0 30px rgba(0, 255, 148, 0.6), 0 0 60px rgba(0, 255, 148, 0.4), 0 0 90px rgba(0, 255, 148, 0.3)',
-        'glow-neon': '0 0 5px rgba(0, 255, 148, 0.5), 0 0 10px rgba(0, 255, 148, 0.4), 0 0 15px rgba(0, 255, 148, 0.3), 0 0 20px rgba(0, 255, 148, 0.2)',
-        
+
+        // Brand glow effects (replacing neon)
+        'glow-sm': '0 0 10px rgba(var(--brand-rgb), 0.28), 0 0 20px rgba(var(--brand-rgb), 0.12)',
+        'glow-md':
+          '0 0 15px rgba(var(--brand-rgb), 0.35), 0 0 30px rgba(var(--brand-rgb), 0.2), 0 0 45px rgba(var(--brand-rgb), 0.10)',
+        'glow-lg':
+          '0 0 20px rgba(var(--brand-rgb), 0.42), 0 0 40px rgba(var(--brand-rgb), 0.28), 0 0 60px rgba(var(--brand-rgb), 0.16)',
+        'glow-xl':
+          '0 0 30px rgba(var(--brand-rgb), 0.5), 0 0 60px rgba(var(--brand-rgb), 0.34), 0 0 90px rgba(var(--brand-rgb), 0.2)',
+
         // Glassmorphism
-        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+        glass: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
         'glass-sm': '0 4px 16px 0 rgba(0, 0, 0, 0.25)',
       },
       dropShadow: {
         1: '0px 1px 0px #E2E8F0',
         2: '0px 1px 4px rgba(0, 0, 0, 0.12)',
-        'glow-sm': '0 0 10px rgba(0, 255, 148, 0.5)',
-        'glow-md': '0 0 15px rgba(0, 255, 148, 0.6)',
-        'glow-lg': '0 0 20px rgba(0, 255, 148, 0.7)',
+        'glow-sm': '0 0 10px rgba(var(--brand-rgb), 0.5)',
+        'glow-md': '0 0 15px rgba(var(--brand-rgb), 0.6)',
+        'glow-lg': '0 0 20px rgba(var(--brand-rgb), 0.7)',
       },
       backdropBlur: {
         xs: '2px',
@@ -313,45 +316,29 @@ export default {
         },
         'pulse-glow': {
           '0%, 100%': {
-            boxShadow: '0 0 20px rgba(0, 255, 148, 0.4), 0 0 40px rgba(0, 255, 148, 0.2)',
+            boxShadow:
+              '0 0 20px rgba(var(--brand-rgb), 0.35), 0 0 40px rgba(var(--brand-rgb), 0.18)',
           },
           '50%': {
-            boxShadow: '0 0 30px rgba(0, 255, 148, 0.6), 0 0 60px rgba(0, 255, 148, 0.4)',
+            boxShadow:
+              '0 0 30px rgba(var(--brand-rgb), 0.5), 0 0 60px rgba(var(--brand-rgb), 0.3)',
           },
         },
-        'float': {
-          '0%, 100%': {
-            transform: 'translateY(0px)',
-          },
-          '50%': {
-            transform: 'translateY(-10px)',
-          },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-10px)' },
         },
         'glow-pulse': {
-          '0%, 100%': {
-            opacity: '1',
-          },
-          '50%': {
-            opacity: '0.5',
-          },
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.5' },
         },
         'slide-in': {
-          '0%': {
-            transform: 'translateX(-100%)',
-            opacity: '0',
-          },
-          '100%': {
-            transform: 'translateX(0)',
-            opacity: '1',
-          },
+          '0%': { transform: 'translateX(-100%)', opacity: '0' },
+          '100%': { transform: 'translateX(0)', opacity: '1' },
         },
         'fade-in': {
-          '0%': {
-            opacity: '0',
-          },
-          '100%': {
-            opacity: '1',
-          },
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
         },
       },
       animation: {

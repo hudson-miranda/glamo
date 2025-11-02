@@ -5,7 +5,7 @@ import { cn } from '../../cn';
 export interface GlowEffectProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   position?: 'center' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-  color?: 'neon' | 'blue' | 'purple';
+  color?: 'brand' | 'blue' | 'purple';
   animated?: boolean;
 }
 
@@ -24,7 +24,7 @@ export const GlowEffect: React.FC<GlowEffectProps> = ({
   className,
   size = 'md',
   position = 'center',
-  color = 'neon',
+  color = 'brand',
   animated = false,
   ...props
 }) => {
@@ -44,7 +44,7 @@ export const GlowEffect: React.FC<GlowEffectProps> = ({
   };
   
   const colors = {
-    neon: 'bg-neon-500',
+    brand: 'bg-brand-500',
     blue: 'bg-blue-500',
     purple: 'bg-purple-500',
   };

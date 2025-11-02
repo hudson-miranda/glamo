@@ -39,7 +39,7 @@ export const Section = React.forwardRef<HTMLElement, SectionProps>(
         {...props}
       >
         {glowEffect && (
-          <div className="absolute inset-0 bg-gradient-radial-neon opacity-30 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-radial-brand opacity-30 pointer-events-none" />
         )}
         {container ? (
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
