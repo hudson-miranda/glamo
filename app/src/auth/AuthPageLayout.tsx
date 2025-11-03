@@ -4,7 +4,7 @@ import './auth-overrides.css';
 
 export function AuthPageLayout({children} : {children: ReactNode }) {
   return (
-    <div className='min-h-screen flex flex-col justify-center bg-gradient-to-b from-white via-purple-50/30 to-white dark:from-black dark:via-purple-950/20 dark:to-black py-12 sm:px-6 lg:px-8'>
+    <div className='min-h-screen flex flex-col justify-center bg-gradient-to-b from-white via-white to-white dark:from-black dark:via-purple-950/20 dark:to-black py-12 sm:px-6 lg:px-8'>
       {/* Logo e Header */}
       <div className='sm:mx-auto sm:w-full sm:max-w-md mb-8'>
         <Link to="/" className='flex items-center justify-center gap-3 group'>
@@ -19,7 +19,7 @@ export function AuthPageLayout({children} : {children: ReactNode }) {
 
       {/* Card Principal */}
       <div className='sm:mx-auto sm:w-full sm:max-w-md'>
-        <div className='bg-white dark:bg-white backdrop-blur-md py-10 px-6 shadow-2xl ring-1 ring-gray-200 dark:ring-gray-800 sm:rounded-2xl sm:px-12 border border-gray-200 dark:border-gray-800'>
+        <div className='bg-white dark:bg-gray-900/95 backdrop-blur-md py-10 px-6 shadow-2xl ring-1 ring-gray-200 dark:ring-gray-800 sm:rounded-2xl sm:px-12 border border-gray-200 dark:border-gray-800'>
           {children}
         </div>
       </div>
