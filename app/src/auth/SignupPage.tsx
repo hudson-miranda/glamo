@@ -6,15 +6,6 @@ import { authAppearance } from './appearance';
 export function Signup() {
   return (
     <AuthPageLayout>
-      {/* Título da Página */}
-      <div className='mb-8'>
-        <h2 className='text-3xl font-bold text-gray-900 dark:text-white text-center bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent'>
-          Crie sua conta
-        </h2>
-        <p className='mt-2 text-sm text-center text-gray-600 dark:text-gray-400'>
-          Comece a transformar seu salão hoje mesmo
-        </p>
-      </div>
 
       {/* Formulário de Cadastro */}
       <SignupForm appearance={authAppearance} />
