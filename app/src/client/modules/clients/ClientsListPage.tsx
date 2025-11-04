@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { DashboardLayout } from '../../layouts/DashboardLayout';
 import { useQuery, listClients } from 'wasp/client/operations';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
@@ -19,14 +18,6 @@ import { useSalonContext } from '../../hooks/useSalonContext';
 import { Link } from 'wasp/client/router';
 
 export default function ClientsListPage() {
-  return (
-    <DashboardLayout>
-      <ClientsListContent />
-    </DashboardLayout>
-  );
-}
-
-function ClientsListContent() {
   const { activeSalonId } = useSalonContext();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);

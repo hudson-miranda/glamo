@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { DashboardLayout } from '../../layouts/DashboardLayout';
 import { useQuery, listSales } from 'wasp/client/operations';
 import { Button } from '../../../components/ui/button';
 import {
@@ -23,14 +22,6 @@ const statusColors: Record<string, 'default' | 'secondary' | 'success' | 'warnin
 };
 
 export default function SalesListPage() {
-  return (
-    <DashboardLayout>
-      <SalesListContent />
-    </DashboardLayout>
-  );
-}
-
-function SalesListContent() {
   const { activeSalonId } = useSalonContext();
   const [page, setPage] = useState(1);
 

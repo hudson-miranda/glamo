@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { DashboardLayout } from '../../layouts/DashboardLayout';
 import { useQuery, listCashSessions } from 'wasp/client/operations';
 import { Button } from '../../../components/ui/button';
 import {
@@ -18,14 +17,6 @@ import { useSalonContext } from '../../hooks/useSalonContext';
 import { useAuth } from 'wasp/client/auth';
 
 export default function CashRegisterPage() {
-  return (
-    <DashboardLayout>
-      <CashRegisterContent />
-    </DashboardLayout>
-  );
-}
-
-function CashRegisterContent() {
   const { data: user } = useAuth();
   const { activeSalonId } = useSalonContext();
   const [page, setPage] = useState(1);

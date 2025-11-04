@@ -1,4 +1,3 @@
-import { DashboardLayout } from '../../layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
 import { EmptyState } from '../../../components/ui/empty-state';
@@ -8,14 +7,6 @@ import { useQuery, listClients, listAppointments } from 'wasp/client/operations'
 import { Link } from 'wasp/client/router';
 
 export default function DashboardPage() {
-  return (
-    <DashboardLayout>
-      <DashboardContent />
-    </DashboardLayout>
-  );
-}
-
-function DashboardContent() {
   const { activeSalonId } = useSalonContext();
 
   // Fetch real data
@@ -66,28 +57,26 @@ function DashboardContent() {
   // Show empty state if no salon selected
   if (!activeSalonId) {
     return (
-      <DashboardLayout>
-        <EmptyState
-          icon={Building2}
-          title='No salon selected'
-          description='Create or select a salon to start managing your business'
-          action={
-            <Button asChild>
-              <Link to='/onboarding/create-salon'>
-                <Plus className='mr-2 h-4 w-4' />
-                Create Salon
-              </Link>
-            </Button>
-          }
-        />
-      </DashboardLayout>
+      <EmptyState
+        icon={Building2}
+        title='No salon selected'
+        description='Create or select a salon to start managing your business'
+        action={
+          <Button asChild>
+            <Link to='/onboarding/create-salon'>
+              <Plus className='mr-2 h-4 w-4' />
+              Create Salon
+            </Link>
+          </Button>
+        }
+      />
     );
   }
 
   const isLoading = isLoadingClients || isLoadingAppointments;
 
   return (
-      <div className='space-y-6'>
+    <div className='space-y-6'>
         <div>
           <h1 className='text-3xl font-bold tracking-tight'>Dashboard</h1>
           <p className='text-muted-foreground'>

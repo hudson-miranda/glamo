@@ -1,4 +1,3 @@
-import { DashboardLayout } from '../../layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
 import {
@@ -12,14 +11,6 @@ import {
 import { useSalonContext } from '../../hooks/useSalonContext';
 
 export default function ReportsPage() {
-  return (
-    <DashboardLayout>
-      <ReportsContent />
-    </DashboardLayout>
-  );
-}
-
-function ReportsContent() {
   const { activeSalonId } = useSalonContext();
 
   return (

@@ -7,6 +7,7 @@ import { demoNavigationitems, marketingNavigationItems } from './components/NavB
 import CookieConsentBanner from './components/cookie-consent/Banner';
 import { ErrorBoundary } from './providers/ErrorBoundary';
 import { Toaster } from '../components/ui/toaster';
+import { DashboardLayout } from './layouts/DashboardLayout';
 
 /**
  * use this component to wrap all child components
@@ -63,7 +64,9 @@ export default function App() {
     <ErrorBoundary>
       <div className='min-h-screen bg-white dark:bg-black text-foreground'>
         {isAdminDashboard || isDashboardPage ? (
-          <Outlet />
+          <DashboardLayout>
+            <Outlet />
+          </DashboardLayout>
         ) : (
           <>
             {shouldDisplayAppNavBar && <NavBar navigationItems={navigationItems} />}
