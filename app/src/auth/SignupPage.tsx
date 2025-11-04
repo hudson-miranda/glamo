@@ -70,8 +70,8 @@ export function Signup() {
         username: formData.email, // username defaults to email
         isAdmin: false, // isAdmin is determined by userSignupFields based on ADMIN_EMAILS env var
       });
-      // Manually redirect to dashboard after successful signup
-      window.location.href = '/dashboard';
+      // Redirect to success page with email parameter
+      window.location.href = `/signup-success?email=${encodeURIComponent(formData.email)}`;
     } catch (err: any) {
       console.error('Signup error:', err);
       setErrors({ 
