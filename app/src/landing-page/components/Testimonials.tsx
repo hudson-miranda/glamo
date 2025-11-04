@@ -73,7 +73,7 @@ export default function Testimonials() {
   return (
     <section
       ref={ref}
-      className="relative py-24 bg-black text-white overflow-hidden"
+      className="relative py-24 bg-white dark:bg-black text-gray-900 dark:text-white overflow-hidden transition-colors duration-300"
     >
       {/* Glow Effects de fundo */}
       <GlowEffect position="top-right" size="xl" color="brand" animated />
@@ -96,7 +96,7 @@ export default function Testimonials() {
               customer has to says
             </GradientText>
           </h2>
-          <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-zinc-400 max-w-3xl mx-auto">
             This is undeniably the most groundbreaking development platform for all testimonials
           </p>
         </motion.div>
@@ -136,7 +136,7 @@ export default function Testimonials() {
                 <div className="text-3xl font-bold text-brand-500 mb-2">
                   {stat.value}
                 </div>
-                <div className="text-sm text-zinc-400">{stat.label}</div>
+                <div className="text-sm text-gray-600 dark:text-zinc-400">{stat.label}</div>
               </Card>
             </motion.div>
           ))}
@@ -168,7 +168,7 @@ function TestimonialCard({
             <svg
               key={i}
               className={`w-5 h-5 ${
-                i < testimonial.rating ? 'text-brand-500' : 'text-zinc-700'
+                i < testimonial.rating ? 'text-brand-500' : 'text-gray-300 dark:text-zinc-700'
               }`}
               fill="currentColor"
               viewBox="0 0 20 20"
@@ -180,7 +180,7 @@ function TestimonialCard({
         </div>
 
         {/* Quote */}
-        <blockquote className="text-zinc-300 leading-relaxed mb-6 text-base">
+        <blockquote className="text-gray-700 dark:text-zinc-300 leading-relaxed mb-6 text-base">
           "{testimonial.text}"
         </blockquote>
 
@@ -190,8 +190,8 @@ function TestimonialCard({
             {testimonial.avatar}
           </div>
           <div>
-            <div className="font-bold text-white">{testimonial.name}</div>
-            <div className="text-sm text-zinc-400">
+            <div className="font-bold text-gray-900 dark:text-white">{testimonial.name}</div>
+            <div className="text-sm text-gray-600 dark:text-zinc-400">
               {testimonial.role} • {testimonial.business}
             </div>
           </div>

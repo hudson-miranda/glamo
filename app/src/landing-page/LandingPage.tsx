@@ -1,4 +1,4 @@
-// landing-page/LandingPage.tsx - REFATORADO COM DESIGN SYSTEM BRAND (Soft Purple)
+// landing-page/LandingPage.tsx - REFATORADO COM DESIGN SYSTEM BRAND (Soft Purple) + THEME SUPPORT
 import Hero from './components/Hero';
 import Features from './components/Features';
 import PricingSection from './components/PricingSection';
@@ -10,7 +10,7 @@ import Footer from './components/Footer';
 
 export default function LandingPage() {
   return (
-    <main className="landing-page bg-black text-white overflow-x-clip">
+    <main className="landing-page bg-white dark:bg-black text-gray-900 dark:text-white overflow-x-clip transition-colors duration-300">
       {/* Hero Section */}
       <Hero />
 

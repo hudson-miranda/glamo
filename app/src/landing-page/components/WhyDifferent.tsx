@@ -90,7 +90,7 @@ export default function WhyDifferent() {
   return (
     <section
       ref={ref}
-      className="relative py-24 bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white overflow-hidden"
+      className="relative py-24 bg-gradient-to-b from-gray-100 dark:from-gray-900 via-gray-50 dark:via-gray-900 to-white dark:to-black text-gray-900 dark:text-white overflow-hidden transition-colors duration-300"
     >
       {/* Fundo animado (sem cortes) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -106,17 +106,17 @@ export default function WhyDifferent() {
           transition={{ duration: 0.6 }}
           className="text-center mb-20"
         >
-          <span className="inline-block px-4 py-2 bg-purple-500/20 text-purple-300 rounded-full text-sm font-semibold mb-4 border border-purple-500/30">
+          <span className="inline-block px-4 py-2 bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 rounded-full text-sm font-semibold mb-4 border border-purple-300 dark:border-purple-500/30">
             POR QUE GLAMO?
           </span>
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white">
             Não somos mais um sistema.
             <br />
             <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
               Somos seu parceiro de crescimento.
             </span>
           </h2>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             Enquanto outros oferecem ferramentas, nós oferecemos resultados
           </p>
         </motion.div>
@@ -138,9 +138,9 @@ export default function WhyDifferent() {
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.8 }}
-          className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10"
+          className="bg-white/80 dark:bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 dark:border-white/10"
         >
-          <h3 className="text-3xl font-bold text-center mb-8">
+          <h3 className="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-white">
             Comparação Lado a Lado
           </h3>
 
@@ -153,7 +153,7 @@ export default function WhyDifferent() {
                 className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500/50 ${
                   activeTab === index
                     ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/50'
-                    : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                    : 'bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/20'
                 }`}
                 aria-pressed={activeTab === index}
                 aria-label={`Selecionar comparação: ${diff.title}`}
@@ -183,7 +183,7 @@ export default function WhyDifferent() {
                 </div>
                 <h4 className="text-xl font-bold text-red-400">Outras Plataformas</h4>
               </div>
-              <p className="text-gray-300 leading-relaxed">
+              <p className="text-gray-300 dark:text-gray-300 leading-relaxed">
                 {differentiators[activeTab].comparison.others}
               </p>
             </div>
@@ -196,9 +196,9 @@ export default function WhyDifferent() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h4 className="text-xl font-bold text-purple-300">Glamo</h4>
+                <h4 className="text-xl font-bold text-purple-700 dark:text-purple-300">Glamo</h4>
               </div>
-              <p className="text-white leading-relaxed">
+              <p className="text-gray-900 dark:text-white leading-relaxed">
                 {differentiators[activeTab].comparison.glamo}
               </p>
             </div>
@@ -228,7 +228,7 @@ export default function WhyDifferent() {
               <div className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
                 {stat.value}
               </div>
-              <div className="text-gray-400 text-sm">{stat.label}</div>
+              <div className="text-gray-600 dark:text-gray-400 text-sm">{stat.label}</div>
             </motion.div>
           ))}
         </motion.div>
@@ -243,7 +243,7 @@ export default function WhyDifferent() {
           <button className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-semibold text-lg hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105">
             Experimente a Diferença
           </button>
-          <p className="text-sm text-gray-400 mt-4">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-4">
             ✨ 14 dias grátis • Cancele quando quiser
           </p>
         </motion.div>
@@ -267,7 +267,7 @@ function DifferentiatorCard({
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay: index * 0.15 }}
       whileHover={{ y: -6 }}
-      className="group bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-purple-500/50 transition-all duration-300"
+      className="group bg-white/90 dark:bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-gray-200 dark:border-white/10 hover:border-purple-500/50 transition-all duration-300"
       role="article"
       aria-label={`Diferencial: ${differentiator.title}`}
     >
@@ -278,15 +278,15 @@ function DifferentiatorCard({
           <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
             {differentiator.stats.value}
           </div>
-          <div className="text-sm text-gray-400">{differentiator.stats.label}</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">{differentiator.stats.label}</div>
         </div>
       </div>
 
       {/* Conteúdo */}
-      <h3 className="text-2xl font-bold mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300">
+      <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300">
         {differentiator.title}
       </h3>
-      <p className="text-gray-400 leading-relaxed">
+      <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
         {differentiator.description}
       </p>
 

@@ -69,7 +69,7 @@ export default function Footer({ footerNavigation }: FooterProps = {}) {
   const badges = footerNavigation?.badges ?? defaultNavigation.badges;
 
   return (
-    <footer className="bg-black text-white border-t border-white/10 relative overflow-hidden">
+    <footer className="bg-white dark:bg-black text-gray-900 dark:text-white border-t border-gray-200 dark:border-white/10 relative overflow-hidden transition-colors duration-300">
       {/* sutil glow no topo para transição com a seção anterior */}
       <div className="pointer-events-none absolute inset-x-0 -top-12 h-24 bg-gradient-to-b from-brand-500/10 to-transparent blur-2xl" />
 
@@ -85,7 +85,7 @@ export default function Footer({ footerNavigation }: FooterProps = {}) {
                 Glamo
               </span>
             </div>
-            <p className="text-gray-400 mb-6">
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
               A plataforma completa com IA para transformar seu negócio de beleza.
             </p>
             <nav aria-label="Redes sociais" className="flex gap-3">
@@ -94,7 +94,7 @@ export default function Footer({ footerNavigation }: FooterProps = {}) {
                   key={s.name + i}
                   href={s.href}
                   aria-label={`Glamo no ${capitalize(s.name)}`}
-                  className="w-10 h-10 rounded-full bg-white/5 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
+                  className="w-10 h-10 rounded-full bg-gray-200 dark:bg-white/5 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
                   whileHover={{ y: -2 }}
                 >
                   <SocialIcon name={s.name} />
@@ -113,14 +113,14 @@ export default function Footer({ footerNavigation }: FooterProps = {}) {
               variants={colVariants}
               custom={idx + 1}
             >
-              <h3 className="font-bold text-lg mb-4">{section.title}</h3>
+              <h3 className="font-bold text-lg mb-4 text-gray-900 dark:text-white">{section.title}</h3>
               <nav aria-label={`Links: ${section.title}`}>
                 <ul className="space-y-3">
                   {section.items.map((item) => (
                     <li key={item.label}>
                       <a
                         href={item.href}
-                        className="text-gray-400 hover:text-purple-400 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500/40 rounded-sm"
+                        className="text-gray-600 dark:text-gray-400 hover:text-purple-500 dark:hover:text-purple-400 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500/40 rounded-sm"
                       >
                         {item.label}
                       </a>
@@ -133,11 +133,11 @@ export default function Footer({ footerNavigation }: FooterProps = {}) {
         </div>
 
         {/* Bottom */}
-        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-gray-400 text-sm">
+        <div className="pt-8 border-t border-gray-200 dark:border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-gray-600 dark:text-gray-400 text-sm">
             © {new Date().getFullYear()} Glamo. Todos os direitos reservados.
           </p>
-          <div className="flex flex-wrap gap-4 text-sm text-gray-400">
+          <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
             {badges!.map((b, i) => (
               <span key={i} className="inline-flex items-center gap-2">
                 {b}

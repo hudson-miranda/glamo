@@ -25,10 +25,10 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
     const baseStyles = 'rounded-xl p-6 transition-all duration-300';
     
     const variants = {
-      'glass': 'glass-card',
-      'solid': 'bg-zinc-900 border border-zinc-800',
-      'bordered': 'bg-zinc-900/50 border border-zinc-700',
-      'glass-brand': 'glass-brand',
+      'glass': 'bg-transparent dark:bg-transparent backdrop-blur-sm border border-brand-500/20 dark:border-white/10',
+      'solid': 'bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800',
+      'bordered': 'bg-gray-50 dark:bg-zinc-900/50 border border-gray-300 dark:border-zinc-700',
+      'glass-brand': 'bg-transparent dark:bg-transparent backdrop-blur-sm border border-brand-500/20 dark:border-brand-500/20',
     };
     
     const hoverStyles = hover ? 'hover:scale-[1.02] hover:-translate-y-1' : '';

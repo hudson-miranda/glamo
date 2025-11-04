@@ -38,7 +38,7 @@ export default function ScrollProgress({
     <>
       {/* Backdrop blur opcional (para melhor contraste sobre conteúdo claro) */}
       {variant === 'backdrop' && (
-        <div className="fixed top-0 left-0 right-0 h-1 bg-black/20 backdrop-blur-sm z-50" />
+        <div className="fixed top-0 left-0 right-0 h-1 bg-gray-200/20 dark:bg-black/20 backdrop-blur-sm z-50" />
       )}
 
       <motion.div

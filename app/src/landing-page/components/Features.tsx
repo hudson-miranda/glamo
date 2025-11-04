@@ -71,11 +71,13 @@ export default function Features() {
   return (
     <section
       ref={ref}
-      className="relative py-24 bg-black text-white overflow-hidden"
+      className="relative py-24 bg-white dark:bg-black text-gray-900 dark:text-white overflow-hidden transition-colors duration-300"
     >
       {/* Efeitos de fundo */}
       <GlowEffect position="top-right" size="xl" color="brand" animated />
-      <GlowEffect position="bottom-left" size="xl" color="brand" animated />      <div className="container mx-auto px-4 relative z-10">
+      <GlowEffect position="bottom-left" size="xl" color="brand" animated />
+
+      <div className="container mx-auto px-4 relative z-10">
         {/* Cabeçalho */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -92,7 +94,7 @@ export default function Features() {
               10+ cutting-edge products
             </GradientText>
           </h2>
-          <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-zinc-400 max-w-3xl mx-auto">
             Everything you need to transform your business in one place
           </p>
         </motion.div>
@@ -119,7 +121,7 @@ export default function Features() {
           <Button variant="primary-glow" size="lg">
             Get Started - It's Free
           </Button>
-          <p className="text-sm text-zinc-400 mt-4">
+          <p className="text-sm text-gray-600 dark:text-zinc-400 mt-4">
             ✨ 14 days free trial • No credit card • Cancel anytime
           </p>
         </motion.div>
@@ -156,10 +158,10 @@ function FeatureCard({
         >
           {feature.icon}
         </div>
-        <h3 className="text-xl font-bold mb-2 text-white group-hover:text-brand-500 transition-colors duration-300">
+        <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white group-hover:text-brand-500 transition-colors duration-300">
           {feature.title}
         </h3>
-        <p className="text-zinc-400 text-sm leading-relaxed">
+        <p className="text-gray-600 dark:text-zinc-400 text-sm leading-relaxed">
           {feature.description}
         </p>
       </Card>

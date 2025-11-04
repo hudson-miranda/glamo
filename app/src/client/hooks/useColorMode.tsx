@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import useLocalStorage from './useLocalStorage';
 
-export default function useColorMode() {
-  const [colorMode, setColorMode] = useLocalStorage('color-theme', 'light');
+type ColorMode = 'light' | 'dark';
+
+export default function useColorMode(): [ColorMode, (value: ColorMode) => void] {
+  const [colorMode, setColorMode] = useLocalStorage<ColorMode>('color-theme', 'light');
 
   useEffect(() => {
     const className = 'dark';
@@ -14,5 +16,5 @@ export default function useColorMode() {
   }, [colorMode]);
 
   return [colorMode, setColorMode];
-};
+}
 

@@ -43,7 +43,7 @@ export default function IntegrationsSection() {
   return (
     <section
       ref={ref}
-      className="relative py-24 bg-black text-white overflow-hidden"
+      className="relative py-24 bg-white dark:bg-black text-gray-900 dark:text-white overflow-hidden transition-colors duration-300"
     >
       {/* Glow Effects de fundo */}
       <GlowEffect position="top-left" size="xl" color="brand" animated />
@@ -65,7 +65,7 @@ export default function IntegrationsSection() {
               I lost popular integration apps
             </GradientText>
           </h2>
-          <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-zinc-400 max-w-3xl mx-auto">
             Connect with your favorite tools and streamline your workflow
           </p>
         </motion.div>
@@ -89,7 +89,7 @@ export default function IntegrationsSection() {
           transition={{ duration: 0.6, delay: 0.8 }}
           className="text-center mt-16"
         >
-          <p className="text-zinc-400 mb-4">
+          <p className="text-gray-600 dark:text-zinc-400 mb-4">
             <span className="text-brand-500 font-bold">+100 integrations</span> available
           </p>
           <a
@@ -142,7 +142,7 @@ function IntegrationCard({
         >
           {integration.icon}
         </div>
-        <span className="text-sm font-semibold text-zinc-300 group-hover:text-white transition-colors duration-300">
+        <span className="text-sm font-semibold text-gray-700 dark:text-zinc-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-300">
           {integration.name}
         </span>
       </Card>

@@ -4,7 +4,7 @@ import { GradientText } from '../../client/components/ui/GradientText';
 import { Button } from '../../client/components/ui/Button';
 import { GlowEffect } from '../../client/components/ui/GlowEffect';
 import { useRef, useState, useEffect } from 'react';
-import { Link } from 'wasp/client/router';
+import { Link } from 'react-router-dom';
 
 export default function CTASection() {
   const [inView, setInView] = useState(false);
@@ -24,11 +24,11 @@ export default function CTASection() {
   return (
     <section
       ref={ref}
-      className="relative py-32 bg-black text-white overflow-hidden"
+      className="relative py-32 bg-white dark:bg-black text-gray-900 dark:text-white overflow-hidden transition-colors duration-300"
     >
       {/* Glow Effects de fundo - mais intensos para destaque */}
       <GlowEffect position="center" size="xl" color="brand" animated />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-50/50 dark:via-black/50 to-white dark:to-black pointer-events-none" />
 
       <div className="container mx-auto px-4 relative z-10">
         <motion.div
@@ -46,7 +46,7 @@ export default function CTASection() {
           </h2>
 
           {/* Subtítulo */}
-          <p className="text-xl md:text-2xl text-zinc-400 mb-12 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-gray-600 dark:text-zinc-400 mb-12 max-w-3xl mx-auto leading-relaxed">
             Let's be the transformation for your technology solution, for teams
             that want to be on top of their technology.
           </p>
@@ -73,7 +73,7 @@ export default function CTASection() {
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.6 }}
-            className="flex flex-wrap items-center justify-center gap-6 text-sm text-zinc-400"
+            className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-600 dark:text-zinc-400"
           >
             <div className="flex items-center gap-2">
               <svg className="w-5 h-5 text-brand-500" fill="currentColor" viewBox="0 0 20 20">
@@ -100,7 +100,7 @@ export default function CTASection() {
             initial={{ opacity: 0, y: 30 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.9 }}
-            className="grid grid-cols-3 gap-8 max-w-3xl mx-auto mt-16 pt-16 border-t border-zinc-800"
+            className="grid grid-cols-3 gap-8 max-w-3xl mx-auto mt-16 pt-16 border-t border-gray-200 dark:border-zinc-800"
           >
             {[
               { value: '2,500+', label: 'Active Users' },
@@ -111,7 +111,7 @@ export default function CTASection() {
                 <div className="text-3xl md:text-4xl font-bold text-brand-500 mb-2">
                   {stat.value}
                 </div>
-                <div className="text-sm text-zinc-400">{stat.label}</div>
+                <div className="text-sm text-gray-600 dark:text-zinc-400">{stat.label}</div>
               </div>
             ))}
           </motion.div>

@@ -1,9 +1,15 @@
 // app/src/landing-page/components/Header.tsx
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import useColorMode from '../../client/hooks/useColorMode';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [colorMode, setColorMode] = useColorMode();
+
+  const toggleTheme = () => {
+    setColorMode(colorMode === 'dark' ? 'light' : 'dark');
+  };
 
   return (
     <>
@@ -20,7 +26,7 @@ export default function Header() {
       </div>
 
       {/* Main Header */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 shadow-sm transition-colors duration-300">
         <nav className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
@@ -45,9 +51,26 @@ export default function Header() {
 
             {/* CTA Buttons */}
             <div className="hidden md:flex items-center gap-4">
+              {/* Theme Toggle Button */}
+              <button
+                onClick={toggleTheme}
+                className="p-2.5 text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                aria-label="Toggle theme"
+              >
+                {colorMode === 'dark' ? (
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  </svg>
+                )}
+              </button>
+              
               <Link
                 to="/login"
-                className="px-6 py-2.5 text-gray-700 font-semibold hover:text-purple-600 transition-colors duration-300"
+                className="px-6 py-2.5 text-gray-700 dark:text-gray-300 font-semibold hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-300"
               >
                 Entrar
               </Link>
@@ -62,7 +85,7 @@ export default function Header() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-gray-700 hover:text-purple-600 transition-colors"
+              className="md:hidden p-2 text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
               aria-label="Toggle menu"
             >
               <svg
@@ -92,7 +115,7 @@ export default function Header() {
 
           {/* Mobile Menu */}
           {mobileMenuOpen && (
-            <div className="md:hidden mt-4 pb-4 border-t border-gray-200 pt-4 space-y-3 animate-fadeIn">
+            <div className="md:hidden mt-4 pb-4 border-t border-gray-200 dark:border-gray-700 pt-4 space-y-3 animate-fadeIn">
               <MobileNavLink href="#features" onClick={() => setMobileMenuOpen(false)}>
                 Funcionalidades
               </MobileNavLink>
@@ -112,9 +135,29 @@ export default function Header() {
                 Contato
               </MobileNavLink>
               <div className="pt-4 space-y-3">
+                <button
+                  onClick={toggleTheme}
+                  className="w-full px-6 py-3 text-center text-gray-700 dark:text-gray-300 font-semibold border-2 border-gray-300 dark:border-gray-600 rounded-full hover:border-purple-600 dark:hover:border-purple-400 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300 flex items-center justify-center gap-2"
+                >
+                  {colorMode === 'dark' ? (
+                    <>
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                      </svg>
+                      <span>Tema Claro</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                      </svg>
+                      <span>Tema Escuro</span>
+                    </>
+                  )}
+                </button>
                 <Link
                   to="/login"
-                  className="block w-full px-6 py-3 text-center text-gray-700 font-semibold border-2 border-gray-300 rounded-full hover:border-purple-600 hover:text-purple-600 transition-all duration-300"
+                  className="block w-full px-6 py-3 text-center text-gray-700 dark:text-gray-300 font-semibold border-2 border-gray-300 dark:border-gray-600 rounded-full hover:border-purple-600 dark:hover:border-purple-400 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Entrar
@@ -139,7 +182,7 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
   return (
     <a
       href={href}
-      className="text-gray-700 font-medium hover:text-purple-600 transition-colors duration-300 relative group"
+      className="text-gray-700 dark:text-gray-300 font-medium hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-300 relative group"
     >
       {children}
       <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-pink-600 group-hover:w-full transition-all duration-300" />
@@ -160,7 +203,7 @@ function MobileNavLink({
     <a
       href={href}
       onClick={onClick}
-      className="block px-4 py-2 text-gray-700 font-medium hover:text-purple-600 hover:bg-BRAND (Soft Purple)-50 rounded-lg transition-all duration-300"
+      className="block px-4 py-2 text-gray-700 dark:text-gray-300 font-medium hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-gray-800 rounded-lg transition-all duration-300"
     >
       {children}
     </a>
