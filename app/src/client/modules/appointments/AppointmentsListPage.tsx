@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { DashboardLayout } from '../../layouts/DashboardLayout';
 import { useQuery, listAppointments } from 'wasp/client/operations';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
@@ -26,14 +25,6 @@ const statusColors: Record<string, 'default' | 'secondary' | 'success' | 'warnin
 };
 
 export default function AppointmentsListPage() {
-  return (
-    <DashboardLayout>
-      <AppointmentsListContent />
-    </DashboardLayout>
-  );
-}
-
-function AppointmentsListContent() {
   const { activeSalonId } = useSalonContext();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);

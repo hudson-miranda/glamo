@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { DashboardLayout } from '../../layouts/DashboardLayout';
 import { useQuery, listProducts } from 'wasp/client/operations';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
@@ -18,14 +17,6 @@ import { Plus, Search, Package, AlertTriangle } from 'lucide-react';
 import { useSalonContext } from '../../hooks/useSalonContext';
 
 export default function InventoryListPage() {
-  return (
-    <DashboardLayout>
-      <InventoryListContent />
-    </DashboardLayout>
-  );
-}
-
-function InventoryListContent() {
   const { activeSalonId } = useSalonContext();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { DashboardLayout } from '../../layouts/DashboardLayout';
 import { useQuery, listServices } from 'wasp/client/operations';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
@@ -18,14 +17,6 @@ import { Plus, Search, Scissors, Edit, Trash2 } from 'lucide-react';
 import { useSalonContext } from '../../hooks/useSalonContext';
 
 export default function ServicesListPage() {
-  return (
-    <DashboardLayout>
-      <ServicesListContent />
-    </DashboardLayout>
-  );
-}
-
-function ServicesListContent() {
   const { activeSalonId } = useSalonContext();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);

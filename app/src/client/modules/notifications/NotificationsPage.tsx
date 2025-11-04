@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { DashboardLayout } from '../../layouts/DashboardLayout';
 import { useQuery, listNotifications, markNotificationRead, markAllNotificationsRead } from 'wasp/client/operations';
 import { Button } from '../../../components/ui/button';
 import { Card, CardContent } from '../../../components/ui/card';
@@ -11,14 +10,6 @@ import { useSalonContext } from '../../hooks/useSalonContext';
 import { toast } from '../../hooks/useToast';
 
 export default function NotificationsPage() {
-  return (
-    <DashboardLayout>
-      <NotificationsContent />
-    </DashboardLayout>
-  );
-}
-
-function NotificationsContent() {
   const { data: user } = useAuth();
   const { activeSalonId } = useSalonContext();
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
