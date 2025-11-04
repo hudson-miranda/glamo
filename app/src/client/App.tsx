@@ -21,9 +21,16 @@ export default function App() {
   const navigationItems = isMarketingPage ? marketingNavigationItems : demoNavigationitems;
 
   const shouldDisplayAppNavBar = useMemo(() => {
-    return (
-      location.pathname !== routes.LoginRoute.build() && location.pathname !== routes.SignupRoute.build()
-    );
+    // Hide NavBar on all auth pages - they have their own simplified NavBar
+    const authPages = [
+      routes.LoginRoute.build(),
+      routes.SignupRoute.build(),
+      '/request-password-reset',
+      '/password-reset',
+      '/email-verification',
+      '/signup-success'
+    ];
+    return !authPages.includes(location.pathname);
   }, [location]);
 
   const isAdminDashboard = useMemo(() => {
