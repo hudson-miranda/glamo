@@ -1,6 +1,6 @@
 // app/src/auth/SignupPage.tsx
 import { useState } from 'react';
-import { signup } from 'wasp/client/auth';
+import { signup, googleSignInUrl } from 'wasp/client/auth';
 import { Link, routes } from 'wasp/client/router';
 import { AuthPageLayout } from './AuthPageLayout';
 import { AuthInput } from './components/AuthInput';
@@ -83,7 +83,8 @@ export function Signup() {
   };
 
   const handleGoogleSignup = () => {
-    window.location.href = '/auth/google/login';
+    // Redirect to Google OAuth using Wasp's built-in Google Auth
+    window.location.href = googleSignInUrl;
   };
 
   const updateField = (field: keyof typeof formData, value: string) => {

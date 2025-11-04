@@ -1,6 +1,6 @@
 // app/src/auth/LoginPage.tsx
 import { useState } from 'react';
-import { login } from 'wasp/client/auth';
+import { login, googleSignInUrl } from 'wasp/client/auth';
 import { Link, routes } from 'wasp/client/router';
 import { AuthPageLayout } from './AuthPageLayout';
 import { AuthInput } from './components/AuthInput';
@@ -33,9 +33,8 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = () => {
-    // Google auth is handled by Wasp's SignupForm/LoginForm
-    // This is a placeholder for when we integrate it
-    window.location.href = '/auth/google/login';
+    // Redirect to Google OAuth using Wasp's built-in Google Auth
+    window.location.href = googleSignInUrl;
   };
 
   return (
