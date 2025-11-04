@@ -69,7 +69,7 @@ export default function FAQ() {
   return (
     <section
       ref={ref}
-      className="relative py-24 bg-black text-white overflow-hidden"
+      className="relative py-24 bg-white dark:bg-black text-gray-900 dark:text-white overflow-hidden transition-colors duration-300"
     >
       {/* Glow Effects de fundo */}
       <GlowEffect position="top-right" size="xl" color="brand" animated />
@@ -91,7 +91,7 @@ export default function FAQ() {
               Questions
             </GradientText>
           </h2>
-          <p className="text-xl text-zinc-400 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-zinc-400 max-w-2xl mx-auto">
             Everything you need to know about our platform
           </p>
         </motion.div>
@@ -118,10 +118,10 @@ export default function FAQ() {
           className="text-center"
         >
           <Card variant="glass-brand" className="max-w-2xl mx-auto">
-            <h3 className="text-3xl font-bold mb-4">
+            <h3 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
               Still have questions?
             </h3>
-            <p className="text-xl text-zinc-400 mb-8">
+            <p className="text-xl text-gray-600 dark:text-zinc-400 mb-8">
               Our team is ready to help you
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -180,7 +180,7 @@ function FAQItemComponent({
         >
           <h3
             className={`text-lg font-bold transition-colors duration-300 ${
-              isOpen ? 'text-brand-500' : 'text-white'
+              isOpen ? 'text-brand-500' : 'text-gray-900 dark:text-white'
             }`}
           >
             {faq.question}
@@ -191,11 +191,11 @@ function FAQItemComponent({
             className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
               isOpen
                 ? 'bg-gradient-to-br from-brand-500 to-purple-500'
-                : 'bg-zinc-800'
+                : 'bg-gray-200 dark:bg-zinc-800'
             }`}
           >
             <svg
-              className="w-5 h-5 text-white"
+              className={`w-5 h-5 ${isOpen ? 'text-white' : 'text-gray-700 dark:text-white'}`}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -222,7 +222,7 @@ function FAQItemComponent({
               role="region"
               aria-label={`Answer: ${faq.question}`}
             >
-              <p className="text-zinc-300 leading-relaxed mt-4 pt-4 border-t border-zinc-800">
+              <p className="text-gray-700 dark:text-zinc-300 leading-relaxed mt-4 pt-4 border-t border-gray-200 dark:border-zinc-800">
                 {faq.answer}
               </p>
             </motion.div>

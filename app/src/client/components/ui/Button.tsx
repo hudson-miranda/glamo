@@ -24,8 +24,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     
     const variants = {
       'primary-glow': 'bg-primary text-primary-foreground hover:bg-brand-600 shadow-glow-md hover:shadow-glow-lg active:scale-95',
-      'secondary': 'bg-zinc-800 text-white hover:bg-zinc-700 border border-zinc-700 hover:border-zinc-600',
-      'ghost': 'bg-transparent text-foreground hover:bg-zinc-800/50 hover:text-brand-500',
+      'secondary': 'bg-zinc-800 dark:bg-zinc-700 text-white hover:bg-zinc-700 dark:hover:bg-zinc-600 border border-zinc-700 dark:border-zinc-600 hover:border-zinc-600 dark:hover:border-zinc-500',
+      'ghost': 'bg-transparent text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-zinc-800/50 hover:text-brand-500',
       'outline': 'bg-transparent text-brand-500 border-2 border-brand-500 hover:bg-brand-500/10 hover:shadow-glow-sm',
       'brand': 'bg-transparent text-brand-500 border border-brand-500/30 hover:border-brand-500 shadow-glow-sm hover:shadow-glow-md backdrop-blur-sm',
     };

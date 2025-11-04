@@ -33,7 +33,7 @@ export const Badge: React.FC<BadgeProps> = ({
     'outline': 'bg-transparent text-brand-500 border border-brand-500',
     'solid': 'bg-brand-500 text-black',
     'glow': 'bg-brand-500/10 text-brand-500 border border-brand-500/30 shadow-glow-sm hover:shadow-glow-md',
-    'mostpopular': 'bg-black text-brand-500 border border-brand-500/30 shadow-glow-sm hover:shadow-glow-md',
+    'mostpopular': 'bg-white dark:bg-black text-brand-500 border border-brand-500/30 shadow-glow-sm hover:shadow-glow-md',
   };
   
   const sizes = {

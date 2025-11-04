@@ -94,7 +94,7 @@ export default function PricingSection() {
   return (
     <section
       ref={ref}
-      className="relative py-24 bg-black text-white overflow-hidden"
+      className="relative py-24 bg-white dark:bg-black text-gray-900 dark:text-white overflow-hidden transition-colors duration-300"
     >
       {/* Glow Effects de fundo */}
       <GlowEffect position="top-left" size="xl" color="brand" animated />
@@ -111,13 +111,13 @@ export default function PricingSection() {
           <Badge variant="glow" className="mb-6">
             PRICING
           </Badge>
-          <h2 className="text-4xl md:text-6xl font-bold mb-4">
+          <h2 className="text-4xl md:text-6xl font-bold mb-4 text-gray-900 dark:text-white">
             The best in the class{' '}
             <GradientText variant="brand" as="span" className="text-4xl md:text-6xl font-bold">
               product for you today!
             </GradientText>
           </h2>
-          <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-zinc-400 max-w-3xl mx-auto">
             Choose the perfect plan for your business needs
           </p>
         </motion.div>
@@ -155,7 +155,7 @@ export default function PricingSection() {
               className="flex flex-col items-center text-center"
             >
               <div className="text-3xl mb-2">{item.icon}</div>
-              <div className="text-sm text-zinc-400">{item.label}</div>
+              <div className="text-sm text-gray-600 dark:text-zinc-400">{item.label}</div>
             </motion.div>
           ))}
         </motion.div>
@@ -198,13 +198,13 @@ function PricingCard({
 
         {/* Plan Header */}
         <div className="mb-6">
-          <h3 className="text-2xl font-bold mb-2 text-white">{plan.name}</h3>
-          <p className="text-sm text-zinc-400 mb-6">{plan.description}</p>
+          <h3 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">{plan.name}</h3>
+          <p className="text-sm text-gray-600 dark:text-zinc-400 mb-6">{plan.description}</p>
           <div className="flex items-baseline gap-2">
-            <span className={`text-5xl font-bold ${plan.highlighted ? 'text-brand-500' : 'text-white'}`}>
+            <span className={`text-5xl font-bold ${plan.highlighted ? 'text-brand-500' : 'text-gray-900 dark:text-white'}`}>
               {plan.price}
             </span>
-            <span className="text-zinc-400">/ {plan.period}</span>
+            <span className="text-gray-600 dark:text-zinc-400">/ {plan.period}</span>
           </div>
         </div>
 
@@ -220,7 +220,7 @@ function PricingCard({
             >
               <svg
                 className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
-                  plan.highlighted ? 'text-brand-500' : 'text-zinc-400'
+                  plan.highlighted ? 'text-brand-500' : 'text-gray-500 dark:text-zinc-400'
                 }`}
                 fill="none"
                 viewBox="0 0 24 24"
@@ -233,7 +233,7 @@ function PricingCard({
                   d="M5 13l4 4L19 7"
                 />
               </svg>
-              <span className="text-zinc-300 text-sm">{feature}</span>
+              <span className="text-gray-700 dark:text-zinc-300 text-sm">{feature}</span>
             </motion.li>
           ))}
         </ul>
