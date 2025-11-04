@@ -48,7 +48,7 @@ export default function LoginPage() {
       >
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold text-gradient-brand bg-clip-text text-transparent">
             Bem-vindo de volta!
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
@@ -124,7 +124,7 @@ export default function LoginPage() {
             <div className="flex justify-end">
               <Link
                 to={routes.RequestPasswordResetRoute.to}
-                className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium transition-colors"
+                className="text-sm text-brand-600 dark:text-brand-600 hover:text-brand-700 dark:hover:text-brand-300 font-medium transition-colors"
               >
                 Esqueceu sua senha?
               </Link>
@@ -147,7 +147,7 @@ export default function LoginPage() {
             Ainda não tem uma conta?{' '}
             <Link
               to={routes.SignupRoute.to}
-              className="font-semibold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+              className="font-semibold text-brand-600 dark:text-brand-600 hover:text-brand-700 dark:hover:text-brand-300 transition-colors"
             >
               Criar conta grátis
             </Link>

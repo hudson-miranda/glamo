@@ -118,7 +118,7 @@ export function PasswordResetPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                 </div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">
                   Nova senha
                 </h1>
                 <p className="text-gray-600 dark:text-gray-400 max-w-sm mx-auto">
@@ -285,7 +285,7 @@ export function PasswordResetPage() {
               <div className="text-center">
                 <Link
                   to={routes.LoginRoute.to}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-white bg-gradient-to-r from-brand-400 to-brand-600 hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40"
                 >
                   Ir para login agora
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -11,7 +11,7 @@ export function AuthPageLayout({children} : {children: ReactNode }) {
           <div className='w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6'>
             <span className='text-3xl'>✨</span>
           </div>
-          <span className='text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent'>
+          <span className='text-3xl font-bold bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent'>
             Glamo
           </span>
         </Link>
