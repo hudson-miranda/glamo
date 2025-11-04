@@ -108,7 +108,7 @@ export function Signup() {
       >
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">
             Comece gratuitamente
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
@@ -242,11 +242,11 @@ export function Signup() {
               />
               <span className="text-sm text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
                 Eu concordo com os{' '}
-                <a href="#" className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium underline underline-offset-2">
+                <a href="#" className="text-brand-600 dark:text-brand-600 hover:text-brand-700 dark:hover:text-brand-300 font-medium underline underline-offset-2">
                   Termos de Serviço
                 </a>
                 {' '}e a{' '}
-                <a href="#" className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium underline underline-offset-2">
+                <a href="#" className="text-brand-600 dark:text-brand-600 hover:text-brand-700 dark:hover:text-brand-300 font-medium underline underline-offset-2">
                   Política de Privacidade
                 </a>
               </span>
@@ -277,7 +277,7 @@ export function Signup() {
             Já tem uma conta?{' '}
             <Link
               to={routes.LoginRoute.to}
-              className="font-semibold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+              className="font-semibold text-brand-600 dark:text-brand-600 hover:text-brand-700 dark:hover:text-brand-300 transition-colors"
             >
               Fazer login
             </Link>

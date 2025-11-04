@@ -34,7 +34,7 @@ export default function Header() {
               <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
                 <span className="text-2xl">✨</span>
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <span className="text-2xl font-bold bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">
                 Glamo
               </span>
             </Link>
@@ -76,7 +76,7 @@ export default function Header() {
               </Link>
               <Link
                 to="/signup"
-                className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105"
+                className="px-6 py-2.5 bg-gradient-to-r from-brand-400 to-brand-600 text-white rounded-full font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105"
               >
                 Começar Grátis
               </Link>
@@ -164,7 +164,7 @@ export default function Header() {
                 </Link>
                 <Link
                   to="/signup"
-                  className="block w-full px-6 py-3 text-center bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300"
+                  className="block w-full px-6 py-3 text-center bg-gradient-to-r from-brand-400 to-brand-600 text-white rounded-full font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Começar Grátis
@@ -185,7 +185,7 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
       className="text-gray-700 dark:text-gray-300 font-medium hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-300 relative group"
     >
       {children}
-      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-pink-600 group-hover:w-full transition-all duration-300" />
+      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-brand-400 to-brand-600 group-hover:w-full transition-all duration-300" />
     </a>
   );
 }

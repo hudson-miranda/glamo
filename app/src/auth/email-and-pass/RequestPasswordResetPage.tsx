@@ -88,7 +88,7 @@ export function RequestPasswordResetPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                   </svg>
                 </div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">
                   Esqueceu sua senha?
                 </h1>
                 <p className="text-gray-600 dark:text-gray-400 max-w-sm mx-auto">
@@ -221,7 +221,7 @@ export function RequestPasswordResetPage() {
                 ) : (
                   <button
                     onClick={handleResend}
-                    className="text-sm font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+                    className="text-sm font-medium text-brand-600 dark:text-brand-600 hover:text-brand-700 dark:hover:text-brand-300 transition-colors"
                   >
                     Não recebeu o e-mail? Clique para reenviar
                   </button>

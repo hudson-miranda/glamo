@@ -16,7 +16,7 @@ export default function ErrorFallback({ error, resetErrorBoundary }: any) {
         </p>
         <button
           onClick={resetErrorBoundary}
-          className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-semibold hover:shadow-lg transition-all duration-300"
+          className="px-6 py-3 bg-gradient-to-r from-brand-400 to-brand-600 text-white rounded-full font-semibold hover:shadow-lg transition-all duration-300"
         >
           Tentar Novamente
         </button>

@@ -240,7 +240,7 @@ export default function WhyDifferent() {
           transition={{ duration: 0.6, delay: 1.2 }}
           className="text-center mt-16"
         >
-          <button className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-semibold text-lg hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105">
+          <button className="px-8 py-4 bg-gradient-to-r from-brand-400 to-brand-600 text-white rounded-full font-semibold text-lg hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105">
             Experimente a Diferença
           </button>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-4">
