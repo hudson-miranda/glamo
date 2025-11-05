@@ -9,6 +9,7 @@ import { ErrorBoundary } from './providers/ErrorBoundary';
 import { Toaster } from '../components/ui/toaster';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import OnboardingGuard from './components/OnboardingGuard';
+import SubscriptionGuard from './components/SubscriptionGuard';
 
 /**
  * use this component to wrap all child components
@@ -54,7 +55,8 @@ export default function App() {
            location.pathname.startsWith('/inventory') ||
            location.pathname.startsWith('/cash-register') ||
            location.pathname.startsWith('/reports') ||
-           location.pathname.startsWith('/notifications');
+           location.pathname.startsWith('/notifications') ||
+           location.pathname.startsWith('/employees');
   }, [location]);
 
   useEffect(() => {
@@ -70,22 +72,24 @@ export default function App() {
   return (
     <ErrorBoundary>
       <OnboardingGuard>
-        <div className='min-h-screen bg-white dark:bg-black text-foreground'>
-          {isAdminDashboard || isDashboardPage ? (
-            <DashboardLayout>
-              <Outlet />
-            </DashboardLayout>
-          ) : (
-            <>
-              {shouldDisplayAppNavBar && <NavBar navigationItems={navigationItems} />}
-              <div className='mx-auto max-w-screen-4xl'>
+        <SubscriptionGuard>
+          <div className='min-h-screen bg-white dark:bg-black text-foreground'>
+            {isAdminDashboard || isDashboardPage ? (
+              <DashboardLayout>
                 <Outlet />
-              </div>
-            </>
-          )}
-        </div>
-        <CookieConsentBanner />
-        <Toaster />
+              </DashboardLayout>
+            ) : (
+              <>
+                {shouldDisplayAppNavBar && <NavBar navigationItems={navigationItems} />}
+                <div className='mx-auto max-w-screen-4xl'>
+                  <Outlet />
+                </div>
+              </>
+            )}
+          </div>
+          <CookieConsentBanner />
+          <Toaster />
+        </SubscriptionGuard>
       </OnboardingGuard>
     </ErrorBoundary>
   );

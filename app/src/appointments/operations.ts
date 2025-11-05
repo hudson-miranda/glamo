@@ -17,6 +17,7 @@ import {
   isWithinBusinessHours,
   calculateAppointmentEndTime,
 } from './conflictDetector';
+import { getEffectivePlan, getPlanLimits } from '../payment/plans';
 
 // ============================================================================
 // Types
@@ -331,6 +332,44 @@ export const createAppointment: CreateAppointment<CreateAppointmentInput, any> =
 
   // Check permission
   await requirePermission(context.user, salonId, 'can_create_appointments', context.entities);
+
+  // Check plan limits - monthly appointments
+  const effectivePlan = getEffectivePlan({
+    subscriptionPlan: context.user.subscriptionPlan,
+    createdAt: context.user.createdAt,
+    datePaid: context.user.datePaid,
+  });
+  const limits = getPlanLimits(effectivePlan);
+
+  // Only check if plan has monthly appointment limit (not unlimited)
+  if (limits.maxMonthlyAppointments !== Infinity) {
+    // Get first and last day of current month
+    const now = new Date();
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+
+    // Count appointments in current month for this salon
+    const monthlyAppointmentCount = await context.entities.Appointment.count({
+      where: {
+        salonId,
+        createdAt: {
+          gte: firstDayOfMonth,
+          lte: lastDayOfMonth,
+        },
+        deletedAt: null,
+        status: {
+          not: 'CANCELLED', // Don't count cancelled appointments
+        },
+      },
+    });
+
+    if (monthlyAppointmentCount >= limits.maxMonthlyAppointments) {
+      throw new HttpError(
+        403,
+        `Monthly appointment limit reached: Your plan allows ${limits.maxMonthlyAppointments} appointments per month. Please upgrade to create more appointments.`
+      );
+    }
+  }
 
   // Validate client exists and belongs to salon
   const client = await context.entities.Client.findUnique({

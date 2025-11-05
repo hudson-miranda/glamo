@@ -7,6 +7,12 @@ import type {
 } from 'wasp/server/operations';
 import { HttpError } from 'wasp/server';
 import { getEffectivePlan, getPlanLimits } from '../payment/plans';
+import { emailSender } from 'wasp/server/email';
+import {
+  getInviteReceivedEmail,
+  getInviteAcceptedEmail,
+  getInviteRejectedEmail,
+} from './emailTemplates';
 
 /**
  * Get all pending invites for the current user's email
@@ -207,10 +213,43 @@ export const sendSalonInvite: SendSalonInvite<SendSalonInviteInput, SalonInvite>
       invitedBy: context.user.id,
       expiresAt,
     },
+    include: {
+      salon: {
+        select: {
+          name: true,
+        },
+      },
+      role: {
+        select: {
+          name: true,
+        },
+      },
+    },
   });
 
-  // TODO: Send email notification
-  // This will be implemented later with the email system
+  // Send email notification to invitee
+  try {
+    const acceptUrl = `${process.env.WASP_WEB_CLIENT_URL}/invite/accept/${invite.id}`;
+    const rejectUrl = `${process.env.WASP_WEB_CLIENT_URL}/invite/reject/${invite.id}`;
+
+    const emailContent = getInviteReceivedEmail({
+      salonName: invite.salon.name,
+      roleName: invite.role.name,
+      inviterName: context.user.name,
+      acceptLink: acceptUrl,
+      rejectLink: rejectUrl,
+    });
+
+    await emailSender.send({
+      to: email,
+      subject: emailContent.subject,
+      text: emailContent.text,
+      html: emailContent.html,
+    });
+  } catch (emailError) {
+    console.error('Failed to send invite email:', emailError);
+    // Don't throw - invite was created successfully, email is secondary
+  }
 
   return invite;
 };
@@ -236,8 +275,23 @@ export const acceptSalonInvite: AcceptSalonInvite<AcceptSalonInviteInput, void> 
   const invite = await context.entities.SalonInvite.findUnique({
     where: { id: inviteId },
     include: {
-      salon: true,
-      role: true,
+      salon: {
+        select: {
+          name: true,
+        },
+      },
+      role: {
+        select: {
+          name: true,
+        },
+      },
+      inviter: {
+        select: {
+          email: true,
+          name: true,
+          emailNotifications: true,
+        },
+      },
     },
   });
 
@@ -320,6 +374,31 @@ export const acceptSalonInvite: AcceptSalonInvite<AcceptSalonInviteInput, void> 
       after: {},
     },
   });
+
+  // Send email notification to inviter (if they have notifications enabled)
+  if (invite.inviter?.emailNotifications && invite.inviter?.email) {
+    try {
+      const dashboardUrl = `${process.env.WASP_WEB_CLIENT_URL}/employees`;
+
+      const emailContent = getInviteAcceptedEmail({
+        salonName: invite.salon.name,
+        userName: context.user.name || context.user.email || 'Usuário',
+        userEmail: context.user.email || '',
+        roleName: invite.role.name,
+        dashboardLink: dashboardUrl,
+      });
+
+      await emailSender.send({
+        to: invite.inviter.email,
+        subject: emailContent.subject,
+        text: emailContent.text,
+        html: emailContent.html,
+      });
+    } catch (emailError) {
+      console.error('Failed to send invite accepted email:', emailError);
+      // Don't throw - action was successful, email is secondary
+    }
+  }
 };
 
 /**
@@ -342,6 +421,25 @@ export const rejectSalonInvite: RejectSalonInvite<RejectSalonInviteInput, void> 
   // Get invite
   const invite = await context.entities.SalonInvite.findUnique({
     where: { id: inviteId },
+    include: {
+      salon: {
+        select: {
+          name: true,
+        },
+      },
+      role: {
+        select: {
+          name: true,
+        },
+      },
+      inviter: {
+        select: {
+          email: true,
+          name: true,
+          emailNotifications: true,
+        },
+      },
+    },
   });
 
   if (!invite) {
@@ -377,4 +475,28 @@ export const rejectSalonInvite: RejectSalonInvite<RejectSalonInviteInput, void> 
       after: {},
     },
   });
+
+  // Send email notification to inviter (if they have notifications enabled)
+  if (invite.inviter?.emailNotifications && invite.inviter?.email) {
+    try {
+      const dashboardUrl = `${process.env.WASP_WEB_CLIENT_URL}/employees`;
+
+      const emailContent = getInviteRejectedEmail({
+        salonName: invite.salon.name,
+        userEmail: context.user.email || 'usuário',
+        roleName: invite.role.name,
+        dashboardLink: dashboardUrl,
+      });
+
+      await emailSender.send({
+        to: invite.inviter.email,
+        subject: emailContent.subject,
+        text: emailContent.text,
+        html: emailContent.html,
+      });
+    } catch (emailError) {
+      console.error('Failed to send invite rejected email:', emailError);
+      // Don't throw - action was successful, email is secondary
+    }
+  }
 };

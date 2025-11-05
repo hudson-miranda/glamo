@@ -10,6 +10,7 @@ import {
 import { getUploadFileSignedURLFromS3, getDownloadFileSignedURLFromS3 } from './s3Utils';
 import { ensureArgsSchemaOrThrowHttpError } from '../server/validation';
 import { ALLOWED_FILE_TYPES } from './validation';
+import { getEffectivePlan, getPlanLimits } from '../payment/plans';
 
 const createFileInputSchema = z.object({
   fileType: z.enum(ALLOWED_FILE_TYPES),
@@ -30,6 +31,23 @@ export const createFile: CreateFile<
   }
 
   const { fileType, fileName } = ensureArgsSchemaOrThrowHttpError(createFileInputSchema, rawArgs);
+
+  // TODO: Add storage limit validation when File model has 'size' field
+  // const effectivePlan = getEffectivePlan({
+  //   subscriptionPlan: context.user.subscriptionPlan,
+  //   createdAt: context.user.createdAt,
+  //   datePaid: context.user.datePaid,
+  // });
+  // const limits = getPlanLimits(effectivePlan);
+  // 
+  // const totalStorageUsed = await context.entities.File.aggregate({
+  //   where: { userId: context.user.id },
+  //   _sum: { size: true },
+  // });
+  //
+  // if (totalStorageUsed._sum.size >= limits.maxStorageGB * 1024 * 1024 * 1024) {
+  //   throw new HttpError(403, `Storage limit reached...`);
+  // }
 
   const { s3UploadUrl, s3UploadFields, key } = await getUploadFileSignedURLFromS3({
     fileType,

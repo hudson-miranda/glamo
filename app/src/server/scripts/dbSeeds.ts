@@ -56,6 +56,7 @@ function generateMockUserData(): MockUserData {
     zipCode: faker.location.zipCode(),
     birthDate: faker.date.birthdate(),
     activeSalonId: null,
+    emailNotifications: true,
     deletedAt: null,
   };
 }

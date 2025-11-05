@@ -68,7 +68,8 @@ export function getSubscriptionPaymentPlanIds(): PaymentPlanId[] {
 export interface PlanLimits {
   maxSalons: number;
   maxProfessionalsPerSalon: number;
-  maxAppointmentsPerMonth: number | null; // null = unlimited
+  maxMonthlyAppointments: number; // Using Infinity for unlimited
+  maxAppointmentsPerMonth: number | null; // null = unlimited (deprecated, use maxMonthlyAppointments)
   features: {
     onlineBooking: boolean;
     inventory: boolean;
@@ -90,6 +91,7 @@ export const planLimits: Record<PaymentPlanId, PlanLimits> = {
   [PaymentPlanId.Essencial]: {
     maxSalons: 1,
     maxProfessionalsPerSalon: 1,
+    maxMonthlyAppointments: 150,
     maxAppointmentsPerMonth: 150,
     features: {
       onlineBooking: true,
@@ -110,6 +112,7 @@ export const planLimits: Record<PaymentPlanId, PlanLimits> = {
   [PaymentPlanId.Profissional]: {
     maxSalons: 2,
     maxProfessionalsPerSalon: 5,
+    maxMonthlyAppointments: Infinity,
     maxAppointmentsPerMonth: null, // unlimited
     features: {
       onlineBooking: true,
@@ -130,6 +133,7 @@ export const planLimits: Record<PaymentPlanId, PlanLimits> = {
   [PaymentPlanId.Enterprise]: {
     maxSalons: 999, // unlimited
     maxProfessionalsPerSalon: 999, // unlimited
+    maxMonthlyAppointments: Infinity,
     maxAppointmentsPerMonth: null, // unlimited
     features: {
       onlineBooking: true,
@@ -150,6 +154,7 @@ export const planLimits: Record<PaymentPlanId, PlanLimits> = {
   [PaymentPlanId.Credits10]: {
     maxSalons: 0,
     maxProfessionalsPerSalon: 0,
+    maxMonthlyAppointments: 0,
     maxAppointmentsPerMonth: 0,
     features: {
       onlineBooking: false,
