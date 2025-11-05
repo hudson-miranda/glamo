@@ -1,4 +1,4 @@
-// components/Features.tsx - REFATORADO COM DESIGN SYSTEM BRAND (Soft Purple)
+// components/Features.tsx
 import { motion } from 'framer-motion';
 import { Card } from '../../client/components/ui/Card';
 import { GradientText } from '../../client/components/ui/GradientText';
@@ -17,39 +17,39 @@ interface Feature {
 const features: Feature[] = [
   {
     icon: '📅',
-    title: 'Smart Scheduling',
-    description: 'AI-powered booking system that works 24/7 for your clients',
+    title: 'Agendamento 24/7',
+    description: 'Seus clientes agendam a qualquer hora com confirmação automática',
     color: 'from-blue-500 to-cyan-500',
   },
   {
     icon: '👥',
-    title: 'Client Management',
-    description: 'Complete CRM to manage relationships and loyalty programs',
-    color: 'from-pink-500 to-rose-500',
+    title: 'CRM Completo',
+    description: 'Gestão completa de clientes com histórico e fidelidade',
+    color: 'from-brand-500 to-rose-500',
   },
   {
-    icon: '💳',
-    title: 'Online Payments',
-    description: 'Accept payments in advance and reduce no-shows to zero',
+    icon: '💰',
+    title: 'Controle Financeiro',
+    description: 'Caixa, vendas e comissões com Mercado Pago e Stripe',
     color: 'from-green-500 to-emerald-500',
   },
   {
-    icon: '📊',
-    title: 'Advanced Analytics',
-    description: 'Real-time dashboards with all your business metrics',
+    icon: '📦',
+    title: 'Gestão de Estoque',
+    description: 'Controle de produtos com alertas inteligentes',
     color: 'from-orange-500 to-red-500',
   },
   {
-    icon: '📱',
-    title: 'WhatsApp Integration',
-    description: 'Automatic confirmations, reminders and marketing campaigns',
-    color: 'from-green-400 to-green-600',
+    icon: '📊',
+    title: 'Relatórios em Tempo Real',
+    description: 'Dashboards automáticos com métricas do negócio',
+    color: 'from-brand-500 to-indigo-500',
   },
   {
     icon: '🤖',
-    title: 'AI Assistant',
-    description: 'Intelligent AI that learns and optimizes your business',
-    color: 'from-purple-500 to-pink-500',
+    title: 'Assistente com IA',
+    description: 'Agente inteligente OpenAI para insights automáticos',
+    color: 'from-brand-500 to-brand-500',
   },
 ];
 
@@ -73,7 +73,7 @@ export default function Features() {
       ref={ref}
       className="relative py-24 bg-white dark:bg-black text-gray-900 dark:text-white overflow-hidden transition-colors duration-300"
     >
-      {/* Efeitos de fundo */}
+      {/* Glow Effects de fundo */}
       <GlowEffect position="top-right" size="xl" color="brand" animated />
       <GlowEffect position="bottom-left" size="xl" color="brand" animated />
 
@@ -86,20 +86,20 @@ export default function Features() {
           className="text-center mb-20"
         >
           <Badge variant="glow" className="mb-6">
-            FEATURES
+            FUNCIONALIDADES
           </Badge>
           <h2 className="text-4xl md:text-6xl font-bold mb-4">
-            Choose from over{' '}
+            Tudo que você precisa em{' '}
             <GradientText variant="brand" as="span" className="text-4xl md:text-6xl font-bold">
-              10+ cutting-edge products
+              um só lugar
             </GradientText>
           </h2>
           <p className="text-xl text-gray-600 dark:text-zinc-400 max-w-3xl mx-auto">
-            Everything you need to transform your business in one place
+            Sistema completo de gestão para transformar seu salão de beleza
           </p>
         </motion.div>
 
-        {/* Grid de features */}
+        {/* Grid de funcionalidades */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
           {features.map((feature, index) => (
             <FeatureCard
@@ -111,7 +111,6 @@ export default function Features() {
           ))}
         </div>
 
-        {/* CTA final */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -119,11 +118,8 @@ export default function Features() {
           className="text-center"
         >
           <Button variant="primary-glow" size="lg">
-            Get Started - It's Free
+            Explorar Todas as Funcionalidades
           </Button>
-          <p className="text-sm text-gray-600 dark:text-zinc-400 mt-4">
-            ✨ 14 days free trial • No credit card • Cancel anytime
-          </p>
         </motion.div>
       </div>
     </section>
@@ -141,27 +137,20 @@ function FeatureCard({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ opacity: 0, y: 30 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay: index * 0.1 }}
     >
-      <Card
-        variant="glass-brand"
-        hover
-        glow
-        className="group cursor-pointer h-full"
-        role="article"
-        aria-label={`Feature: ${feature.title}`}
-      >
+      <Card variant="glass" hover className="group h-full p-8 cursor-pointer">
         <div
-          className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-xl flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform duration-300`}
+          className={`w-16 h-16 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-all duration-300 shadow-glow-sm group-hover:shadow-glow-md`}
         >
           {feature.icon}
         </div>
-        <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white group-hover:text-brand-500 transition-colors duration-300">
+        <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-brand-500 dark:group-hover:text-brand-400 transition-colors duration-300">
           {feature.title}
         </h3>
-        <p className="text-gray-600 dark:text-zinc-400 text-sm leading-relaxed">
+        <p className="text-gray-600 dark:text-zinc-400 leading-relaxed">
           {feature.description}
         </p>
       </Card>

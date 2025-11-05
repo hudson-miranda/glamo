@@ -95,7 +95,7 @@ export default function WhyDifferent() {
       {/* Fundo animado (sem cortes) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-10 left-1/4 w-[28rem] h-[28rem] bg-purple-500 rounded-full blur-3xl opacity-20 animate-pulse" />
-        <div className="absolute -bottom-10 right-1/4 w-[28rem] h-[28rem] bg-pink-500 rounded-full blur-3xl opacity-20 animate-pulse" />
+        <div className="absolute -bottom-10 right-1/4 w-[28rem] h-[28rem] bg-brand-500 rounded-full blur-3xl opacity-20 animate-pulse" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -112,7 +112,7 @@ export default function WhyDifferent() {
           <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white">
             Não somos mais um sistema.
             <br />
-            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-brand-400 to-brand-400 bg-clip-text text-transparent">
               Somos seu parceiro de crescimento.
             </span>
           </h2>
@@ -150,9 +150,9 @@ export default function WhyDifferent() {
               <button
                 key={index}
                 onClick={() => setActiveTab(index)}
-                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500/50 ${
+                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-brand-500 ${
                   activeTab === index
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/50'
+                    ? 'bg-gradient-to-r from-brand-500 to-brand-400 text-white shadow-lg shadow-brand-500/50'
                     : 'bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/20'
                 }`}
                 aria-pressed={activeTab === index}
@@ -189,9 +189,9 @@ export default function WhyDifferent() {
             </div>
 
             {/* Glamo */}
-            <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-2xl p-6">
+            <div className="bg-gradient-to-br from-brand-500/20 to-brand-500/20 border border-purple-500/30 rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-r from-brand-500 to-brand-500 rounded-full flex items-center justify-center">
                   <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
@@ -225,7 +225,7 @@ export default function WhyDifferent() {
               transition={{ duration: 0.5, delay: 1 + index * 0.1 }}
               className="text-center"
             >
-              <div className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+              <div className="text-4xl font-bold bg-gradient-to-r from-brand-400 to-brand-400 bg-clip-text text-transparent mb-2">
                 {stat.value}
               </div>
               <div className="text-gray-600 dark:text-gray-400 text-sm">{stat.label}</div>
@@ -275,7 +275,7 @@ function DifferentiatorCard({
       <div className="flex items-start justify-between mb-6">
         <div className="text-6xl select-none" aria-hidden="true">{differentiator.icon}</div>
         <div className="text-right">
-          <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <div className="text-3xl font-bold bg-gradient-to-r from-brand-400 to-brand-400 bg-clip-text text-transparent">
             {differentiator.stats.value}
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-400">{differentiator.stats.label}</div>
@@ -283,7 +283,7 @@ function DifferentiatorCard({
       </div>
 
       {/* Conteúdo */}
-      <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300">
+      <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-brand-400 group-hover:to-brand-400 group-hover:bg-clip-text transition-all duration-300">
         {differentiator.title}
       </h3>
       <p className="text-gray-600 dark:text-gray-400 leading-relaxed">

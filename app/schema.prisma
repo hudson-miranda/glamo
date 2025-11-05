@@ -69,6 +69,7 @@ model User {
   cashSessionsOpened       CashRegisterSession[]  @relation("SessionOpenedBy")
   cashSessionsClosed       CashRegisterSession[]  @relation("SessionClosedBy")
   createdVouchers          Voucher[]
+  sentInvites              SalonInvite[]
 }
 
 model GptResponse {
@@ -221,6 +222,37 @@ model Salon {
   productCategories  ProductCategory[]
   productBrands      ProductBrand[]
   suppliers          Supplier[]
+  invitesSent        SalonInvite[]        @relation("InvitesSent")
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+model SalonInvite {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  salonId      String
+  email        String
+  roleId       String
+  invitedBy    String
+  status       InviteStatus @default(PENDING)
+  expiresAt    DateTime
+  acceptedAt   DateTime?
+  rejectedAt   DateTime?
+
+  salon        Salon        @relation("InvitesSent", fields: [salonId], references: [id], onDelete: Cascade)
+  role         Role         @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  inviter      User         @relation(fields: [invitedBy], references: [id], onDelete: Restrict)
+
+  @@unique([salonId, email])
+  @@index([email])
+  @@index([status])
 }
 
 model UserSalon {
@@ -252,6 +284,7 @@ model Role {
   salon           Salon            @relation(fields: [salonId], references: [id], onDelete: Restrict)
   rolePermissions RolePermission[]
   userRoles       UserRole[]
+  invites         SalonInvite[]
 
   @@unique([salonId, name])
 }

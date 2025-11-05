@@ -16,33 +16,33 @@ interface FAQItem {
 const faqs: FAQItem[] = [
   {
     id: 1,
-    question: 'How much does it cost?',
-    answer: 'We offer plans starting from $49/month with all essential features. You get a 14-day free trial with no credit card required. Cancel anytime without penalties.',
+    question: 'Como funciona o período de teste gratuito?',
+    answer: 'Você tem 14 dias para testar todas as funcionalidades do Glamo sem precisar informar cartão de crédito. É só criar sua conta e começar a usar imediatamente.',
   },
   {
     id: 2,
-    question: 'Is there a free trial?',
-    answer: 'Yes! We offer a 14-day free trial with full access to all premium features. No credit card needed for signup. Explore everything without commitment.',
+    question: 'Preciso instalar algum software?',
+    answer: 'Não! O Glamo é 100% online (cloud). Você acessa de qualquer navegador, no computador, tablet ou celular. Sempre atualizado e sem instalação.',
   },
   {
     id: 3,
-    question: 'Can I manage multiple professionals?',
-    answer: 'Absolutely! You can add as many professionals and locations as you need. Each professional has their own schedule, and you get complete visibility through a centralized dashboard.',
+    question: 'Posso gerenciar vários profissionais?',
+    answer: 'Sim! Você pode adicionar quantos profissionais e unidades precisar. Cada profissional tem sua própria agenda e você tem visão completa através de um painel centralizado.',
   },
   {
     id: 4,
-    question: 'What payment methods do you accept?',
-    answer: 'We integrate with major platforms: credit/debit cards, PayPal, Stripe, and digital wallets. You can receive online payments or record cash transactions.',
+    question: 'Quais formas de pagamento são aceitas?',
+    answer: 'Integramos com as principais plataformas: cartões de crédito/débito, Mercado Pago, PagSeguro e carteiras digitais. Você pode receber online ou registrar pagamentos em dinheiro.',
   },
   {
     id: 5,
-    question: 'Is WhatsApp integration available?',
-    answer: 'Yes! We have native WhatsApp Business API integration. Send confirmations, reminders, promotions, and even allow bookings directly through WhatsApp.',
+    question: 'Tem integração com WhatsApp?',
+    answer: 'Sim! Temos integração nativa com WhatsApp Business API. Envie confirmações, lembretes, promoções e até permita agendamentos direto pelo WhatsApp.',
   },
   {
     id: 6,
-    question: 'How does customer support work?',
-    answer: 'We offer support in multiple languages via WhatsApp, email, and live chat. Our average response time is under 5 minutes during business hours.',
+    question: 'Como funciona o suporte?',
+    answer: 'Oferecemos suporte 100% em português via WhatsApp, email e chat. Nosso tempo médio de resposta é de 5 minutos no horário comercial.',
   },
 ];
 
@@ -83,16 +83,16 @@ export default function FAQ() {
           className="text-center mb-16"
         >
           <Badge variant="glow" className="mb-6">
-            FAQ
+            PERGUNTAS FREQUENTES
           </Badge>
           <h2 className="text-4xl md:text-6xl font-bold mb-4">
-            Frequently Asked{' '}
+            Dúvidas{' '}
             <GradientText variant="brand" as="span" className="text-4xl md:text-6xl font-bold">
-              Questions
+              Frequentes
             </GradientText>
           </h2>
           <p className="text-xl text-gray-600 dark:text-zinc-400 max-w-2xl mx-auto">
-            Everything you need to know about our platform
+            Tudo que você precisa saber sobre o Glamo
           </p>
         </motion.div>
 
@@ -190,7 +190,7 @@ function FAQItemComponent({
             transition={{ duration: 0.3 }}
             className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
               isOpen
-                ? 'bg-gradient-to-br from-brand-500 to-purple-500'
+                ? 'bg-gradient-to-br from-brand-500 to-brand-500'
                 : 'bg-gray-200 dark:bg-zinc-800'
             }`}
           >

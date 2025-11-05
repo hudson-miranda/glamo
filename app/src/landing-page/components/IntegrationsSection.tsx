@@ -13,16 +13,12 @@ interface Integration {
 }
 
 const integrations: Integration[] = [
-  { name: 'Stripe', icon: '💳', color: 'from-blue-500 to-purple-500' },
-  { name: 'PayPal', icon: '💰', color: 'from-blue-400 to-blue-600' },
+  { name: 'Mercado Pago', icon: '💳', color: 'from-blue-500 to-cyan-500' },
+  { name: 'PagSeguro', icon: '💰', color: 'from-green-500 to-emerald-500' },
+  { name: 'Stripe', icon: '�', color: 'from-brand-500 to-indigo-500' },
   { name: 'WhatsApp', icon: '💬', color: 'from-green-400 to-green-600' },
-  { name: 'Slack', icon: '💬', color: 'from-pink-400 to-purple-600' },
   { name: 'Google Cal', icon: '📅', color: 'from-red-500 to-yellow-500' },
-  { name: 'Zoom', icon: '🎥', color: 'from-blue-500 to-cyan-500' },
-  { name: 'Mailchimp', icon: '📧', color: 'from-yellow-400 to-orange-500' },
-  { name: 'Zapier', icon: '⚡', color: 'from-orange-500 to-red-500' },
-  { name: 'Instagram', icon: '📸', color: 'from-pink-500 to-purple-500' },
-  { name: 'Facebook', icon: '👥', color: 'from-blue-500 to-blue-700' },
+  { name: 'OpenAI', icon: '🤖', color: 'from-emerald-400 to-cyan-500' },
 ];
 
 export default function IntegrationsSection() {
@@ -58,20 +54,20 @@ export default function IntegrationsSection() {
           className="text-center mb-20"
         >
           <Badge variant="glow" className="mb-6">
-            INTEGRATIONS
+            INTEGRAÇÕES
           </Badge>
           <h2 className="text-4xl md:text-6xl font-bold mb-4">
             <GradientText variant="brand" as="span" className="text-4xl md:text-6xl font-bold">
-              I lost popular integration apps
+              Conecte com suas ferramentas favoritas
             </GradientText>
           </h2>
           <p className="text-xl text-gray-600 dark:text-zinc-400 max-w-3xl mx-auto">
-            Connect with your favorite tools and streamline your workflow
+            Integrações nativas com as principais plataformas de pagamento e comunicação
           </p>
         </motion.div>
 
         {/* Grid de integrações */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {integrations.map((integration, index) => (
             <IntegrationCard
               key={index}
@@ -82,21 +78,21 @@ export default function IntegrationsSection() {
           ))}
         </div>
 
-        {/* CTA */}
-        <motion.div
+        {/* CTA - Oculto por enquanto */}
+        {/* <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.8 }}
           className="text-center mt-16"
         >
           <p className="text-gray-600 dark:text-zinc-400 mb-4">
-            <span className="text-brand-500 font-bold">+100 integrations</span> available
+            <span className="text-brand-500 font-bold">+20 integrações</span> disponíveis
           </p>
           <a
             href="#"
             className="inline-flex items-center gap-2 text-brand-500 hover:text-brand-400 font-semibold transition-colors duration-300 underline-offset-4 hover:underline"
           >
-            See all apps
+            Ver todas as integrações
             <svg
               className="w-5 h-5"
               fill="none"
@@ -111,7 +107,7 @@ export default function IntegrationsSection() {
               />
             </svg>
           </a>
-        </motion.div>
+        </motion.div> */}
       </div>
     </section>
   );

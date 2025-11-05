@@ -3,9 +3,9 @@ export const designSystem = {
   colors: {
     gradient: {
       primary: 'from-brand-400 to-brand-600',
-      secondary: 'from-purple-400 to-pink-400',
+      secondary: 'from-brand-400 to-brand-400',
       dark: 'from-gray-900 to-black',
-      light: 'from-purple-50 to-white',
+      light: 'from-brand-50 to-white',
     },
     badge: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
     card: 'bg-white/5 backdrop-blur-sm border-white/10 hover:border-purple-500/50',

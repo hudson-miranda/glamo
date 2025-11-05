@@ -89,7 +89,7 @@ app OpenSaaS {
     // NOTE: "Dummy" provider is just for local development purposes.
     //   Make sure to check the server logs for the email confirmation url (it will not be sent to an address)!
     //   Once you are ready for production, switch to e.g. "SendGrid" or "Mailgun" providers. Check out https://docs.opensaas.sh/guides/email-sending/ .
-    provider: Dummy,
+    provider: SendGrid,
     defaultFrom: {
       name: "Glamo",
       // When using a real provider, e.g. SendGrid, you must use the same email address that you configured your account to send out emails with!
@@ -365,12 +365,33 @@ query getUserSalons {
 
 action createSalon {
   fn: import { createSalon } from "@src/salon/operations",
-  entities: [User, Salon, UserSalon, Role, UserRole, Log]
+  entities: [User, Salon, UserSalon, Role, UserRole, RolePermission, Permission, Log]
 }
 
 action switchActiveSalon {
   fn: import { switchActiveSalon } from "@src/salon/operations",
   entities: [User, Salon, UserSalon]
+}
+
+// Salon Invites
+query getPendingInvites {
+  fn: import { getPendingInvites } from "@src/salon/invites",
+  entities: [User, SalonInvite, Salon, Role]
+}
+
+action sendSalonInvite {
+  fn: import { sendSalonInvite } from "@src/salon/invites",
+  entities: [User, SalonInvite, Salon, Role, UserSalon, UserRole, RolePermission, Permission]
+}
+
+action acceptSalonInvite {
+  fn: import { acceptSalonInvite } from "@src/salon/invites",
+  entities: [User, SalonInvite, Salon, Role, UserSalon, UserRole, Log]
+}
+
+action rejectSalonInvite {
+  fn: import { rejectSalonInvite } from "@src/salon/invites",
+  entities: [SalonInvite, Log]
 }
 //#endregion
 
@@ -685,10 +706,23 @@ page DashboardPage {
   component: import DashboardPage from "@src/client/modules/dashboard/DashboardPage"
 }
 
+// Onboarding Routes
+route OnboardingRoute { path: "/onboarding", to: OnboardingPage }
+page OnboardingPage {
+  authRequired: true,
+  component: import OnboardingPage from "@src/client/modules/onboarding/OnboardingPage"
+}
+
 route CreateSalonRoute { path: "/onboarding/create-salon", to: CreateSalonPage }
 page CreateSalonPage {
   authRequired: true,
   component: import CreateSalonPage from "@src/client/modules/onboarding/CreateSalonPage"
+}
+
+route WaitingInviteRoute { path: "/onboarding/waiting-invite", to: WaitingInvitePage }
+page WaitingInvitePage {
+  authRequired: true,
+  component: import WaitingInvitePage from "@src/client/modules/onboarding/WaitingInvitePage"
 }
 
 route ClientsListRoute { path: "/clients", to: ClientsListPage }

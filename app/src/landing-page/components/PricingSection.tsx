@@ -20,59 +20,60 @@ interface PricingPlan {
 
 const pricingPlans: PricingPlan[] = [
   {
-    name: 'Starter',
-    price: '$49',
-    period: 'per month',
-    description: 'Perfect for solo professionals starting their journey',
+    name: 'Essencial',
+    price: 'R$ 97',
+    period: 'por mês',
+    description: 'Perfeito para profissionais autônomos',
     features: [
-      'Up to 100 bookings/month',
-      '1 professional',
-      'Basic scheduling',
-      'WhatsApp reminders',
-      'Payment integration',
-      'Mobile app access',
-      'Email support',
+      'Até 150 agendamentos/mês',
+      '1 profissional',
+      'Agendamento online',
+      'Gestão de clientes',
+      'Controle financeiro básico',
+      'Notificações automáticas',
+      'Acesso mobile',
+      'Suporte por email',
     ],
-    cta: 'Start Free Trial',
+    cta: 'Começar Teste Grátis',
   },
   {
-    name: 'Professional',
-    price: '$99',
-    period: 'per month',
-    description: 'Most popular choice for growing businesses',
+    name: 'Profissional',
+    price: 'R$ 197',
+    period: 'por mês',
+    description: 'Ideal para salões em crescimento',
     features: [
-      'Unlimited bookings',
-      'Up to 5 professionals',
-      'AI-powered scheduling',
-      'Advanced analytics',
-      'Marketing automation',
-      'Custom branding',
-      'Priority support',
-      'Team management',
-      'Multi-location support',
+      'Agendamentos ilimitados',
+      'Até 5 profissionais',
+      'Gestão completa de estoque',
+      'Relatórios avançados',
+      'Comissões automáticas',
+      'Integração WhatsApp',
+      'Suporte prioritário',
+      'Personalização de marca',
+      'Multi-unidades (até 2)',
     ],
     highlighted: true,
-    badge: 'Most Popular',
-    cta: 'Get Started Now',
+    badge: 'Mais Popular',
+    cta: 'Assinar Agora',
   },
   {
     name: 'Enterprise',
-    price: '$299',
-    period: 'per month',
-    description: 'Complete solution for large organizations',
+    price: 'R$ 497',
+    period: 'por mês',
+    description: 'Solução completa para redes de salões',
     features: [
-      'Everything in Professional',
-      'Unlimited professionals',
-      'Unlimited locations',
-      'White label solution',
-      'Custom domain',
-      'API access',
-      'Dedicated account manager',
-      'Custom integrations',
-      'SLA guarantee',
-      'On-premise option',
+      'Tudo do Profissional',
+      'Profissionais ilimitados',
+      'Unidades ilimitadas',
+      'API personalizada',
+      'Domínio personalizado',
+      'Gerente de conta dedicado',
+      'Integrações customizadas',
+      'Treinamento da equipe',
+      'SLA garantido',
+      'Suporte 24/7',
     ],
-    cta: 'Contact Sales',
+    cta: 'Falar com Vendas',
   },
 ];
 
@@ -109,16 +110,16 @@ export default function PricingSection() {
           className="text-center mb-20"
         >
           <Badge variant="glow" className="mb-6">
-            PRICING
+            PLANOS E PREÇOS
           </Badge>
           <h2 className="text-4xl md:text-6xl font-bold mb-4 text-gray-900 dark:text-white">
-            The best in the class{' '}
+            Escolha o plano{' '}
             <GradientText variant="brand" as="span" className="text-4xl md:text-6xl font-bold">
-              product for you today!
+              perfeito para você
             </GradientText>
           </h2>
           <p className="text-xl text-gray-600 dark:text-zinc-400 max-w-3xl mx-auto">
-            Choose the perfect plan for your business needs
+            Todos os planos incluem 14 dias de teste grátis
           </p>
         </motion.div>
 

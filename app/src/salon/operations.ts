@@ -2,6 +2,7 @@ import type { Salon, User, UserSalon } from 'wasp/entities';
 import type { GetUserSalons, CreateSalon, SwitchActiveSalon } from 'wasp/server/operations';
 import { HttpError } from 'wasp/server';
 import { Prisma } from '@prisma/client';
+import { createDefaultRolesForSalon, assignOwnerRole } from '../rbac/seed';
 
 /**
  * List all salons the user belongs to
@@ -81,39 +82,11 @@ export const createSalon: CreateSalon<CreateSalonInput, Salon> = async (args, co
     },
   });
 
-  // Get the owner role
-  const ownerRole = await context.entities.Role.findFirst({
-    where: { name: 'owner' },
-  });
+  // Create default roles for this salon
+  await createDefaultRolesForSalon(salon.id);
 
-  if (!ownerRole) {
-    throw new HttpError(500, 'Owner role not found');
-  }
-
-  // Create UserSalon relationship
-  const userSalon = await context.entities.UserSalon.create({
-    data: {
-      userId: context.user.id,
-      salonId: salon.id,
-      isActive: true,
-    },
-  });
-
-  // Assign owner role to user for this salon
-  await context.entities.UserRole.create({
-    data: {
-      userSalonId: userSalon.id,
-      roleId: ownerRole.id,
-    },
-  });
-
-  // Set as active salon if user doesn't have one
-  if (!context.user.activeSalonId) {
-    await context.entities.User.update({
-      where: { id: context.user.id },
-      data: { activeSalonId: salon.id },
-    });
-  }
+  // Assign owner role to user
+  await assignOwnerRole(context.user.id, salon.id);
 
   // Log the action
   await context.entities.Log.create({

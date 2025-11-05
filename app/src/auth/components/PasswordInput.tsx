@@ -50,11 +50,11 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             type={showPassword ? 'text' : 'password'}
             value={value}
             className={cn(
-              "w-full pl-10 pr-12 py-3 rounded-xl border transition-all duration-300",
+              "w-full pl-10 pr-12 py-3 rounded-xl border",
               "bg-white dark:bg-gray-800/50",
               "text-gray-900 dark:text-white",
               "placeholder:text-gray-400 dark:placeholder:text-gray-500",
-              "focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500",
+              "focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500",
               "disabled:opacity-50 disabled:cursor-not-allowed",
               error
                 ? "border-red-300 dark:border-red-500/50 focus:ring-red-500/50 focus:border-red-500"
