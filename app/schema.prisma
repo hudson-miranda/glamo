@@ -25,20 +25,21 @@ model User {
   credits                       Int       @default(3)
 
   // Glamo-specific fields
-  name          String?
-  phone         String?
-  phone2        String?
-  phoneType     String?
-  phoneType2    String?
-  address       String?
-  addressNumber String?
-  complement    String?
-  city          String?
-  state         String?
-  zipCode       String?
-  birthDate     DateTime?
-  activeSalonId String?
-  deletedAt     DateTime?
+  name               String?
+  phone              String?
+  phone2             String?
+  phoneType          String?
+  phoneType2         String?
+  address            String?
+  addressNumber      String?
+  complement         String?
+  city               String?
+  state              String?
+  zipCode            String?
+  birthDate          DateTime?
+  activeSalonId      String?
+  emailNotifications Boolean  @default(true) // User preference for email notifications
+  deletedAt          DateTime?
 
   // OpenSaaS relations
   gptResponses        GptResponse[]

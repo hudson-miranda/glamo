@@ -373,6 +373,11 @@ action switchActiveSalon {
   entities: [User, Salon, UserSalon]
 }
 
+query listSalonRoles {
+  fn: import { listSalonRoles } from "@src/salon/operations",
+  entities: [User, Role]
+}
+
 // Salon Invites
 query getPendingInvites {
   fn: import { getPendingInvites } from "@src/salon/invites",
@@ -392,6 +397,32 @@ action acceptSalonInvite {
 action rejectSalonInvite {
   fn: import { rejectSalonInvite } from "@src/salon/invites",
   entities: [SalonInvite, Log]
+}
+
+// Employee Management
+query listEmployees {
+  fn: import { listEmployees } from "@src/salon/employees",
+  entities: [User, UserSalon, UserRole, Role]
+}
+
+action updateEmployeeRole {
+  fn: import { updateEmployeeRole } from "@src/salon/employees",
+  entities: [User, UserSalon, UserRole, Role, Log]
+}
+
+action deactivateEmployee {
+  fn: import { deactivateEmployee } from "@src/salon/employees",
+  entities: [User, UserSalon, UserRole, Role, Log]
+}
+
+action resendInvite {
+  fn: import { resendInvite } from "@src/salon/employees",
+  entities: [User, SalonInvite, Log]
+}
+
+action cancelInvite {
+  fn: import { cancelInvite } from "@src/salon/employees",
+  entities: [User, SalonInvite, Log]
 }
 //#endregion
 
@@ -729,6 +760,12 @@ route ClientsListRoute { path: "/clients", to: ClientsListPage }
 page ClientsListPage {
   authRequired: true,
   component: import ClientsListPage from "@src/client/modules/clients/ClientsListPage"
+}
+
+route EmployeesRoute { path: "/employees", to: EmployeesPage }
+page EmployeesPage {
+  authRequired: true,
+  component: import EmployeesPage from "@src/client/modules/employees/EmployeesPage"
 }
 
 route NotificationsRoute { path: "/notifications", to: NotificationsPage }

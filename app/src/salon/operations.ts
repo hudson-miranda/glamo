@@ -3,6 +3,7 @@ import type { GetUserSalons, CreateSalon, SwitchActiveSalon } from 'wasp/server/
 import { HttpError } from 'wasp/server';
 import { Prisma } from '@prisma/client';
 import { createDefaultRolesForSalon, assignOwnerRole } from '../rbac/seed';
+import { getEffectivePlan, getPlanLimits } from '../payment/plans';
 
 /**
  * List all salons the user belongs to
@@ -65,6 +66,30 @@ export const createSalon: CreateSalon<CreateSalonInput, Salon> = async (args, co
 
   if (!name || name.trim().length === 0) {
     throw new HttpError(400, 'Salon name is required');
+  }
+
+  // Check plan limits - verify if user can create more salons
+  const effectivePlan = getEffectivePlan({
+    subscriptionPlan: context.user.subscriptionPlan,
+    createdAt: context.user.createdAt,
+    datePaid: context.user.datePaid,
+  });
+  const limits = getPlanLimits(effectivePlan);
+
+  // Count current salons
+  const currentSalonCount = await context.entities.UserSalon.count({
+    where: {
+      userId: context.user.id,
+      isActive: true,
+      deletedAt: null,
+    },
+  });
+
+  if (currentSalonCount >= limits.maxSalons) {
+    throw new HttpError(
+      403,
+      `Plan limit reached: You can create up to ${limits.maxSalons} salon(s) with your current plan. Please upgrade to create more salons.`
+    );
   }
 
   // Create salon
@@ -137,4 +162,33 @@ export const switchActiveSalon: SwitchActiveSalon<SwitchActiveSalonInput, User> 
   });
 
   return updatedUser;
+};
+
+/**
+ * List all roles available in the active salon
+ */
+export const listSalonRoles: any = async (_args: void, context: any) => {
+  if (!context.user) {
+    throw new HttpError(401, 'User not authenticated');
+  }
+
+  if (!context.user.activeSalonId) {
+    throw new HttpError(400, 'No active salon selected');
+  }
+
+  const roles = await context.entities.Role.findMany({
+    where: {
+      salonId: context.user.activeSalonId,
+    },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+    },
+    orderBy: {
+      name: 'asc',
+    },
+  });
+
+  return roles;
 };

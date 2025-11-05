@@ -15,6 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
   LucideIcon,
+  UserCog,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Button } from '../../components/ui/button';
@@ -37,6 +38,12 @@ const navItems: NavItem[] = [
     href: '/clients',
     icon: Users,
     permission: 'can_view_clients',
+  },
+  {
+    title: 'Employees',
+    href: '/employees',
+    icon: UserCog,
+    permission: 'can_view_staff',
   },
   {
     title: 'Notifications',
