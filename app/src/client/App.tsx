@@ -8,6 +8,7 @@ import CookieConsentBanner from './components/cookie-consent/Banner';
 import { ErrorBoundary } from './providers/ErrorBoundary';
 import { Toaster } from '../components/ui/toaster';
 import { DashboardLayout } from './layouts/DashboardLayout';
+import OnboardingGuard from './components/OnboardingGuard';
 
 /**
  * use this component to wrap all child components
@@ -22,7 +23,7 @@ export default function App() {
   const navigationItems = isMarketingPage ? marketingNavigationItems : demoNavigationitems;
 
   const shouldDisplayAppNavBar = useMemo(() => {
-    // Hide NavBar on all auth pages - they have their own simplified NavBar
+    // Hide NavBar on all auth pages and onboarding pages
     const authPages = [
       routes.LoginRoute.build(),
       routes.SignupRoute.build(),
@@ -31,7 +32,13 @@ export default function App() {
       '/email-verification',
       '/signup-success'
     ];
-    return !authPages.includes(location.pathname);
+    const onboardingPages = [
+      '/onboarding',
+      '/onboarding/create-salon',
+      '/onboarding/waiting-invite'
+    ];
+    const hiddenPages = [...authPages, ...onboardingPages];
+    return !hiddenPages.some(page => location.pathname.startsWith(page));
   }, [location]);
 
   const isAdminDashboard = useMemo(() => {
@@ -62,22 +69,24 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <div className='min-h-screen bg-white dark:bg-black text-foreground'>
-        {isAdminDashboard || isDashboardPage ? (
-          <DashboardLayout>
-            <Outlet />
-          </DashboardLayout>
-        ) : (
-          <>
-            {shouldDisplayAppNavBar && <NavBar navigationItems={navigationItems} />}
-            <div className='mx-auto max-w-screen-4xl'>
+      <OnboardingGuard>
+        <div className='min-h-screen bg-white dark:bg-black text-foreground'>
+          {isAdminDashboard || isDashboardPage ? (
+            <DashboardLayout>
               <Outlet />
-            </div>
-          </>
-        )}
-      </div>
-      <CookieConsentBanner />
-      <Toaster />
+            </DashboardLayout>
+          ) : (
+            <>
+              {shouldDisplayAppNavBar && <NavBar navigationItems={navigationItems} />}
+              <div className='mx-auto max-w-screen-4xl'>
+                <Outlet />
+              </div>
+            </>
+          )}
+        </div>
+        <CookieConsentBanner />
+        <Toaster />
+      </OnboardingGuard>
     </ErrorBoundary>
   );
 }

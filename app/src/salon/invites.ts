@@ -222,7 +222,7 @@ type AcceptSalonInviteInput = {
   inviteId: string;
 };
 
-export const acceptSalonInvite: AcceptSalonInvite<AcceptSalonInviteInput, User> = async (
+export const acceptSalonInvite: AcceptSalonInvite<AcceptSalonInviteInput, void> = async (
   args,
   context
 ) => {
@@ -303,9 +303,8 @@ export const acceptSalonInvite: AcceptSalonInvite<AcceptSalonInviteInput, User> 
   });
 
   // Set as active salon if user doesn't have one
-  let updatedUser = context.user;
   if (!context.user.activeSalonId) {
-    updatedUser = await context.entities.User.update({
+    await context.entities.User.update({
       where: { id: context.user.id },
       data: { activeSalonId: invite.salonId },
     });
@@ -318,11 +317,9 @@ export const acceptSalonInvite: AcceptSalonInvite<AcceptSalonInviteInput, User> 
       entity: 'SalonInvite',
       entityId: inviteId,
       action: 'ACCEPT',
-      after: null,
+      after: {},
     },
   });
-
-  return updatedUser;
 };
 
 /**
@@ -377,7 +374,7 @@ export const rejectSalonInvite: RejectSalonInvite<RejectSalonInviteInput, void> 
       entity: 'SalonInvite',
       entityId: inviteId,
       action: 'REJECT',
-      after: null,
+      after: {},
     },
   });
 };

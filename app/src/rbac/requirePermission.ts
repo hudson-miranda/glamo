@@ -12,14 +12,14 @@ export interface ContextUser {
  * @param user - The authenticated user (must have id and activeSalonId)
  * @param salonId - The salon ID to check permission in
  * @param permission - The permission name to verify (e.g., 'can_view_clients')
- * @param prisma - Prisma client instance for database queries
+ * @param entities - Prisma entities from Wasp context
  * @throws {HttpError} - 401 if user not authenticated, 403 if no permission or wrong salon
  */
 export async function requirePermission(
   user: ContextUser | undefined,
   salonId: string,
   permission: string,
-  prisma: any
+  entities: any
 ): Promise<void> {
   // Check if user is authenticated
   if (!user || !user.id) {
@@ -37,7 +37,7 @@ export async function requirePermission(
   }
 
   // Get user's roles and permissions for this salon
-  const userSalon = await prisma.userSalon.findUnique({
+  const userSalon = await entities.UserSalon.findUnique({
     where: {
       userId_salonId: {
         userId: user.id,
@@ -77,13 +77,13 @@ export async function requirePermission(
   // Check if user has the required permission
   if (!userPermissions.has(permission)) {
     // Log access denied attempt
-    await prisma.log.create({
+    await entities.Log.create({
       data: {
         userId: user.id,
         entity: 'Permission',
         entityId: salonId,
         action: 'ACCESS_DENIED',
-        before: null,
+        before: {},
         after: {
           permission,
           userPermissions: Array.from(userPermissions),

@@ -1,7 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
-
 // Define all permissions
 const PERMISSIONS = [
   // Client permissions
@@ -127,6 +125,8 @@ const DEFAULT_ROLES = [
  * This should be run once when setting up the system.
  */
 export async function seedRbacPermissionsAndRoles() {
+  const prisma = new PrismaClient();
+  
   console.log('🌱 Seeding RBAC permissions and roles...');
 
   try {
@@ -148,6 +148,8 @@ export async function seedRbacPermissionsAndRoles() {
   } catch (error) {
     console.error('❌ Error seeding RBAC:', error);
     throw error;
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
@@ -156,14 +158,19 @@ export async function seedRbacPermissionsAndRoles() {
  * This should be called when a new salon is created.
  * 
  * @param salonId - The ID of the salon to create roles for
+ * @param entities - Prisma entities from context
  */
-export async function createDefaultRolesForSalon(salonId: string) {
+export async function createDefaultRolesForSalon(salonId: string, entities?: any) {
   console.log(`🌱 Creating default roles for salon ${salonId}...`);
+
+  // Use entities if provided (from Wasp context), otherwise use direct prisma
+  const db = entities || new PrismaClient();
+  const shouldDisconnect = !entities;
 
   try {
     for (const roleConfig of DEFAULT_ROLES) {
       // Create role
-      const role = await prisma.role.upsert({
+      const role = await (entities ? db.Role : db.role).upsert({
         where: {
           salonId_name: {
             salonId,
@@ -178,7 +185,7 @@ export async function createDefaultRolesForSalon(salonId: string) {
       });
 
       // Get permission IDs
-      const permissions = await prisma.permission.findMany({
+      const permissions = await (entities ? db.Permission : db.permission).findMany({
         where: {
           name: {
             in: roleConfig.permissions,
@@ -188,7 +195,7 @@ export async function createDefaultRolesForSalon(salonId: string) {
 
       // Create role permissions
       for (const permission of permissions) {
-        await prisma.rolePermission.upsert({
+        await (entities ? db.RolePermission : db.rolePermission).upsert({
           where: {
             roleId_permissionId: {
               roleId: role.id,
@@ -210,6 +217,10 @@ export async function createDefaultRolesForSalon(salonId: string) {
   } catch (error) {
     console.error('❌ Error creating default roles:', error);
     throw error;
+  } finally {
+    if (shouldDisconnect && !entities) {
+      await (db as PrismaClient).$disconnect();
+    }
   }
 }
 
@@ -219,13 +230,18 @@ export async function createDefaultRolesForSalon(salonId: string) {
  * 
  * @param userId - The ID of the user to assign owner role
  * @param salonId - The ID of the salon
+ * @param entities - Prisma entities from context
  */
-export async function assignOwnerRole(userId: string, salonId: string) {
+export async function assignOwnerRole(userId: string, salonId: string, entities?: any) {
   console.log(`🔑 Assigning owner role to user ${userId} for salon ${salonId}...`);
+
+  // Use entities if provided (from Wasp context), otherwise use direct prisma
+  const db = entities || new PrismaClient();
+  const shouldDisconnect = !entities;
 
   try {
     // Get or create UserSalon record
-    const userSalon = await prisma.userSalon.upsert({
+    const userSalon = await (entities ? db.UserSalon : db.userSalon).upsert({
       where: {
         userId_salonId: {
           userId,
@@ -243,7 +259,7 @@ export async function assignOwnerRole(userId: string, salonId: string) {
     });
 
     // Get the owner role for this salon
-    const ownerRole = await prisma.role.findUnique({
+    const ownerRole = await (entities ? db.Role : db.role).findUnique({
       where: {
         salonId_name: {
           salonId,
@@ -257,7 +273,7 @@ export async function assignOwnerRole(userId: string, salonId: string) {
     }
 
     // Assign owner role to user
-    await prisma.userRole.upsert({
+    await (entities ? db.UserRole : db.userRole).upsert({
       where: {
         userSalonId_roleId: {
           userSalonId: userSalon.id,
@@ -272,7 +288,7 @@ export async function assignOwnerRole(userId: string, salonId: string) {
     });
 
     // Update user's active salon if not set
-    await prisma.user.update({
+    await (entities ? db.User : db.user).update({
       where: { id: userId },
       data: {
         activeSalonId: salonId,
@@ -283,21 +299,9 @@ export async function assignOwnerRole(userId: string, salonId: string) {
   } catch (error) {
     console.error('❌ Error assigning owner role:', error);
     throw error;
+  } finally {
+    if (shouldDisconnect && !entities) {
+      await (db as PrismaClient).$disconnect();
+    }
   }
-}
-
-// Main seed function for testing
-if (require.main === module) {
-  seedRbacPermissionsAndRoles()
-    .then(() => {
-      console.log('✅ Seeding completed');
-      process.exit(0);
-    })
-    .catch((error) => {
-      console.error('❌ Seeding failed:', error);
-      process.exit(1);
-    })
-    .finally(async () => {
-      await prisma.$disconnect();
-    });
 }

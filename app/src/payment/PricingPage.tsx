@@ -9,7 +9,7 @@ import { Card, CardContent, CardFooter, CardTitle } from '../components/ui/card'
 import { cn } from '../lib/utils';
 import { PaymentPlanId, paymentPlans, prettyPaymentPlanName, SubscriptionStatus } from './plans';
 
-const bestDealPaymentPlanId: PaymentPlanId = PaymentPlanId.Pro;
+const bestDealPaymentPlanId: PaymentPlanId = PaymentPlanId.Profissional;
 
 interface PaymentPlanCard {
   name: string;
@@ -19,23 +19,29 @@ interface PaymentPlanCard {
 }
 
 export const paymentPlanCards: Record<PaymentPlanId, PaymentPlanCard> = {
-  [PaymentPlanId.Hobby]: {
-    name: prettyPaymentPlanName(PaymentPlanId.Hobby),
-    price: '$9.99',
-    description: 'All you need to get started',
-    features: ['Limited monthly usage', 'Basic support'],
+  [PaymentPlanId.Essencial]: {
+    name: prettyPaymentPlanName(PaymentPlanId.Essencial),
+    price: '$19.90',
+    description: 'Ideal para profissionais autônomos',
+    features: ['1 salão', '1 profissional', '150 agendamentos/mês', 'Suporte básico'],
   },
-  [PaymentPlanId.Pro]: {
-    name: prettyPaymentPlanName(PaymentPlanId.Pro),
-    price: '$19.99',
-    description: 'Our most popular plan',
-    features: ['Unlimited monthly usage', 'Priority customer support'],
+  [PaymentPlanId.Profissional]: {
+    name: prettyPaymentPlanName(PaymentPlanId.Profissional),
+    price: '$49.90',
+    description: 'Nosso plano mais popular',
+    features: ['Até 2 salões', 'Até 5 profissionais', 'Agendamentos ilimitados', 'Suporte prioritário', 'Relatórios avançados'],
+  },
+  [PaymentPlanId.Enterprise]: {
+    name: prettyPaymentPlanName(PaymentPlanId.Enterprise),
+    price: 'Personalizado',
+    description: 'Para redes de salões',
+    features: ['Salões ilimitados', 'Profissionais ilimitados', 'Agendamentos ilimitados', 'Suporte 24/7', 'API personalizada', 'Treinamento dedicado'],
   },
   [PaymentPlanId.Credits10]: {
     name: prettyPaymentPlanName(PaymentPlanId.Credits10),
     price: '$9.99',
-    description: 'One-time purchase of 10 credits for your account',
-    features: ['Use credits for e.g. OpenAI API calls', 'No expiration date'],
+    description: 'Compra única de 10 créditos',
+    features: ['Use créditos para funcionalidades extras', 'Sem data de expiração'],
   },
 };
 
