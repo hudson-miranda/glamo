@@ -83,10 +83,10 @@ export const createSalon: CreateSalon<CreateSalonInput, Salon> = async (args, co
   });
 
   // Create default roles for this salon
-  await createDefaultRolesForSalon(salon.id);
+  await createDefaultRolesForSalon(salon.id, context.entities);
 
   // Assign owner role to user
-  await assignOwnerRole(context.user.id, salon.id);
+  await assignOwnerRole(context.user.id, salon.id, context.entities);
 
   // Log the action
   await context.entities.Log.create({
