@@ -14,8 +14,8 @@ export default function Header() {
   return (
     <>
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white py-2.5 px-4 text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/50 via-pink-600/50 to-orange-500/50 animate-pulse" />
+      <div className="bg-gradient-to-r from-brand-600 via-brand-600 to-orange-500 text-white py-2.5 px-4 text-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-brand-600/50 via-brand-600/50 to-orange-500/50 animate-pulse" />
         <div className="relative z-10 flex items-center justify-center gap-3 text-sm font-bold tracking-wide">
           <span className="hidden sm:inline">✨</span>
           <span>Comece Agora</span>
@@ -31,7 +31,7 @@ export default function Header() {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
+              <div className="w-10 h-10 bg-gradient-to-r from-brand-500 to-brand-500 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
                 <span className="text-2xl">✨</span>
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">

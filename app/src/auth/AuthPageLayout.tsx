@@ -12,7 +12,7 @@ export function AuthPageLayout({children} : {children: ReactNode }) {
           <div className='flex items-center justify-between h-16'>
             {/* Logo */}
             <Link to="/" className='flex items-center gap-3 group'>
-              <div className='w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6'>
+              <div className='w-10 h-10 bg-gradient-to-r from-brand-400 to-brand-600 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6'>
                 <span className='text-2xl'>✨</span>
               </div>
               <span className='text-2xl font-bold bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent'>
@@ -48,7 +48,7 @@ export function AuthPageLayout({children} : {children: ReactNode }) {
       {/* Efeitos decorativos de fundo */}
       <div className='fixed inset-0 pointer-events-none -z-10 overflow-hidden'>
         <div className='absolute top-1/4 -left-32 w-96 h-96 bg-purple-500 rounded-full blur-3xl opacity-10 dark:opacity-5 animate-pulse' />
-        <div className='absolute bottom-1/4 -right-32 w-96 h-96 bg-pink-500 rounded-full blur-3xl opacity-10 dark:opacity-5 animate-pulse' />
+        <div className='absolute bottom-1/4 -right-32 w-96 h-96 bg-brand-500 rounded-full blur-3xl opacity-10 dark:opacity-5 animate-pulse' />
       </div>
     </div>
   );

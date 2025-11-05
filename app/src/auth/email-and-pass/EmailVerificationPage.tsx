@@ -95,7 +95,7 @@ export function EmailVerificationPage() {
               exit={{ opacity: 0 }}
               className="text-center space-y-6"
             >
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-brand-100 to-brand-100 dark:from-brand-900/30 dark:to-brand-900/30">
                 <motion.svg
                   className="w-10 h-10 text-purple-600 dark:text-purple-400"
                   fill="none"
@@ -167,7 +167,7 @@ export function EmailVerificationPage() {
               <div className="text-center">
                 <Link
                   to={routes.LoginRoute.to}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-white bg-gradient-to-r from-brand-400 to-brand-600 hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-white bg-gradient-to-r from-brand-400 to-brand-600 hover:from-brand-700 hover:to-brand-700 transition-all shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40"
                 >
                   Fazer login agora
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -186,7 +186,7 @@ export function EmailVerificationPage() {
             >
               {/* Header */}
               <div className="text-center space-y-3">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 mb-2">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-brand-100 to-brand-100 dark:from-brand-900/30 dark:to-brand-900/30 mb-2">
                   <svg className="w-8 h-8 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>

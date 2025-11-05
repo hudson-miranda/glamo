@@ -70,7 +70,7 @@ export default function NavBar({ navigationItems }: { navigationItems: Navigatio
                 <NavLogo isScrolled={isScrolled} />
                 <span
                   className={cn(
-                    'font-bold leading-6 bg-gradient-to-r from-[#A78BFA] to-[#EC4899] bg-clip-text text-transparent transition-all duration-300',
+                    'font-bold leading-6 bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent transition-all duration-300',
                     isScrolled ? 'ml-2 text-lg' : 'ml-2 text-xl'
                   )}
                 >

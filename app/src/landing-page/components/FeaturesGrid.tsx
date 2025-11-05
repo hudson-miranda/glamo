@@ -23,7 +23,7 @@ const features: Feature[] = [
     icon: '🤖',
     title: 'IA Inteligente',
     description: 'Inteligência artificial que aprende com seu negócio e otimiza automaticamente',
-    color: 'from-purple-500 to-pink-500',
+    color: 'from-brand-500 to-brand-500',
     benefits: [
       'Sugestão automática de horários',
       'Previsão de cancelamentos',
@@ -83,7 +83,7 @@ const features: Feature[] = [
     icon: '👥',
     title: 'CRM Completo',
     description: 'Gerencie relacionamento com clientes e fidelize mais',
-    color: 'from-pink-500 to-rose-500',
+    color: 'from-brand-500 to-rose-500',
     benefits: [
       'Histórico completo',
       'Preferências salvas',
@@ -95,7 +95,7 @@ const features: Feature[] = [
     icon: '🎯',
     title: 'Marketing Automático',
     description: 'Campanhas inteligentes para trazer clientes de volta',
-    color: 'from-violet-500 to-purple-500',
+    color: 'from-violet-500 to-brand-500',
     benefits: [
       'Email marketing',
       'SMS em massa',
@@ -143,7 +143,7 @@ const features: Feature[] = [
     icon: '🎨',
     title: 'Personalizável',
     description: 'Customize cores, logo e domínio com sua marca',
-    color: 'from-pink-400 to-purple-400',
+    color: 'from-brand-400 to-brand-400',
     benefits: [
       'Logo personalizado',
       'Cores da marca',
@@ -189,7 +189,7 @@ export default function FeaturesGrid() {
       {/* Fundo animado (sem cortes) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-1/4 right-1/4 w-[28rem] h-[28rem] bg-brand-500 rounded-full blur-3xl opacity-20 animate-pulse" />
-        <div className="absolute bottom-1/4 left-1/4 w-[28rem] h-[28rem] bg-pink-500 rounded-full blur-3xl opacity-20 animate-pulse" />
+        <div className="absolute bottom-1/4 left-1/4 w-[28rem] h-[28rem] bg-brand-500 rounded-full blur-3xl opacity-20 animate-pulse" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -206,7 +206,7 @@ export default function FeaturesGrid() {
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
             Tudo que você precisa.
             <br />
-            <span className="bg-gradient-to-r from-brand-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">
               Em um único lugar.
             </span>
           </h2>
@@ -246,7 +246,7 @@ export default function FeaturesGrid() {
                 {features[selectedFeature].icon}
               </div>
               <div className="flex-1">
-                <h3 className="text-3xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <h3 className="text-3xl font-bold mb-4 bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">
                   {features[selectedFeature].title}
                 </h3>
                 <p className="text-xl text-gray-400 mb-6">
@@ -344,7 +344,7 @@ function FeatureCard({
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay: index * 0.05 }}
       onClick={onClick}
-      className={`group cursor-pointer bg-white/5 backdrop-blur-sm rounded-2xl p-6 border transition-all duration-300 ${
+      className={`group cursor-pointer bg-white/5 backdrop-blur-sm rounded-2xl p-6 border ${
         isSelected
           ? 'border-purple-500/50 shadow-xl shadow-purple-500/20 scale-105'
           : 'border-white/10 hover:border-purple-500/30 hover:scale-105'

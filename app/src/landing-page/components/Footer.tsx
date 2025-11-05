@@ -23,35 +23,32 @@ const defaultNavigation: Required<FooterProps>['footerNavigation'] = {
     {
       title: 'Produto',
       items: [
-        { label: 'Funcionalidades', href: '/features' },
-        { label: 'Preços', href: '/pricing' },
-        { label: 'Integrações', href: '/integrations' },
-        { label: 'API', href: '/api' },
-        { label: 'Changelog', href: '/changelog' },
+        { label: 'Funcionalidades', href: '#features' },
+        { label: 'Preços', href: '#pricing' },
+        { label: 'Integrações', href: '#integrations' },
+        { label: 'Demonstração', href: '#demo' },
       ],
     },
     {
       title: 'Empresa',
       items: [
-        { label: 'Sobre', href: '/about' },
-        { label: 'Blog', href: '/blog' },
-        { label: 'Carreiras', href: '/careers' },
-        { label: 'Imprensa', href: '/press' },
-        { label: 'Parceiros', href: '/partners' },
+        { label: 'Sobre', href: '#about' },
+        { label: 'Blog', href: '#blog' },
+        { label: 'Contato', href: '#contact' },
+        { label: 'Carreiras', href: '#careers' },
       ],
     },
     {
       title: 'Suporte',
       items: [
-        { label: 'Central de Ajuda', href: '/help' },
-        { label: 'Contato', href: '/contact' },
-        { label: 'Status', href: '/status' },
-        { label: 'Termos', href: '/terms' },
-        { label: 'Privacidade', href: '/privacy' },
+        { label: 'Central de Ajuda', href: '#help' },
+        { label: 'Documentação', href: '#docs' },
+        { label: 'Termos de Uso', href: '#terms' },
+        { label: 'Privacidade', href: '#privacy' },
       ],
     },
   ],
-  badges: ['🔒 LGPD Compliant', '⭐ 4.9/5 Rating', '🇧🇷 Made in Brazil'],
+  badges: ['🔒 LGPD Compliant', '⭐ 4.9/5 Avaliação', '🇧🇷 Feito no Brasil'],
 };
 
 const colVariants = {
@@ -78,15 +75,15 @@ export default function Footer({ footerNavigation }: FooterProps = {}) {
           {/* Brand */}
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={colVariants} custom={0}>
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-2xl">
+              <div className="w-12 h-12 bg-gradient-to-r from-brand-500 to-brand-500 rounded-xl flex items-center justify-center text-2xl">
                 ✨
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <span className="text-2xl font-bold bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">
                 Glamo
               </span>
             </div>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
-              A plataforma completa com IA para transformar seu negócio de beleza.
+              Sistema completo de gestão para salões de beleza e barbearias.
             </p>
             <nav aria-label="Redes sociais" className="flex gap-3">
               {social!.map((s, i) => (
@@ -94,7 +91,7 @@ export default function Footer({ footerNavigation }: FooterProps = {}) {
                   key={s.name + i}
                   href={s.href}
                   aria-label={`Glamo no ${capitalize(s.name)}`}
-                  className="w-10 h-10 rounded-full bg-gray-200 dark:bg-white/5 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
+                  className="w-10 h-10 rounded-full bg-gray-200 dark:bg-white/5 hover:bg-gradient-to-r hover:from-brand-500 hover:to-brand-500 flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-brand-500/40"
                   whileHover={{ y: -2 }}
                 >
                   <SocialIcon name={s.name} />
@@ -120,7 +117,7 @@ export default function Footer({ footerNavigation }: FooterProps = {}) {
                     <li key={item.label}>
                       <a
                         href={item.href}
-                        className="text-gray-600 dark:text-gray-400 hover:text-purple-500 dark:hover:text-purple-400 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500/40 rounded-sm"
+                        className="text-gray-600 dark:text-gray-400 hover:text-brand-500 dark:hover:text-brand-400 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-brand-500/40 rounded-sm"
                       >
                         {item.label}
                       </a>

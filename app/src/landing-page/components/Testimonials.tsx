@@ -19,39 +19,39 @@ interface Testimonial {
 const testimonials: Testimonial[] = [
   {
     id: 1,
-    name: 'Sarah Johnson',
-    role: 'Salon Owner',
-    business: 'Bella Beauty Studio',
+    name: 'Mariana Silva',
+    role: 'Proprietária',
+    business: 'Salão Elegance',
     avatar: '👩‍🦰',
     rating: 5,
-    text: 'Amazing tool! Saved me months. This is undeniably the most groundbreaking development platform. It truly revolutionizes the way we approach our projects.',
+    text: 'O Glamo transformou completamente a gestão do meu salão. Antes eu perdia horas com planilhas, agora tudo é automático. Aumentei meu faturamento em 30% no primeiro trimestre!',
   },
   {
     id: 2,
-    name: 'Michael Chen',
-    role: 'Barbershop Owner',
-    business: 'Modern Cuts',
+    name: 'Carlos Eduardo',
+    role: 'Gerente',
+    business: 'Barbearia Premium',
     avatar: '👨‍🦲',
     rating: 5,
-    text: 'This is undeniably the most groundbreaking development platform. The AI features are incredible and help me optimize my schedule perfectly.',
+    text: 'A melhor decisão que tomei para minha barbearia. O controle de comissões ficou transparente e a equipe adorou. Recomendo para todos os colegas do setor.',
   },
   {
     id: 3,
-    name: 'Emma Williams',
-    role: 'Spa Director',
-    business: 'Zen Wellness',
+    name: 'Ana Paula Costa',
+    role: 'Diretora',
+    business: 'Rede Beleza & Cia (3 unidades)',
     avatar: '👩‍⚕️',
     rating: 5,
-    text: 'The customer experience is amazing. Our clients love the easy booking system and we saw a 60% increase in online bookings within the first month.',
+    text: 'Gerencio 3 unidades e o Glamo me dá visão completa de tudo em tempo real. Os relatórios são incríveis e me ajudam a tomar decisões estratégicas rapidamente.',
   },
   {
     id: 4,
-    name: 'David Martinez',
-    role: 'Clinic Owner',
-    business: 'Premium Aesthetic (3 locations)',
+    name: 'Roberto Mendes',
+    role: 'Proprietário',
+    business: 'Studio Hair',
     avatar: '👨‍💼',
     rating: 5,
-    text: 'Managing multiple locations has never been easier. The centralized dashboard gives me complete visibility and control over all my business operations.',
+    text: 'Interface super intuitiva e moderna. Minha equipe aprendeu a usar em menos de um dia. O suporte é excepcional e sempre disponível quando precisamos.',
   },
 ];
 
@@ -88,16 +88,16 @@ export default function Testimonials() {
           className="text-center mb-20"
         >
           <Badge variant="glow" className="mb-6">
-            TESTIMONIALS
+            DEPOIMENTOS
           </Badge>
           <h2 className="text-4xl md:text-6xl font-bold mb-4">
-            Here's what our{' '}
+            O que nossos{' '}
             <GradientText variant="brand" as="span" className="text-4xl md:text-6xl font-bold">
-              customer has to says
+              clientes dizem
             </GradientText>
           </h2>
           <p className="text-xl text-gray-600 dark:text-zinc-400 max-w-3xl mx-auto">
-            This is undeniably the most groundbreaking development platform for all testimonials
+            Histórias reais de transformação e sucesso com o Glamo
           </p>
         </motion.div>
 
@@ -186,7 +186,7 @@ function TestimonialCard({
 
         {/* Author */}
         <div className="flex items-center gap-3 mt-auto">
-          <div className="w-12 h-12 bg-gradient-to-br from-brand-500 to-purple-500 rounded-full flex items-center justify-center text-2xl">
+          <div className="w-12 h-12 bg-gradient-to-br from-brand-500 to-brand-500 rounded-full flex items-center justify-center text-2xl">
             {testimonial.avatar}
           </div>
           <div>

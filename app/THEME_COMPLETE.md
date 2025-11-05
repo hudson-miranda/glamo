@@ -192,7 +192,7 @@ transition-colors duration-300
 |---------|-------|
 | Purple | `purple-500` (#A855F7) |
 | Pink | `pink-500` (#EC4899) |
-| Gradient | `from-purple-500 to-pink-500` |
+| Gradient | `from-brand-500 to-brand-500` |
 | Brand Text | `text-brand-500` |
 
 ---

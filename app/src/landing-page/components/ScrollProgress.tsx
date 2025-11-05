@@ -32,7 +32,7 @@ export default function ScrollProgress({
   }, [progressPercent]);
 
   const baseClasses = `fixed top-0 left-0 right-0 origin-left z-50 ${className}`;
-  const gradientClasses = 'bg-gradient-to-r from-purple-500 via-pink-500 to-pink-600';
+  const gradientClasses = 'bg-gradient-to-r from-brand-500 via-brand-500 to-brand-600';
 
   return (
     <>

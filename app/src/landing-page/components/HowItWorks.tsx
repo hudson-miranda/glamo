@@ -81,7 +81,7 @@ export default function HowItWorks() {
       {/* Fundo animado (sem cortes) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-10 right-1/4 w-[28rem] h-[28rem] bg-purple-500 rounded-full blur-3xl opacity-20 animate-pulse" />
-        <div className="absolute -bottom-10 left-1/4 w-[28rem] h-[28rem] bg-pink-500 rounded-full blur-3xl opacity-20 animate-pulse" />
+        <div className="absolute -bottom-10 left-1/4 w-[28rem] h-[28rem] bg-brand-500 rounded-full blur-3xl opacity-20 animate-pulse" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -98,7 +98,7 @@ export default function HowItWorks() {
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
             Simples como deve ser.
             <br />
-            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">
               Poderoso como você precisa.
             </span>
           </h2>
@@ -133,7 +133,7 @@ export default function HowItWorks() {
           <div className="flex items-start gap-6">
             <div className="text-6xl" aria-hidden="true">{steps[activeStep].icon}</div>
             <div className="flex-1">
-              <h3 className="text-3xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <h3 className="text-3xl font-bold mb-4 bg-gradient-to-r from-brand-400 to-brand-400 bg-clip-text text-transparent">
                 {steps[activeStep].title}
               </h3>
               <p className="text-xl text-gray-400 mb-6">
@@ -148,7 +148,7 @@ export default function HowItWorks() {
                     transition={{ duration: 0.3, delay: i * 0.06 }}
                     className="flex items-center gap-3"
                   >
-                    <div className="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-6 h-6 bg-gradient-to-r from-brand-500 to-brand-500 rounded-full flex items-center justify-center flex-shrink-0">
                       <svg
                         className="w-4 h-4 text-white"
                         fill="none"
@@ -205,7 +205,7 @@ function StepCard({
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay: index * 0.1 }}
       onClick={onClick}
-      className={`group cursor-pointer bg-white/5 backdrop-blur-sm rounded-2xl p-6 border transition-all duration-300 ${
+      className={`group cursor-pointer bg-white/5 backdrop-blur-sm rounded-2xl p-6 border ${
         isActive
           ? 'border-purple-500/50 shadow-xl shadow-purple-500/20 scale-[1.02]'
           : 'border-white/10 hover:border-purple-500/30 hover:scale-105'
@@ -219,7 +219,7 @@ function StepCard({
       aria-label={`Selecionar passo ${step.number}: ${step.title}`}
     >
       {/* Número */}
-      <div className="text-6xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4 opacity-50 select-none">
+      <div className="text-6xl font-extrabold bg-gradient-to-r from-brand-400 to-brand-400 bg-clip-text text-transparent mb-4 opacity-50 select-none">
         {step.number}
       </div>
 
@@ -229,7 +229,7 @@ function StepCard({
       </div>
 
       {/* Conteúdo */}
-      <h3 className="text-xl font-bold mb-2 text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300">
+      <h3 className="text-xl font-bold mb-2 text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-brand-400 group-hover:to-brand-400 group-hover:bg-clip-text transition-all duration-300">
         {step.title}
       </h3>
       <p className="text-gray-400 text-sm leading-relaxed">

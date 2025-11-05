@@ -15,7 +15,7 @@ export const authAppearance = {
   colors: {
     // Cores da marca (brand)
     brand: '#9333ea', // purple-600 - Botões, links, elementos principais
-    brandAccent: '#510c91ff', // pink-600 - Hover, estados ativos
+    brandAccent: '#510c91ff', // brand-600 - Hover, estados ativos
     submitButtonText: 'white', // Texto dos botões de submit
     
     // Cores de cinza (usadas em textos e bordas)

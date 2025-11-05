@@ -46,28 +46,28 @@ export default function Hero() {
             transition={{ duration: 0.6 }}
           >
             <Badge variant="glow" className="mb-6">
-              🚀 A Revolução do Agendamento
+              ✨ Sistema de Gestão Completo para Salões
             </Badge>
             
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Seamless solution
+              Gestão Inteligente
               <br />
               <GradientText variant="brand" as="span" className="text-5xl md:text-7xl font-bold">
-                with magic!
+                para seu Salão!
               </GradientText>
             </h1>
 
             <p className="text-xl text-gray-600 dark:text-zinc-400 mb-8 leading-relaxed">
-              Let's be the project management platform that aims for teams to
-              be structured and become aware of their projects.
+              Agendamentos, controle financeiro, gestão de estoque e clientes.
+              Tudo em um só lugar, simples e automático.
             </p>
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-6 mb-8">
               {[
-                { value: '⭐⭐⭐⭐⭐', label: '5 Stars Rating' },
-                { value: '5.9M+', label: 'Total Users' },
-                { value: '10+', label: 'Products' }
+                { value: '⭐⭐⭐⭐⭐', label: 'Avaliação 5 Estrelas' },
+                { value: '1000+', label: 'Salões Ativos' },
+                { value: '9', label: 'Módulos Integrados' }
               ].map((stat, index) => (
                 <motion.div
                   key={index}
@@ -92,16 +92,16 @@ export default function Hero() {
             >
               <Link to="/signup">
                 <Button variant="primary-glow" size="lg">
-                  Get Free Demo
+                  Começar Teste Grátis
                 </Button>
               </Link>
               <Button variant="secondary" size="lg">
-                Watch Demo
+                Ver Demonstração
               </Button>
             </motion.div>
 
             <p className="text-sm text-gray-600 dark:text-zinc-400 mt-6">
-              ✨ 14 days free trial • No credit card required • Cancel anytime
+              ✨ 14 dias grátis • Sem cartão de crédito • Cancele quando quiser
             </p>
           </motion.div>
 
@@ -114,23 +114,23 @@ export default function Hero() {
           >
             {/* Dashboard mockup */}
             <div className="relative p-8 border border-gray-200/50 dark:border-zinc-800/50 bg-transparent dark:bg-transparent">
-              <div className="bg-gradient-to-br from-brand-500/10 to-purple-500/10 rounded-2xl p-6 border border-brand-500/30">
+              <div className="bg-gradient-to-br from-brand-500/10 to-brand-500/10 rounded-2xl p-6 border border-brand-500/30">
                 {/* Mock stats cards */}
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div className="p-4 border border-gray-200/50 dark:border-zinc-800/50 bg-transparent dark:bg-transparent">
-                    <div className="text-sm text-gray-600 dark:text-zinc-400 mb-1">My Balance</div>
-                    <div className="text-2xl font-bold text-brand-500">$5476</div>
+                    <div className="text-sm text-gray-600 dark:text-zinc-400 mb-1">Faturamento Hoje</div>
+                    <div className="text-2xl font-bold text-brand-500">R$ 2.847</div>
                     <div className="flex items-center gap-2 mt-2">
-                      <span className="text-green-400 text-xs">↑ 12%</span>
-                      <span className="text-xs text-gray-500 dark:text-zinc-500">vs last month</span>
+                      <span className="text-green-400 text-xs">↑ 18%</span>
+                      <span className="text-xs text-gray-500 dark:text-zinc-500">vs mês passado</span>
                     </div>
                   </div>
                   <div className="p-4 border border-gray-200/50 dark:border-zinc-800/50 bg-transparent dark:bg-transparent">
-                    <div className="text-sm text-gray-600 dark:text-zinc-400 mb-1">Total Sales</div>
-                    <div className="text-2xl font-bold text-gray-900 dark:text-white">$12,143</div>
+                    <div className="text-sm text-gray-600 dark:text-zinc-400 mb-1">Agendamentos</div>
+                    <div className="text-2xl font-bold text-gray-900 dark:text-white">24</div>
                     <div className="flex items-center gap-2 mt-2">
-                      <span className="text-green-400 text-xs">↑ 8%</span>
-                      <span className="text-xs text-gray-500 dark:text-zinc-500">this week</span>
+                      <span className="text-green-400 text-xs">↑ 12%</span>
+                      <span className="text-xs text-gray-500 dark:text-zinc-500">esta semana</span>
                     </div>
                   </div>
                 </div>
@@ -138,8 +138,8 @@ export default function Hero() {
                 {/* Mock chart area */}
                 <div className="p-4 border border-gray-200/50 dark:border-zinc-800/50 mb-4 bg-transparent dark:bg-transparent">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white">My Progress</span>
-                    <span className="text-xs text-gray-600 dark:text-zinc-400">Weekly</span>
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">Faturamento Semanal</span>
+                    <span className="text-xs text-gray-600 dark:text-zinc-400">Últimos 7 dias</span>
                   </div>
                   <div className="flex items-end gap-1 h-24">
                     {[60, 80, 45, 90, 70, 85, 95].map((height, i) => (
@@ -162,7 +162,7 @@ export default function Hero() {
                       className="p-4 border border-gray-200/50 dark:border-zinc-800/50 flex items-center justify-between bg-transparent dark:bg-transparent"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-brand-500 to-purple-500 rounded-lg"></div>
+                        <div className="w-10 h-10 bg-gradient-to-br from-brand-500 to-brand-500 rounded-lg"></div>
                         <div>
                           <div className="font-semibold text-gray-900 dark:text-white text-sm">{tx.name}</div>
                           <div className="text-xs text-gray-600 dark:text-zinc-400">Description lorem...</div>
@@ -193,7 +193,7 @@ export default function Hero() {
                 className="absolute -bottom-6 -left-6 p-4 border border-brand-500/30 bg-transparent dark:bg-transparent"
               >
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-gradient-to-br from-brand-500 to-purple-500 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gradient-to-br from-brand-500 to-brand-500 rounded-full flex items-center justify-center">
                     <svg className="w-5 h-5 text-white dark:text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
