@@ -179,11 +179,11 @@ export const listSalonRoles: any = async (_args: void, context: any) => {
   const roles = await context.entities.Role.findMany({
     where: {
       salonId: context.user.activeSalonId,
+      deletedAt: null,
     },
     select: {
       id: true,
       name: true,
-      description: true,
     },
     orderBy: {
       name: 'asc',
