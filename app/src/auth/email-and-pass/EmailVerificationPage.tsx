@@ -157,7 +157,7 @@ export function EmailVerificationPage() {
                       Pronto para começar!
                     </p>
                     <p className="text-sm text-green-800 dark:text-green-400">
-                      Faça login e explore todas as funcionalidades do Glamo para gerenciar seu salão de beleza.
+                      Faça login e explore todas as funcionalidades do Glamo para gerenciar seu negócio de beleza.
                     </p>
                   </div>
                 </div>

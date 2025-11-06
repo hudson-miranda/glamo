@@ -11,11 +11,11 @@
 9. Controle de estoque e alertas de baixo nível.
 10. Abertura e fechamento de caixa com conciliação.
 11. Relatórios de vendas, comissões, estoque e caixa.
-12. RBAC contextual por salão (roles e permissões).
+12. RBAC contextual por negócio (roles e permissões).
 
 ### Requisitos Não Funcionais
 
-* Multi-tenant seguro (isolamento por salão).
+* Multi-tenant seguro (isolamento por negócio).
 * Autenticação via Auth Wasp.
 * PostgreSQL + Prisma.
 * Resiliência e logs com auditoria.

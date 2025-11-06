@@ -71,7 +71,7 @@ export function DeactivateEmployeeDialog({
             Desativar Funcionário
           </DialogTitle>
           <DialogDescription>
-            Esta ação removerá o acesso do funcionário ao salão.
+            Esta ação removerá o acesso do funcionário ao negócio.
           </DialogDescription>
         </DialogHeader>
 
@@ -80,7 +80,7 @@ export function DeactivateEmployeeDialog({
             <AlertTriangle className='h-4 w-4' />
             <AlertDescription>
               <strong>Atenção:</strong> Ao desativar este funcionário, ele perderá acesso
-              imediato a todas as funcionalidades do salão. Esta ação não exclui o cadastro,
+              imediato a todas as funcionalidades do negócio. Esta ação não exclui o cadastro,
               apenas desativa o acesso.
             </AlertDescription>
           </Alert>

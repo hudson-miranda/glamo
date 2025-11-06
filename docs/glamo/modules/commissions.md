@@ -1,6 +1,6 @@
 ### Objetivo
 
-Definir e calcular comissões por serviço/variação considerando papéis (profissional/assistente), valores não comissionáveis e regras do salão.
+Definir e calcular comissões por serviço/variação considerando papéis (profissional/assistente), valores não comissionáveis e regras do negócio.
 
 ### Engine de Cálculo (função pura)
 

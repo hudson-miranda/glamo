@@ -15,9 +15,9 @@ wasp db migrate-dev
 
 ## 🔍 Roteiro de Testes
 
-### ✅ TESTE 1: Novo Usuário - Fluxo de Criação de Salão
+### ✅ TESTE 1: Novo Usuário - Fluxo de Criação de Negócio
 
-**Objetivo:** Validar que novo usuário é direcionado para onboarding e consegue criar salão com trial.
+**Objetivo:** Validar que novo usuário é direcionado para onboarding e consegue criar negócio com trial.
 
 **Passos:**
 1. Se estiver logado, faça logout
@@ -33,17 +33,17 @@ wasp db migrate-dev
    - Badge "14 Dias Grátis - Plano Profissional" no topo
    - Card com lista de benefícios do trial
    - Formulário de criação
-9. Preencha apenas o nome do salão (ex: "Teste Salão")
+9. Preencha apenas o nome do negócio (ex: "Teste Negócio")
 10. Clique em "Iniciar Trial Gratuito"
 11. **VALIDAR:** 
-    - Deve mostrar loading "Criando salão..."
+    - Deve mostrar loading "Criando negócio..."
     - Deve mostrar toast de sucesso: "Seu período de trial de 14 dias começou"
     - Deve redirecionar para `/dashboard`
 12. **VALIDAR:** Dashboard deve carregar normalmente
 
 **✅ Teste passou se:**
 - Redirecionamento automático funcionou
-- Salão foi criado
+- Negócio foi criado
 - Trial foi ativado
 - Dashboard está acessível
 
@@ -56,11 +56,11 @@ wasp db migrate-dev
 **Passos:**
 1. Volte para `/onboarding/create-salon` (ou crie novo usuário)
 2. Deixe o nome vazio e clique em "Iniciar Trial Gratuito"
-3. **VALIDAR:** Deve mostrar erro: "O nome do salão é obrigatório"
+3. **VALIDAR:** Deve mostrar erro: "O nome do negócio é obrigatório"
 4. Digite apenas "AB" (2 caracteres) no nome
 5. Clique em "Iniciar Trial Gratuito"
-6. **VALIDAR:** Deve mostrar erro: "O nome do salão deve ter pelo menos 3 caracteres"
-7. Digite nome válido: "Salão Teste"
+6. **VALIDAR:** Deve mostrar erro: "O nome do negócio deve ter pelo menos 3 caracteres"
+7. Digite nome válido: "Negócio Teste"
 8. Digite CNPJ inválido: "123"
 9. Clique em "Iniciar Trial Gratuito"
 10. **VALIDAR:** Deve mostrar erro: "Por favor, verifique o CNPJ informado"
@@ -82,13 +82,13 @@ wasp db migrate-dev
 
 ---
 
-### ✅ TESTE 3: Proteção de Rotas - Usuário SEM Salão
+### ✅ TESTE 3: Proteção de Rotas - Usuário SEM Negócio
 
-**Objetivo:** Validar que usuário sem salão não consegue acessar páginas protegidas.
+**Objetivo:** Validar que usuário sem negócio não consegue acessar páginas protegidas.
 
 **Passos:**
 1. Crie novo usuário (signup)
-2. Na tela de onboarding, **NÃO** crie salão ainda
+2. Na tela de onboarding, **NÃO** crie negócio ainda
 3. Abra nova aba e digite manualmente: `http://localhost:3000/dashboard`
 4. **VALIDAR:** Deve redirecionar para `/onboarding`
 5. Tente acessar: `http://localhost:3000/clients`
@@ -104,12 +104,12 @@ wasp db migrate-dev
 
 ---
 
-### ✅ TESTE 4: Proteção de Rotas - Usuário COM Salão
+### ✅ TESTE 4: Proteção de Rotas - Usuário COM Negócio
 
-**Objetivo:** Validar que usuário com salão não pode voltar para onboarding.
+**Objetivo:** Validar que usuário com negócio não pode voltar para onboarding.
 
 **Passos:**
-1. Use usuário que já criou salão (ou crie um novo e crie salão)
+1. Use usuário que já criou negócio (ou crie um novo e crie negócio)
 2. Deve estar no `/dashboard`
 3. Tente acessar manualmente: `http://localhost:3000/onboarding`
 4. **VALIDAR:** Deve redirecionar de volta para `/dashboard`
@@ -135,13 +135,13 @@ wasp db migrate-dev
 4. **VALIDAR:** Deve mostrar empty state:
    - Mensagem: "Nenhum convite pendente"
    - Texto: "Você ainda não recebeu convites de salões"
-   - Botão: "Criar Meu Próprio Salão"
-5. Clique em "Criar Meu Próprio Salão"
+   - Botão: "Criar Meu Próprio Negócio"
+5. Clique em "Criar Meu Próprio Negócio"
 6. **VALIDAR:** Deve redirecionar para `/onboarding/create-salon`
 
 **✅ Teste passou se:**
 - Empty state apareceu corretamente
-- Botão redirecionou para criar salão
+- Botão redirecionou para criar negócio
 
 ---
 
@@ -232,11 +232,11 @@ Após todos os testes, verifique:
 
 - [ ] Migration executada com sucesso
 - [ ] Novo usuário redireciona para `/onboarding`
-- [ ] Criar salão funciona e ativa trial
+- [ ] Criar negócio funciona e ativa trial
 - [ ] Validações de formulário bloqueiam erros
 - [ ] Formatações automáticas funcionam
-- [ ] Usuário sem salão não acessa páginas protegidas
-- [ ] Usuário com salão não acessa onboarding
+- [ ] Usuário sem negócio não acessa páginas protegidas
+- [ ] Usuário com negócio não acessa onboarding
 - [ ] Empty state de convites aparece
 - [ ] Dark mode funciona
 - [ ] Mobile responsivo funciona

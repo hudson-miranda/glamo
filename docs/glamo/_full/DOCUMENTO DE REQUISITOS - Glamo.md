@@ -14,15 +14,15 @@
 **🔹 RF.002 - Atribuição de Papéis e Permissões**
 
 - **RF.002.01** O sistema deve permitir que cada usuário esteja associado a um ou mais salões.
-- **RF.002.02** Cada associação usuário ↔ salão deve conter papéis e permissões específicos.
-- **RF.002.03** O dono do salão pode criar papéis personalizados com permissões específicas.
+- **RF.002.02** Cada associação usuário ↔ negócio deve conter papéis e permissões específicos.
+- **RF.002.03** O dono do negócio pode criar papéis personalizados com permissões específicas.
 - **RF.002.04** O sistema deve controlar o acesso a funcionalidades com base nas permissões atribuídas.
-- **RF.002.05** O sistema deve permitir a visualização de todas as permissões do usuário autenticado no salão ativo via endpoint dedicado.
+- **RF.002.05** O sistema deve permitir a visualização de todas as permissões do usuário autenticado no negócio ativo via endpoint dedicado.
 
 **🔹 RF.003 - Alternância de Salões**
 
 - **RF.003.01** O sistema deve permitir ao usuário alternar entre os salões que participa.
-- **RF.003.02** A alternância define o "salão ativo", cujos dados serão exibidos na interface.
+- **RF.003.02** A alternância define o "negócio ativo", cujos dados serão exibidos na interface.
 
 **🔹 RF.004 - Notificações**
 
@@ -45,7 +45,7 @@
 
 - **RF.006.01** O sistema deve permitir o cadastro de clientes por meio de formulário.
 - **RF.006.02** Cada cliente pode estar vinculado a um ou mais salões.
-- **RF.006.03** Um cliente pode estar vinculado a um usuário (login próprio) ou ser gerenciado apenas pelo salão.
+- **RF.006.03** Um cliente pode estar vinculado a um usuário (login próprio) ou ser gerenciado apenas pelo negócio.
 - **RF.006.04** O sistema deve armazenar nome, telefone, e-mail, data de nascimento e observações.
 - **RF.006.05** O sistema deve manter histórico de serviços realizados, vendas, créditos e agendamentos por cliente.
 

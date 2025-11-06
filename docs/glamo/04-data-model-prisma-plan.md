@@ -2,7 +2,7 @@ Resumo de entidades principais:
 
 * **User** → dados pessoais, activeSalonId.
 * **Salon** → unidade de negócio.
-* **UserSalon** → vínculo entre usuário e salão.
+* **UserSalon** → vínculo entre usuário e negócio.
 * **Role/Permission/UserRole/RolePermission** → RBAC contextual.
 * **Client** → informações e histórico.
 * **Service / ServiceVariant / CommissionConfig** → estrutura de serviços.

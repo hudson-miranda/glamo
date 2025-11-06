@@ -1,6 +1,6 @@
 ### Objetivo
 
-Gerir o caixa diário por salão e/ou por colaborador, com abertura, fechamento, conciliação e export.
+Gerir o caixa diário por negócio e/ou por colaborador, com abertura, fechamento, conciliação e export.
 
 ### Entidades
 

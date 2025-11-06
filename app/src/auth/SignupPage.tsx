@@ -11,7 +11,9 @@ import { motion } from 'framer-motion';
 
 export function Signup() {
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
+    phone: '',
     password: '',
     confirmPassword: '',
   });
@@ -22,11 +24,28 @@ export function Signup() {
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
+    // Name validation
+    if (!formData.name.trim()) {
+      newErrors.name = 'Nome completo é obrigatório';
+    } else if (formData.name.trim().length < 3) {
+      newErrors.name = 'Nome deve ter no mínimo 3 caracteres';
+    } else if (!/^[a-zA-ZÀ-ÿ\s]+$/.test(formData.name)) {
+      newErrors.name = 'Nome deve conter apenas letras';
+    }
+
     // Email validation
     if (!formData.email) {
       newErrors.email = 'E-mail é obrigatório';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'E-mail inválido';
+    }
+
+    // Phone validation (optional, but if filled must be valid)
+    if (formData.phone.trim()) {
+      const cleanPhone = formData.phone.replace(/\D/g, '');
+      if (cleanPhone.length < 10 || cleanPhone.length > 11) {
+        newErrors.phone = 'Telefone inválido. Use o formato (99) 99999-9999';
+      }
     }
 
     // Password validation
@@ -65,7 +84,9 @@ export function Signup() {
     try {
       // Pass email in the data object - userSignupFields will derive username and isAdmin from it
       await signup({ 
-        email: formData.email, 
+        email: formData.email,
+        name: formData.name.trim(),
+        phone: formData.phone.replace(/\D/g, '') || undefined, // Remove formatting and send only if filled
         password: formData.password,
         username: formData.email, // username defaults to email
         isAdmin: false, // isAdmin is determined by userSignupFields based on ADMIN_EMAILS env var
@@ -88,7 +109,28 @@ export function Signup() {
   };
 
   const updateField = (field: keyof typeof formData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    // Apply phone mask if field is phone
+    if (field === 'phone') {
+      const cleanPhone = value.replace(/\D/g, '');
+      let formattedPhone = cleanPhone;
+      
+      if (cleanPhone.length <= 10) {
+        // Format: (99) 9999-9999
+        formattedPhone = cleanPhone
+          .replace(/^(\d{2})(\d)/, '($1) $2')
+          .replace(/(\d{4})(\d)/, '$1-$2');
+      } else {
+        // Format: (99) 99999-9999
+        formattedPhone = cleanPhone
+          .replace(/^(\d{2})(\d)/, '($1) $2')
+          .replace(/(\d{5})(\d)/, '$1-$2');
+      }
+      
+      setFormData(prev => ({ ...prev, [field]: formattedPhone.substring(0, 15) }));
+    } else {
+      setFormData(prev => ({ ...prev, [field]: value }));
+    }
+    
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => {
@@ -113,7 +155,7 @@ export function Signup() {
             Comece gratuitamente
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Crie sua conta e transforme seu salão
+            Crie sua conta e transforme seu negócio
           </p>
         </div>
 
@@ -158,6 +200,33 @@ export function Signup() {
           )}
 
           <AuthInput
+            label="Nome Completo"
+            type="text"
+            required
+            value={formData.name}
+            onChange={(e) => updateField('name', e.target.value)}
+            placeholder="João Silva"
+            autoComplete="name"
+            error={errors.name}
+            icon={
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5 text-gray-500"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                />
+              </svg>
+            }
+          />
+
+          <AuthInput
             label="E-mail"
             type="email"
             required
@@ -179,6 +248,32 @@ export function Signup() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25H4.5A2.25 2.25 0 012.25 17.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5H4.5a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.912l-7.5 4.5a2.25 2.25 0 01-2.36 0l-7.5-4.5a2.25 2.25 0 01-1.07-1.912V6.75"
+                />
+              </svg>
+            }
+          />
+
+          <AuthInput
+            label="Celular (opcional)"
+            type="tel"
+            value={formData.phone}
+            onChange={(e) => updateField('phone', e.target.value)}
+            placeholder="(99) 99999-9999"
+            autoComplete="tel"
+            error={errors.phone}
+            icon={
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5 text-gray-500"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"
                 />
               </svg>
             }

@@ -2,7 +2,7 @@
 
 | Papel            | Permissões principais                      |
 | ---------------- | ------------------------------------------ |
-| **Owner**        | Todas as permissões do salão               |
+| **Owner**        | Todas as permissões do negócio               |
 | **Manager**      | Gestão de usuários, agenda, vendas e caixa |
 | **Professional** | Acesso à própria agenda e comissões        |
 | **Cashier**      | Operações de vendas e caixa                |
@@ -20,4 +20,4 @@
 
 ### Helper
 
-`requirePermission(ctxUser, salonId, permission)` → valida se o usuário possui permissão ativa no salão.
+`requirePermission(ctxUser, salonId, permission)` → valida se o usuário possui permissão ativa no negócio.

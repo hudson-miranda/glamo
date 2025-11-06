@@ -30,7 +30,7 @@ const plans = [
     period: '/mês',
     icon: Sparkles,
     features: [
-      '1 salão',
+      '1 negócio',
       '1 profissional',
       '150 agendamentos/mês',
       '5GB de armazenamento',

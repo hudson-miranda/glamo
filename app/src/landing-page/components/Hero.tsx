@@ -53,7 +53,7 @@ export default function Hero() {
               Gestão Inteligente
               <br />
               <GradientText variant="brand" as="span" className="text-5xl md:text-7xl font-bold">
-                para seu Salão!
+                para seu Negócio!
               </GradientText>
             </h1>
 

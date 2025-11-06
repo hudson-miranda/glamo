@@ -21,10 +21,10 @@ const testimonials: Testimonial[] = [
     id: 1,
     name: 'Mariana Silva',
     role: 'Proprietária',
-    business: 'Salão Elegance',
+    business: 'Negócio Elegance',
     avatar: '👩‍🦰',
     rating: 5,
-    text: 'O Glamo transformou completamente a gestão do meu salão. Antes eu perdia horas com planilhas, agora tudo é automático. Aumentei meu faturamento em 30% no primeiro trimestre!',
+    text: 'O Glamo transformou completamente a gestão do meu negócio. Antes eu perdia horas com planilhas, agora tudo é automático. Aumentei meu faturamento em 30% no primeiro trimestre!',
   },
   {
     id: 2,

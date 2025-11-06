@@ -29,7 +29,7 @@ O **Glamo** é um sistema SaaS de gestão para salões de beleza, projetado para
 | state | string | Estado. |
 | zipCode | string | CEP. |
 | birthDate | datetime | Data de nascimento. |
-| activeSalonId | string | Último salão selecionado. |
+| activeSalonId | string | Último negócio selecionado. |
 | createdAt | datetime | Registro de criação. |
 | updatedAt | datetime | Última atualização. |
 | deletedAt | datetime | Data de exclusão lógica (soft delete). |
@@ -42,20 +42,20 @@ O **Glamo** é um sistema SaaS de gestão para salões de beleza, projetado para
 | --- | --- | --- |
 | id  | int (PK) | Identificador único. |
 | userId | int (FK) | Referência ao usuário. |
-| salonId | int (FK) | Referência ao salão. |
-| isActive | boolean | Indica se o relacionamento está ativo (salão ativo). |
+| salonId | int (FK) | Referência ao negócio. |
+| isActive | boolean | Indica se o relacionamento está ativo (negócio ativo). |
 | createdAt | datetime | Data de criação do vínculo. |
 | updatedAt | datetime | Última atualização. |
 | deletedAt | datetime | Data de exclusão lógica. |
 
 **📄 Tabela: ROLES**
 
-**Descrição**: Papéis personalizados que podem ser criados por salão.
+**Descrição**: Papéis personalizados que podem ser criados por negócio.
 
 | **Campo** | **Tipo** | **Descrição** |
 | --- | --- | --- |
 | id  | int (PK) | Identificador único do papel. |
-| salonId | int (FK) | Salão ao qual o papel pertence. |
+| salonId | int (FK) | Negócio ao qual o papel pertence. |
 | name | string | Nome do papel (Ex: Caixa, Assistente). |
 | createdAt | datetime | Data de criação. |
 | updatedAt | datetime | Última atualização. |
@@ -85,7 +85,7 @@ O **Glamo** é um sistema SaaS de gestão para salões de beleza, projetado para
 
 **📄 Tabela: USER_ROLES**
 
-**Descrição**: Liga papéis aos usuários dentro de um salão.
+**Descrição**: Liga papéis aos usuários dentro de um negócio.
 
 | **Campo** | **Tipo** | **Descrição** |
 | --- | --- | --- |
@@ -113,12 +113,12 @@ O **Glamo** é um sistema SaaS de gestão para salões de beleza, projetado para
 
 **📄 Tabela: CLIENTS**
 
-**Descrição**: Armazena informações dos clientes de cada salão, podendo ou não estar vinculados a um usuário.
+**Descrição**: Armazena informações dos clientes de cada negócio, podendo ou não estar vinculados a um usuário.
 
 | **Campo** | **Tipo** | **Descrição** |
 | --- | --- | --- |
 | id  | int (PK) | Identificador único do cliente. |
-| salonId | int (FK) | Salão ao qual o cliente está vinculado. |
+| salonId | int (FK) | Negócio ao qual o cliente está vinculado. |
 | userId | int (FK) | Usuário relacionado, se houver (opcional). |
 | name | string | Nome do cliente. |
 | email | string | E-mail para contato. |
@@ -137,7 +137,7 @@ O **Glamo** é um sistema SaaS de gestão para salões de beleza, projetado para
 | id  | int (PK) | Identificador único do crédito. |
 | clientId | int (FK) | Cliente relacionado. |
 | professionalId | int (FK) | Profissional associado (origem do crédito). |
-| salonId | int (FK) | Salão relacionado. |
+| salonId | int (FK) | Negócio relacionado. |
 | amount | float | Valor total do crédito. |
 | origin | string | Origem do crédito (bônus, devolução, etc.). |
 | paymentMethod | string | Forma como o crédito foi adquirido. |
@@ -187,12 +187,12 @@ O **Glamo** é um sistema SaaS de gestão para salões de beleza, projetado para
 
 **📄 Tabela: SERVICES**
 
-**Descrição**: Tabela principal de serviços oferecidos em cada salão.
+**Descrição**: Tabela principal de serviços oferecidos em cada negócio.
 
 | **Campo** | **Tipo** | **Descrição** |
 | --- | --- | --- |
 | id  | int (PK) | Identificador único do serviço. |
-| salonId | int (FK) | Salão que oferece o serviço. |
+| salonId | int (FK) | Negócio que oferece o serviço. |
 | createdByUserId | int (FK) | Usuário que criou o serviço. |
 | updatedByUserId | int (FK) | Último usuário que editou o serviço. |
 | serviceRoomId | int (FK) | Sala onde o serviço é realizado. |
@@ -273,7 +273,7 @@ O **Glamo** é um sistema SaaS de gestão para salões de beleza, projetado para
 | **Campo** | **Tipo** | **Descrição** |
 | --- | --- | --- |
 | id  | int (PK) | Identificador único. |
-| salonId | int (FK) | Salão que oferece o pacote. |
+| salonId | int (FK) | Negócio que oferece o pacote. |
 | createdByUserId | int (FK) | Criador. |
 | updatedByUserId | int (FK) | Último modificador. |
 | name | string | Nome do pacote. |
@@ -304,12 +304,12 @@ O **Glamo** é um sistema SaaS de gestão para salões de beleza, projetado para
 
 **📄 Tabela: PRODUCTS**
 
-**Descrição**: Tabela de produtos comercializados no salão.
+**Descrição**: Tabela de produtos comercializados no negócio.
 
 | **Campo** | **Tipo** | **Descrição** |
 | --- | --- | --- |
 | id  | int (PK) | Identificador único do produto. |
-| salonId | int (FK) | Salão ao qual o produto pertence. |
+| salonId | int (FK) | Negócio ao qual o produto pertence. |
 | categoryId | int (FK) | Categoria do produto. |
 | brandId | int (FK) | Marca do produto. |
 | supplierId | int (FK) | Fornecedor vinculado. |
@@ -339,7 +339,7 @@ O **Glamo** é um sistema SaaS de gestão para salões de beleza, projetado para
 | **Campo** | **Tipo** | **Descrição** |
 | --- | --- | --- |
 | id  | int (PK) | Identificador único. |
-| salonId | int (FK) | Salão vinculado. |
+| salonId | int (FK) | Negócio vinculado. |
 | name | string | Nome da categoria. |
 | description | string | Descrição da categoria. |
 | createdAt | datetime | Data de criação. |
@@ -353,7 +353,7 @@ O **Glamo** é um sistema SaaS de gestão para salões de beleza, projetado para
 | **Campo** | **Tipo** | **Descrição** |
 | --- | --- | --- |
 | id  | int (PK) | Identificador único. |
-| salonId | int (FK) | Salão vinculado. |
+| salonId | int (FK) | Negócio vinculado. |
 | name | string | Nome da marca. |
 | description | string | Descrição. |
 | createdAt | datetime | Criação. |
@@ -367,7 +367,7 @@ O **Glamo** é um sistema SaaS de gestão para salões de beleza, projetado para
 | **Campo** | **Tipo** | **Descrição** |
 | --- | --- | --- |
 | id  | int (PK) | Identificador único. |
-| salonId | int (FK) | Salão relacionado. |
+| salonId | int (FK) | Negócio relacionado. |
 | name | string | Nome do fornecedor. |
 | description | string | Descrição adicional. |
 | email | string | E-mail de contato. |
@@ -411,7 +411,7 @@ O **Glamo** é um sistema SaaS de gestão para salões de beleza, projetado para
 | **Campo** | **Tipo** | **Descrição** |
 | --- | --- | --- |
 | id  | int (PK) | Identificador único do agendamento. |
-| salonId | int (FK) | Salão onde será realizado o atendimento. |
+| salonId | int (FK) | Negócio onde será realizado o atendimento. |
 | clientId | int (FK) | Cliente que agendou. |
 | professionalId | int (FK) | Profissional responsável. |
 | voucherId | int (FK) | Voucher aplicado (se houver). |

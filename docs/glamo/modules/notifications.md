@@ -1,6 +1,6 @@
 ### Objetivo
 
-Notificações internas e multicanal para usuários do salão.
+Notificações internas e multicanal para usuários do negócio.
 
 ### Entidades
 
@@ -11,7 +11,7 @@ Notificações internas e multicanal para usuários do salão.
 
 1. **Preferências de Canal:**
 
-   * Respeitar preferências do usuário/salão quando externas (email/WhatsApp/push).
+   * Respeitar preferências do usuário/negócio quando externas (email/WhatsApp/push).
 2. **Leitura:**
 
    * `markAsRead` altera flag e grava log.

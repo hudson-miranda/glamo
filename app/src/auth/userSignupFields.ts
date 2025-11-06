@@ -5,6 +5,8 @@ const adminEmails = process.env.ADMIN_EMAILS?.split(',') || [];
 
 const emailDataSchema = z.object({
   email: z.string(),
+  name: z.string().optional(),
+  phone: z.string().optional(),
 });
 
 export const getEmailUserFields = defineUserSignupFields({
@@ -19,6 +21,14 @@ export const getEmailUserFields = defineUserSignupFields({
   isAdmin: (data) => {
     const emailData = emailDataSchema.parse(data);
     return adminEmails.includes(emailData.email);
+  },
+  name: (data) => {
+    const emailData = emailDataSchema.parse(data);
+    return emailData.name;
+  },
+  phone: (data) => {
+    const emailData = emailDataSchema.parse(data);
+    return emailData.phone;
   },
 });
 
@@ -73,6 +83,7 @@ const googleDataSchema = z.object({
   profile: z.object({
     email: z.string(),
     email_verified: z.boolean(),
+    name: z.string().optional(),
   }),
 });
 
@@ -91,6 +102,10 @@ export const getGoogleUserFields = defineUserSignupFields({
       return false;
     }
     return adminEmails.includes(googleData.profile.email);
+  },
+  name: (data) => {
+    const googleData = googleDataSchema.parse(data);
+    return googleData.profile.name;
   },
 });
 

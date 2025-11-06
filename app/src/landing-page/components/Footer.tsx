@@ -75,9 +75,9 @@ export default function Footer({ footerNavigation }: FooterProps = {}) {
           {/* Brand */}
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={colVariants} custom={0}>
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-r from-brand-500 to-brand-500 rounded-xl flex items-center justify-center text-2xl">
+              {/*<div className="w-12 h-12 bg-gradient-to-r from-brand-500 to-brand-500 rounded-xl flex items-center justify-center text-2xl">
                 ✨
-              </div>
+              </div>*/}
               <span className="text-2xl font-bold bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">
                 Glamo
               </span>
