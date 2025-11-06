@@ -51,7 +51,7 @@ Complete redesign of the Glamo landing page with premium SaaS aesthetics inspire
 #### **Prompt 6: Contact Form & Onboarding**
 - ✅ Modern contact form with floating labels
 - ✅ Real-time validation (email, required fields)
-- ✅ Business type selector (salão, barbearia, spa)
+- ✅ Business type selector (negócio, barbearia, spa)
 - ✅ Toast notifications for success/error
 - ✅ "Request Demo" CTA
 - ✅ Ready for backend integration (/api/contact)
@@ -203,7 +203,7 @@ transition={{ duration: 0.6 }}
 ### Portuguese Content
 
 All copy is in Portuguese (PT-BR) targeted at:
-- Salão de beleza owners
+- Negócio de beleza owners
 - Barbearia owners
 - Spa managers
 - Beauty industry professionals
@@ -213,7 +213,7 @@ All copy is in Portuguese (PT-BR) targeted at:
 ```html
 <title>Glamo - Sistema de Gestão para Salões</title>
 <meta name="description" content="Sistema de gestão inteligente para salões de beleza..." />
-<meta name="keywords" content="gestão salão, agendamento online..." />
+<meta name="keywords" content="gestão negócio, agendamento online..." />
 ```
 
 ## 🎯 Conversion Features
@@ -290,7 +290,7 @@ All copy is in Portuguese (PT-BR) targeted at:
 
 ### Testimonials (6 profiles)
 
-1. Mariana Silva - Salão Elegance
+1. Mariana Silva - Negócio Elegance
 2. Carlos Eduardo - Barbearia Premium
 3. Ana Paula Costa - Rede Beleza & Cia
 4. Roberto Mendes - Studio Hair

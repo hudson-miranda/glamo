@@ -46,7 +46,7 @@ export default function EmployeesPage() {
         <div className='space-y-1'>
           <h1 className='text-3xl font-bold tracking-tight'>Equipe</h1>
           <p className='text-muted-foreground'>
-            Gerencie os funcionários e convites do seu salão
+            Gerencie os funcionários e convites do seu negócio
           </p>
         </div>
         <div className='flex items-center gap-3'>
@@ -66,7 +66,7 @@ export default function EmployeesPage() {
             Funcionários Ativos
           </CardTitle>
           <CardDescription>
-            Membros da equipe com acesso ao salão
+            Membros da equipe com acesso ao negócio
           </CardDescription>
         </CardHeader>
         <CardContent className='p-0'>

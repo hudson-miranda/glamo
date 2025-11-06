@@ -31,9 +31,9 @@ export default function Header() {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 bg-gradient-to-r from-brand-500 to-brand-500 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
+              {/*<div className="w-10 h-10 bg-gradient-to-r from-brand-500 to-brand-500 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
                 <span className="text-2xl">✨</span>
-              </div>
+              </div>*/}
               <span className="text-2xl font-bold bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">
                 Glamo
               </span>

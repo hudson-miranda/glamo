@@ -99,10 +99,10 @@ export const features: GridFeature[] = [
 export const testimonials = [
   {
     name: 'Mariana Silva',
-    role: 'Proprietária - Salão Elegance',
+    role: 'Proprietária - Negócio Elegance',
     avatarSrc: daBoiAvatar,
     socialUrl: '#',
-    quote: 'O Glamo transformou completamente a gestão do meu salão. Antes eu perdia horas com planilhas, agora tudo é automático. Aumentei meu faturamento em 30% no primeiro trimestre!',
+    quote: 'O Glamo transformou completamente a gestão do meu negócio. Antes eu perdia horas com planilhas, agora tudo é automático. Aumentei meu faturamento em 30% no primeiro trimestre!',
   },
   {
     name: 'Carlos Eduardo',

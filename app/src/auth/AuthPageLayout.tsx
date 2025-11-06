@@ -12,9 +12,9 @@ export function AuthPageLayout({children} : {children: ReactNode }) {
           <div className='flex items-center justify-between h-16'>
             {/* Logo */}
             <Link to="/" className='flex items-center gap-3 group'>
-              <div className='w-10 h-10 bg-gradient-to-r from-brand-400 to-brand-600 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6'>
+              {/*<div className='w-10 h-10 bg-gradient-to-r from-brand-400 to-brand-600 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6'>
                 <span className='text-2xl'>✨</span>
-              </div>
+              </div>*/}
               <span className='text-2xl font-bold bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent'>
                 Glamo
               </span>
@@ -40,7 +40,7 @@ export function AuthPageLayout({children} : {children: ReactNode }) {
         {/* Footer */}
         <div className='mt-8 text-center'>
           <p className='text-sm text-gray-600 dark:text-gray-400'>
-            © 2025 Glamo. Transforme seu salão com tecnologia.
+            © 2025 Glamo. Transforme seu negócio com tecnologia.
           </p>
         </div>
       </div>

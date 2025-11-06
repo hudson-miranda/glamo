@@ -39,7 +39,7 @@ export default function CTASection() {
         >
           {/* Headline impactante */}
           <h2 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-            Transforme seu salão{' '}
+            Transforme seu negócio{' '}
             <GradientText variant="brand" as="span" className="text-5xl md:text-7xl font-bold">
               hoje mesmo!
             </GradientText>

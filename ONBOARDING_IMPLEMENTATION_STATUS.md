@@ -11,7 +11,7 @@
 **Arquivo:** `app/src/payment/plans.ts`
 
 - **Planos atualizados:**
-  - ~~Hobby~~ → **Essencial** (1 salão, 1 profissional, 150 agendamentos/mês)
+  - ~~Hobby~~ → **Essencial** (1 negócio, 1 profissional, 150 agendamentos/mês)
   - ~~Pro~~ → **Profissional** (2 salões, 5 profissionais, ilimitado)
   - Novo: **Enterprise** (999 salões, 999 profissionais, ilimitado)
 
@@ -133,18 +133,18 @@ action rejectSalonInvite { ... }
   1. **Criar Meu Negócio** → Badge "14 Dias Grátis", lista benefícios do trial
   2. **Aguardar Convite** → Para funcionários
 - Design: gradientes brand (#ADA5FB → #6B5CF6)
-- Auto-redireciona para dashboard se usuário já tem salão
+- Auto-redireciona para dashboard se usuário já tem negócio
 
 #### **WaitingInvitePage.tsx** - Gestão de Convites
 **Arquivo:** `app/src/client/modules/onboarding/WaitingInvitePage.tsx`
 
 - Lista todos os convites pendentes
-- Exibe: nome do salão, cargo, quem convidou, data de expiração
+- Exibe: nome do negócio, cargo, quem convidou, data de expiração
 - Botões: Aceitar / Recusar
-- Empty state com botão "Criar Meu Próprio Salão"
+- Empty state com botão "Criar Meu Próprio Negócio"
 - Toast notifications para feedback
 
-#### **CreateSalonPage.tsx** - Criação de Salão (REFATORADA)
+#### **CreateSalonPage.tsx** - Criação de Negócio (REFATORADA)
 **Arquivo:** `app/src/client/modules/onboarding/CreateSalonPage.tsx`
 
 **Melhorias implementadas:**
@@ -163,7 +163,7 @@ action rejectSalonInvite { ... }
 - ✅ Loading states e feedback visual
 - ✅ Botão "Voltar" para /onboarding
 - ✅ Mensagem de sucesso menciona trial
-- ✅ Auto-redireciona se usuário já tem salão
+- ✅ Auto-redireciona se usuário já tem negócio
 
 ---
 
@@ -176,11 +176,11 @@ action rejectSalonInvite { ... }
 
 1. **Páginas públicas:** sempre acessíveis (/, /pricing, /blog, etc)
 2. **Páginas de auth:** sempre acessíveis (/login, /signup, etc)
-3. **Usuário COM salão + em página de onboarding:** redireciona → `/dashboard`
-4. **Usuário SEM salão + em página protegida:** redireciona → `/onboarding`
-5. **Usuário SEM salão + não está em onboarding:** redireciona → `/onboarding`
+3. **Usuário COM negócio + em página de onboarding:** redireciona → `/dashboard`
+4. **Usuário SEM negócio + em página protegida:** redireciona → `/onboarding`
+5. **Usuário SEM negócio + não está em onboarding:** redireciona → `/onboarding`
 
-**Páginas protegidas (requerem salão):**
+**Páginas protegidas (requerem negócio):**
 - `/dashboard`
 - `/clients`
 - `/services`
@@ -225,40 +225,40 @@ Isso irá:
 
 Depois da migration, teste o fluxo completo:
 
-#### **Teste 1: Novo Usuário - Criar Salão**
+#### **Teste 1: Novo Usuário - Criar Negócio**
 1. Faça logout (se estiver logado)
 2. Faça signup com novo email
 3. ✅ Deve redirecionar para `/onboarding` automaticamente
 4. ✅ Escolha "Criar Meu Negócio"
 5. ✅ Preencha o formulário de criação
 6. ✅ Clique em "Iniciar Trial Gratuito"
-7. ✅ Deve criar salão e redirecionar para `/dashboard`
+7. ✅ Deve criar negócio e redirecionar para `/dashboard`
 8. ✅ Deve aparecer mensagem: "Seu período de trial de 14 dias começou"
 
-#### **Teste 2: Tentativa de Acessar Dashboard sem Salão**
+#### **Teste 2: Tentativa de Acessar Dashboard sem Negócio**
 1. Crie novo usuário (signup)
 2. Na tela de onboarding, tente acessar manualmente `/dashboard`
 3. ✅ Deve redirecionar de volta para `/onboarding`
 4. Tente acessar `/clients`, `/services`, etc
 5. ✅ Deve redirecionar para `/onboarding`
 
-#### **Teste 3: Usuário com Salão - Não pode Acessar Onboarding**
-1. Já logado com salão criado
+#### **Teste 3: Usuário com Negócio - Não pode Acessar Onboarding**
+1. Já logado com negócio criado
 2. Tente acessar `/onboarding` manualmente
 3. ✅ Deve redirecionar para `/dashboard`
 
 #### **Teste 4: Sistema de Convites (requer 2 usuários)**
-1. Usuário A (com salão criado):
+1. Usuário A (com negócio criado):
    - Vá para página de funcionários (quando existir) ou use developer tools
    - Execute: `sendSalonInvite({ email: "usuario-b@example.com", roleId: "..." })`
 2. Usuário B (novo signup com email usado no convite):
    - Deve ver convite pendente em `/onboarding/waiting-invite`
    - Clique em "Aceitar"
    - ✅ Deve criar UserSalon + UserRole
-   - ✅ Deve redirecionar para `/dashboard` do salão
+   - ✅ Deve redirecionar para `/dashboard` do negócio
 
 #### **Teste 5: Validações CreateSalonPage**
-1. Tente criar salão sem nome → ✅ Erro
+1. Tente criar negócio sem nome → ✅ Erro
 2. Tente nome com 2 caracteres → ✅ Erro "Nome muito curto"
 3. CNPJ inválido → ✅ Erro "CNPJ inválido"
 4. Email inválido → ✅ Erro "Email inválido"
@@ -298,7 +298,7 @@ Essas funcionalidades NÃO são necessárias para o fluxo básico funcionar, mas
 - Email de boas-vindas ao aceitar
 
 ### 3. **Validação de Limites de Plano**
-- Bloquear criação de salão se limite atingido
+- Bloquear criação de negócio se limite atingido
 - Bloquear criação de agendamentos se limite atingido
 - Modal de upgrade quando atingir limite
 
@@ -310,8 +310,8 @@ Essas funcionalidades NÃO são necessárias para o fluxo básico funcionar, mas
 ### 5. **Melhorias de UX**
 - Loading skeleton nas páginas de onboarding
 - Animações de transição entre telas
-- Confetti animation ao criar salão
-- Onboarding tutorial após criar salão (tour guiado)
+- Confetti animation ao criar negócio
+- Onboarding tutorial após criar negócio (tour guiado)
 
 ---
 
@@ -375,7 +375,7 @@ wasp db migrate-dev
 3. User.activeSalonId está null?
 4. Console logs do OnboardingGuard aparecem?
 
-### Problema: "Erro ao criar salão"
+### Problema: "Erro ao criar negócio"
 **Verificar:**
 1. Migration executada corretamente?
 2. Seeds de roles foram executados?

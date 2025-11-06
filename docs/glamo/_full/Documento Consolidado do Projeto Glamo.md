@@ -16,7 +16,7 @@ Em casos de discrepâncias ou evoluções, buscou-se refletir o estado mais atua
 
 ## 2. Visão Geral do Projeto
 
-O Glamo é um sistema de gestão projetado especificamente para salões de beleza e estabelecimentos similares. Seu objetivo principal é centralizar e otimizar as operações diárias, abrangendo desde o gerenciamento de clientes e agendamentos até o controle financeiro, estoque de produtos e cálculo de comissões para profissionais. O sistema visa fornecer ferramentas robustas para proprietários, gerentes e profissionais do salão, além de potencialmente oferecer funcionalidades para os clientes finais (como agendamento online, embora não explicitamente detalhado como funcionalidade principal nos requisitos iniciais).
+O Glamo é um sistema de gestão projetado especificamente para salões de beleza e estabelecimentos similares. Seu objetivo principal é centralizar e otimizar as operações diárias, abrangendo desde o gerenciamento de clientes e agendamentos até o controle financeiro, estoque de produtos e cálculo de comissões para profissionais. O sistema visa fornecer ferramentas robustas para proprietários, gerentes e profissionais do negócio, além de potencialmente oferecer funcionalidades para os clientes finais (como agendamento online, embora não explicitamente detalhado como funcionalidade principal nos requisitos iniciais).
 
 **Principais Módulos e Funcionalidades:**
 
@@ -51,13 +51,13 @@ Esta seção detalha os requisitos funcionais (RF) e não funcionais (RNF) confo
     *   RF.001.06 O sistema deve permitir a autenticação por token (JWT).
 *   **RF.002 - Atribuição de Papéis e Permissões**
     *   RF.002.01 O sistema deve permitir que cada usuário esteja associado a um ou mais salões.
-    *   RF.002.02 Cada associação usuário ↔ salão deve conter papéis e permissões específicos.
-    *   RF.002.03 O dono do salão pode criar papéis personalizados com permissões específicas.
+    *   RF.002.02 Cada associação usuário ↔ negócio deve conter papéis e permissões específicos.
+    *   RF.002.03 O dono do negócio pode criar papéis personalizados com permissões específicas.
     *   RF.002.04 O sistema deve controlar o acesso a funcionalidades com base nas permissões atribuídas.
-    *   RF.002.05 O sistema deve permitir a visualização de todas as permissões do usuário autenticado no salão ativo via endpoint dedicado.
+    *   RF.002.05 O sistema deve permitir a visualização de todas as permissões do usuário autenticado no negócio ativo via endpoint dedicado.
 *   **RF.003 - Alternância de Salões**
     *   RF.003.01 O sistema deve permitir ao usuário alternar entre os salões que participa.
-    *   RF.003.02 A alternância define o "salão ativo", cujos dados serão exibidos na interface.
+    *   RF.003.02 A alternância define o "negócio ativo", cujos dados serão exibidos na interface.
 *   **RF.004 - Notificações**
     *   RF.004.01 O sistema deve permitir o envio de notificações aos usuários via painel interno.
     *   RF.004.02 As notificações podem ser geradas manualmente ou automaticamente pelo sistema.
@@ -75,7 +75,7 @@ Esta seção detalha os requisitos funcionais (RF) e não funcionais (RNF) confo
 *   **RF.006 - Gestão de Clientes**
     *   RF.006.01 O sistema deve permitir o cadastro de clientes por meio de formulário.
     *   RF.006.02 Cada cliente pode estar vinculado a um ou mais salões.
-    *   RF.006.03 Um cliente pode estar vinculado a um usuário (login próprio) ou ser gerenciado apenas pelo salão.
+    *   RF.006.03 Um cliente pode estar vinculado a um usuário (login próprio) ou ser gerenciado apenas pelo negócio.
     *   RF.006.04 O sistema deve armazenar nome, telefone, e-mail, data de nascimento e observações.
     *   RF.006.05 O sistema deve manter histórico de serviços realizados, vendas, créditos e agendamentos por cliente.
 
@@ -261,7 +261,7 @@ A modelagem de dados é um pilar central do sistema Glamo, definindo a estrutura
     *   **Descrição**: Relacionamento N:N entre usuários e salões.
     *   **Campos Principais:** `id`, `userId` (FK para `users`), `salonId` (FK para `salons`), `isActive`, `createdAt`, `updatedAt`, `deletedAt` (paranoid).
 *   **Tabela: `roles` (Modelo: `Role`)**
-    *   **Descrição**: Papéis customizáveis por salão.
+    *   **Descrição**: Papéis customizáveis por negócio.
     *   **Campos Principais:** `id`, `salonId` (FK para `salons`), `name`, `createdAt`, `updatedAt`, `deletedAt` (paranoid).
 *   **Tabela: `permissions` (Modelo: `Permission`)**
     *   **Descrição**: Permissões atômicas do sistema.
@@ -270,7 +270,7 @@ A modelagem de dados é um pilar central do sistema Glamo, definindo a estrutura
     *   **Descrição**: Associações N:N entre papéis e permissões.
     *   **Campos Principais:** `id`, `roleId` (FK para `roles`), `permissionId` (FK para `permissions`), `createdAt`.
 *   **Tabela: `user_roles` (Modelo: `UserRole`)**
-    *   **Descrição**: Associa papéis a um vínculo usuário-salão.
+    *   **Descrição**: Associa papéis a um vínculo usuário-negócio.
     *   **Campos Principais:** `id`, `userSalonId` (FK para `user_salons`), `roleId` (FK para `roles`), `createdAt`.
 *   **Tabela: `logs` (Modelo: `Log`)**
     *   **Descrição**: Registros de auditoria de ações críticas.
@@ -282,7 +282,7 @@ A modelagem de dados é um pilar central do sistema Glamo, definindo a estrutura
 **5.2. Clientes e Financeiro**
 
 *   **Tabela: `clients` (Modelo: `Client`)**
-    *   **Descrição**: Informações dos clientes do salão.
+    *   **Descrição**: Informações dos clientes do negócio.
     *   **Campos Principais:** `id`, `salonId` (FK para `salons`), `userId` (FK para `users`, nullable), `name`, `email`, `phone`, `observations`, `createdAt`, `updatedAt`, `deletedAt` (paranoid).
 *   **Tabela: `client_credits` (Modelo: `ClientCredit`)**
     *   **Descrição**: Créditos associados aos clientes.
@@ -297,7 +297,7 @@ A modelagem de dados é um pilar central do sistema Glamo, definindo a estrutura
     *   **Descrição**: Uso de créditos em pagamentos.
     *   **Campos (Doc. Técnica):** `id`, `paymentId` (FK para `payments`), `creditId` (FK para `client_credits`), `amountUsed`, `createdAt`.
 *   **Tabela: `daily_cash` (Modelo: `DailyCash`)**
-    *   **Descrição**: Controle de caixa diário do salão.
+    *   **Descrição**: Controle de caixa diário do negócio.
     *   **Campos Principais:** `id`, `salonId` (FK para `salons`), `openingAmount`, `closingAmount`, `openedAt`, `closedAt`, `openedByUserId` (FK para `users`), `closedByUserId` (FK para `users`), `createdAt`, `updatedAt`.
 *   **Tabela: `professional_cash` (Modelo: `ProfessionalCash`)**
     *   **Descrição**: Controle de caixa por profissional (se aplicável).
@@ -306,7 +306,7 @@ A modelagem de dados é um pilar central do sistema Glamo, definindo a estrutura
 **5.3. Serviços e Comissionamento**
 
 *   **Tabela: `services` (Modelo: `Service`)**
-    *   **Descrição**: Serviços oferecidos pelo salão.
+    *   **Descrição**: Serviços oferecidos pelo negócio.
     *   **Campos Principais:** `id`, `salonId` (FK para `salons`), `name`, `description`, `baseDuration`, `basePrice`, `isActive`, `createdAt`, `updatedAt`. *(Nota: Modelo `Service` é mais simples que a tabela na Doc. Técnica, omitindo campos como `createdByUserId`, `costValue`, `nonCommissionableValue`, etc. Estes podem estar em outros modelos ou a implementação difere)*.
 *   **Tabela: `service_variants` (Modelo: Ausente no código exportado)**
     *   **Descrição**: Variações de serviços.
@@ -440,19 +440,19 @@ A API RESTful é a interface principal para a comunicação entre o frontend e o
 *   **GET `/:id`**: Obtém detalhes de um usuário específico.
 *   **PUT `/:id`**: Atualiza dados do usuário.
 *   **DELETE `/:id`**: Exclui (soft delete) um usuário (requer permissão, ex: `can_manage_users`).
-*   **PATCH `/switch-salon`**: Altera o salão ativo do usuário logado.
-*   **GET `/me/permissions`**: Lista as permissões do usuário logado no salão ativo.
+*   **PATCH `/switch-salon`**: Altera o negócio ativo do usuário logado.
+*   **GET `/me/permissions`**: Lista as permissões do usuário logado no negócio ativo.
 *   **GET `/me`**: Obtém os dados do usuário logado.
 
 **6.3. Papéis e Permissões (`/api/roles`, `/api/permissions`, `/api/user-roles`)**
 
-*   **GET `/api/roles`**: Lista os papéis do salão ativo (requer permissão, ex: `can_view_roles`).
+*   **GET `/api/roles`**: Lista os papéis do negócio ativo (requer permissão, ex: `can_view_roles`).
 *   **POST `/api/roles`**: Cria um novo papel (requer permissão, ex: `can_manage_roles`).
 *   **PUT `/api/roles/:id`**: Atualiza um papel (requer permissão, ex: `can_manage_roles`).
 *   **DELETE `/api/roles/:id`**: Exclui um papel (requer permissão, ex: `can_manage_roles`).
 *   **GET `/api/permissions`**: Lista todas as permissões disponíveis no sistema.
-*   **POST `/api/user-roles`**: Atribui um papel a um usuário em um salão específico (requer permissão, ex: `can_manage_users`).
-*   **DELETE `/api/user-roles/:userSalonId/:roleId`**: Remove um papel de um usuário em um salão (requer permissão, ex: `can_manage_users`).
+*   **POST `/api/user-roles`**: Atribui um papel a um usuário em um negócio específico (requer permissão, ex: `can_manage_users`).
+*   **DELETE `/api/user-roles/:userSalonId/:roleId`**: Remove um papel de um usuário em um negócio (requer permissão, ex: `can_manage_users`).
 
 **6.4. Notificações (`/api/notifications`)**
 
@@ -468,7 +468,7 @@ A API RESTful é a interface principal para a comunicação entre o frontend e o
 
 **6.6. Clientes (`/api/clients`)**
 
-*   **GET `/`**: Lista clientes do salão ativo (requer `can_view_clients`).
+*   **GET `/`**: Lista clientes do negócio ativo (requer `can_view_clients`).
 *   **POST `/`**: Cria um novo cliente (requer `can_create_clients`).
 *   **GET `/:id`**: Obtém detalhes de um cliente (requer `can_view_clients`).
 *   **PUT `/:id`**: Edita dados de um cliente (requer `can_edit_clients`).
@@ -494,7 +494,7 @@ A API RESTful é a interface principal para a comunicação entre o frontend e o
 
 **6.8. Serviços (`/api/services`)**
 
-*   **GET `/`**: Lista serviços do salão ativo.
+*   **GET `/`**: Lista serviços do negócio ativo.
 *   **POST `/`**: Cria um novo serviço (requer permissão, ex: `can_edit_services`).
 *   **GET `/:id`**: Obtém detalhes de um serviço.
 *   **PUT `/:id`**: Atualiza um serviço (requer permissão, ex: `can_edit_services`).
@@ -553,8 +553,8 @@ A API RESTful é a interface principal para a comunicação entre o frontend e o
 
 **6.13. Caixa (`/api/daily-cash`, `/api/professional-cash`)**
 
-*   **POST `/api/daily-cash/open`**: Abre o caixa diário do salão (requer `can_manage_cash`).
-*   **POST `/api/daily-cash/close`**: Fecha o caixa diário do salão (requer `can_manage_cash`).
+*   **POST `/api/daily-cash/open`**: Abre o caixa diário do negócio (requer `can_manage_cash`).
+*   **POST `/api/daily-cash/close`**: Fecha o caixa diário do negócio (requer `can_manage_cash`).
 *   **GET `/api/daily-cash/current`**: Obtém o status do caixa diário atual.
 *   **POST `/api/professional-cash/open`**: Abre o caixa do profissional (requer `can_manage_cash`).
 *   **POST `/api/professional-cash/close`**: Fecha o caixa do profissional (requer `can_manage_cash`).
@@ -570,15 +570,15 @@ A API RESTful é a interface principal para a comunicação entre o frontend e o
 **6.15. Outros (`/api/salons`, `/api/health`, etc.)**
 
 *   **GET `/api/salons`**: Lista os salões aos quais o usuário tem acesso.
-*   **POST `/api/salons`**: Cria um novo salão (requer permissão de superadmin ou específica).
-*   **GET `/api/salons/:id`**: Obtém detalhes de um salão.
-*   **PUT `/api/salons/:id`**: Atualiza dados de um salão (requer permissão de owner/manager).
+*   **POST `/api/salons`**: Cria um novo negócio (requer permissão de superadmin ou específica).
+*   **GET `/api/salons/:id`**: Obtém detalhes de um negócio.
+*   **PUT `/api/salons/:id`**: Atualiza dados de um negócio (requer permissão de owner/manager).
 *   **GET `/api/health`**: Endpoint de verificação de saúde da aplicação.
 *   *(Endpoints para Feedbacks, Loyalty Points, Promotion Campaigns, Webhooks podem existir conforme modelos, mas não estão na Doc. API)*
 
 **Middleware de Autorização:**
 
-Quase todas as rotas (exceto autenticação e health check) utilizam `authMiddleware` para verificar o JWT e `rolePermissionMiddleware('permissao_necessaria')` para garantir que o usuário logado, no contexto do salão ativo, possua a permissão requerida para executar a ação.
+Quase todas as rotas (exceto autenticação e health check) utilizam `authMiddleware` para verificar o JWT e `rolePermissionMiddleware('permissao_necessaria')` para garantir que o usuário logado, no contexto do negócio ativo, possua a permissão requerida para executar a ação.
 
 ## 7. Detalhes da Implementação (Código-Fonte)
 

@@ -113,7 +113,7 @@ export function EditRoleDialog({
         <DialogHeader>
           <DialogTitle>Alterar Função</DialogTitle>
           <DialogDescription>
-            Altere a função de {employee.userName || employee.userEmail} no salão.
+            Altere a função de {employee.userName || employee.userEmail} no negócio.
           </DialogDescription>
         </DialogHeader>
 

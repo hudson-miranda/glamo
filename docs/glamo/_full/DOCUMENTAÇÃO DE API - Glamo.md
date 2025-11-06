@@ -19,18 +19,18 @@
 | Obter detalhes de um usuário | GET | /api/users/:id | Recupera informações detalhadas de um usuário. |
 | Atualizar dados do usuário | PUT | /api/users/:id | Edita dados pessoais e de contato. |
 | Excluir (soft delete) usuário | DELETE | /api/users/:id | Marca usuário como deletado. |
-| Alternar salão ativo | PATCH | /api/users/switch-salon | Altera o salão ativo do usuário logado. |
-| Listar permissões atuais | GET | /api/users/me/permissions | Lista todas as permissões do usuário no salão ativo. |
+| Alternar negócio ativo | PATCH | /api/users/switch-salon | Altera o negócio ativo do usuário logado. |
+| Listar permissões atuais | GET | /api/users/me/permissions | Lista todas as permissões do usuário no negócio ativo. |
 
 **🔹 Módulo: Papéis, Permissões e Vínculos**
 
 | **Funcionalidade** | **Método** | **Endpoint** | **Descrição** |
 | --- | --- | --- | --- |
-| Listar papéis | GET | /api/roles | Lista os papéis do salão ativo. |
+| Listar papéis | GET | /api/roles | Lista os papéis do negócio ativo. |
 | Criar novo papel | POST | /api/roles | Cria um papel customizado. |
 | Atualizar papel | PUT | /api/roles/:id | Edita nome ou permissões. |
 | Excluir papel | DELETE | /api/roles/:id | Remove papel, se não estiver vinculado a usuários. |
-| Atribuir papel a usuário no salão | POST | /api/user-roles | Liga usuário a um papel no contexto de um salão. |
+| Atribuir papel a usuário no negócio | POST | /api/user-roles | Liga usuário a um papel no contexto de um negócio. |
 | Listar permissões disponíveis | GET | /api/permissions | Lista todas as permissões possíveis do sistema. |
 
 **🔹 Módulo: Notificações**
@@ -56,14 +56,14 @@ Logs registram ipAddress, userAgent, dados anteriores e posteriores da alteraç�
 | **Nome** | **Descrição** |
 | --- | --- |
 | authMiddleware | Valida JWT e session. |
-| rolePermissionMiddleware('permission') | Verifica se o usuário tem permissão no salão ativo. |
+| rolePermissionMiddleware('permission') | Verifica se o usuário tem permissão no negócio ativo. |
 | rateLimiterMiddleware | Limita requisições por IP/usuário usando Redis. |
 
 **🔹 Módulo: Clientes**
 
 | **Funcionalidade** | **Método** | **Endpoint** | **Descrição** | **Permissão Necessária** |
 | --- | --- | --- | --- | --- |
-| Listar clientes do salão | GET | /api/clients | Lista todos os clientes vinculados ao salão ativo. | can_view_clients |
+| Listar clientes do negócio | GET | /api/clients | Lista todos os clientes vinculados ao negócio ativo. | can_view_clients |
 | Criar cliente | POST | /api/clients | Cadastra um novo cliente manualmente. | can_create_clients |
 | Editar cliente | PUT | /api/clients/:id | Altera dados do cliente. | can_edit_clients |
 | Excluir cliente | DELETE | /api/clients/:id | Soft delete do cliente. | can_delete_clients |
@@ -73,7 +73,7 @@ Logs registram ipAddress, userAgent, dados anteriores e posteriores da alteraç�
 
 | **Funcionalidade** | **Método** | **Endpoint** | **Descrição** | **Permissão Necessária** |
 | --- | --- | --- | --- | --- |
-| Listar agendamentos do salão | GET | /api/appointments | Lista agendamentos por período, status, profissional, cliente, etc. | can_view_appointments |
+| Listar agendamentos do negócio | GET | /api/appointments | Lista agendamentos por período, status, profissional, cliente, etc. | can_view_appointments |
 | Horários disponíveis |     | /api/appointments/available-slots | Retorna horários disponíveis por profissional. | can_create_appointments |
 | Criar novo agendamento | POST | /api/appointments | Cria um novo agendamento com serviços, horários e assistentes. | can_create_appointments |
 | Editar agendamento | PUT | /api/appointments/:id | Permite reagendamento ou edição parcial. | can_edit_appointments |
@@ -128,7 +128,7 @@ Logs registram ipAddress, userAgent, dados anteriores e posteriores da alteraç�
 
 | **Funcionalidade** | **Método** | **Endpoint** | **Descrição** | **Permissão Necessária** |
 | --- | --- | --- | --- | --- |
-| Listar produtos | GET | /api/products | Lista produtos do salão com filtros por categoria, marca ou estoque. | can_view_products |
+| Listar produtos | GET | /api/products | Lista produtos do negócio com filtros por categoria, marca ou estoque. | can_view_products |
 | Criar produto | POST | /api/products | Cadastra novo produto. | can_create_products |
 | Atualizar produto | PUT | /api/products/:id | Edita informações do produto. | can_edit_products |
 | Arquivar produto | DELETE | /api/products/:id | Marca produto como arquivado (soft delete). | can_delete_products |
@@ -182,11 +182,11 @@ O payload deve incluir: previousQuantity, finalQuantity, reason e movementType.
 
 **🔹 Papéis de Usuário (Roles)**
 
-No Glamo, cada usuário pode ter um ou mais papéis **por salão**, com permissões ajustáveis. Os papéis abaixo são sugestões padrão:
+No Glamo, cada usuário pode ter um ou mais papéis **por negócio**, com permissões ajustáveis. Os papéis abaixo são sugestões padrão:
 
 | **Papel Padrão** | **Descrição** |
 | --- | --- |
-| owner | Dono do salão, acesso completo. |
+| owner | Dono do negócio, acesso completo. |
 | manager | Gestor geral, acesso a vendas, agendamentos, produtos e relatórios. |
 | professional | Profissional prestador de serviço. Acesso à própria agenda e comissões. |
 | cashier | Responsável por comandas, caixa e recebimentos. |
@@ -201,13 +201,13 @@ As permissões são **ações atômicas** atribuídas aos papéis. A seguir, alg
 | --- | --- |
 | can_view_users | Visualizar usuários do sistema. |
 | can_manage_users | Criar, editar e deletar usuários. |
-| can_view_roles | Ver papéis existentes no salão. |
+| can_view_roles | Ver papéis existentes no negócio. |
 | can_manage_roles | Criar e editar papéis. |
 | can_view_clients | Visualizar lista de clientes. |
 | can_create_clients | Cadastrar novos clientes. |
 | can_edit_clients | Editar dados de clientes. |
 | can_delete_clients | Remover (soft delete) clientes. |
-| can_view_appointments | Visualizar agendamentos do salão. |
+| can_view_appointments | Visualizar agendamentos do negócio. |
 | can_create_appointments | Criar novos agendamentos. |
 | can_edit_appointments | Editar agendamentos existentes. |
 | can_delete_appointments | Cancelar ou excluir agendamentos. |
@@ -242,6 +242,6 @@ router.get('/clients', authMiddleware, rolePermissionMiddleware('can_view_client
 
 **🔹 Observações Adicionais**
 
-- Os papéis são personalizáveis por salão (via USER_ROLES).
+- Os papéis são personalizáveis por negócio (via USER_ROLES).
 - As permissões são centralizadas (via PERMISSIONS) e associadas aos papéis (via ROLE_PERMISSIONS).
 - Usuários podem ter múltiplos papéis em diferentes salões e alternar o contexto com activeSalonId.

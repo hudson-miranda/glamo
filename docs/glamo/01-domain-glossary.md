@@ -1,6 +1,6 @@
 | Termo                      | Significado                                                            |
 | -------------------------- | ---------------------------------------------------------------------- |
-| **Salão**                  | Unidade de negócio (filial) com usuários, clientes e estoque próprios. |
+| **Negócio**                  | Unidade de negócio (filial) com usuários, clientes e estoque próprios. |
 | **Profissional**           | Prestador de serviços (cabeleireiro, manicure etc).                    |
 | **Assistente**             | Auxilia um profissional em um atendimento.                             |
 | **Serviço**                | Tipo de atendimento prestado (ex.: Corte de cabelo).                   |

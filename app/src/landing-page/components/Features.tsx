@@ -95,7 +95,7 @@ export default function Features() {
             </GradientText>
           </h2>
           <p className="text-xl text-gray-600 dark:text-zinc-400 max-w-3xl mx-auto">
-            Sistema completo de gestão para transformar seu salão de beleza
+            Sistema completo de gestão para transformar seu negócio de beleza
           </p>
         </motion.div>
 

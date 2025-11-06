@@ -23,7 +23,7 @@ Gerenciar vendas de serviços/produtos/pacotes, aplicando descontos, créditos, 
    * Podem quitar parcial/total; registrar em `CreditPayment`.
 3. **Descontos:**
 
-   * Por item e total; validar limites por política do salão.
+   * Por item e total; validar limites por política do negócio.
 4. **Comissões:**
 
    * Calculadas ao fechar a venda com base nos itens de serviço e nas `CommissionConfig`.

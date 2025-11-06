@@ -1,6 +1,6 @@
 ### Visão Geral
 
-**Glamo** é uma plataforma SaaS multi‑salão para gestão de agendamentos, serviços, vendas, comissões e finanças. O foco é oferecer controle total de operações de beleza (salões, barbearias, clínicas) com governança, performance e escalabilidade.
+**Glamo** é uma plataforma SaaS multi‑negócio para gestão de agendamentos, serviços, vendas, comissões e finanças. O foco é oferecer controle total de operações de beleza (salões, barbearias, clínicas) com governança, performance e escalabilidade.
 
 ### Objetivos Principais
 
@@ -17,7 +17,7 @@
 * **Vendas e Pagamentos** – múltiplos métodos e créditos.
 * **Estoque** – controle e alertas de produtos.
 * **Caixa** – abertura, fechamento, conciliação.
-* **RBAC Contextual** – permissões por salão.
+* **RBAC Contextual** – permissões por negócio.
 
 ### Fontes Originais
 

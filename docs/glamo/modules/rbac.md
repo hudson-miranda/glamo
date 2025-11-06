@@ -1,6 +1,6 @@
 ### Objetivo
 
-Controle de acesso contextual por salão.
+Controle de acesso contextual por negócio.
 
 ### Entidades
 
@@ -10,15 +10,15 @@ Controle de acesso contextual por salão.
 
 1. **Contexto Ativo:**
 
-   * `User.activeSalonId` define o salão corrente; todas as ações exigem essa referência.
+   * `User.activeSalonId` define o negócio corrente; todas as ações exigem essa referência.
 2. **Permissões:**
 
    * Verificação via `requirePermission(ctxUser, salonId, permission)`.
 3. **Seeds:**
 
-   * Criar permissões e papéis padrão; atribuir `owner` ao criador do salão.
+   * Criar permissões e papéis padrão; atribuir `owner` ao criador do negócio.
 
 ### Testes
 
 * Verificação de permissão por rota
-* Troca de salão ativo
+* Troca de negócio ativo

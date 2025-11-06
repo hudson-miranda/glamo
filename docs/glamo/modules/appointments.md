@@ -27,7 +27,7 @@ Gerenciar agendamentos de serviços em salões multi-tenant com prevenção de c
    * Opcional: evitar conflito por `serviceRoomId` quando aplicável.
 2. **Janela mínima de atendimento:**
 
-   * A duração mínima de um agendamento é 10 min; máxima por política do salão (default: 240 min).
+   * A duração mínima de um agendamento é 10 min; máxima por política do negócio (default: 240 min).
 3. **Assistentes:**
 
    * Podem ser adicionados e removidos até o início do serviço.
@@ -41,7 +41,7 @@ Gerenciar agendamentos de serviços em salões multi-tenant com prevenção de c
    * Cada transição deve ser gravada em `AppointmentStatusLog` (com autor).
 6. **Permissões:**
 
-   * Visualização/edição dependem do papel no salão (`requirePermission`).
+   * Visualização/edição dependem do papel no negócio (`requirePermission`).
 7. **Auditoria:**
 
    * Qualquer alteração relevante registra `Log` com before/after.

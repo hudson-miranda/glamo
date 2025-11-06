@@ -23,7 +23,7 @@ export const paymentPlanCards: Record<PaymentPlanId, PaymentPlanCard> = {
     name: prettyPaymentPlanName(PaymentPlanId.Essencial),
     price: '$19.90',
     description: 'Ideal para profissionais autônomos',
-    features: ['1 salão', '1 profissional', '150 agendamentos/mês', 'Suporte básico'],
+    features: ['1 negócio', '1 profissional', '150 agendamentos/mês', 'Suporte básico'],
   },
   [PaymentPlanId.Profissional]: {
     name: prettyPaymentPlanName(PaymentPlanId.Profissional),
