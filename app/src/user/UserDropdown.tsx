@@ -17,8 +17,8 @@ export function UserDropdown({ user }: { user: Partial<UserEntity> }) {
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <button className='flex items-center duration-300 ease-in-out text-foreground hover:text-primary transition-colors'>
-          <span className='hidden mr-2 text-right lg:block text-sm font-medium text-foreground'>
+        <button className='flex items-center ease-in-out text-foreground hover:text-primary transition-colors'>
+          <span className='hidden mr-2 text-right lg:block text-sm font-medium text-foreground hover:text-primary transition-colors'>
             {user.username}
           </span>
           <User className='size-5' />

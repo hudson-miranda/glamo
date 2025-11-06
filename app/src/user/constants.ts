@@ -3,8 +3,8 @@ import { routes } from 'wasp/client/router';
 
 export const userMenuItems = [
   {
-    name: 'AI Scheduler (Demo App)',
-    to: routes.DemoAppRoute.to,
+    name: 'Glamo | Dashboard',
+    to: routes.DashboardRoute.to,
     icon: LayoutDashboard,
     isAdminOnly: false,
     isAuthRequired: true,
@@ -16,11 +16,11 @@ export const userMenuItems = [
     isAuthRequired: false,
     isAdminOnly: false,
   },
-  {
-    name: 'Admin Dashboard',
-    to: routes.AdminRoute.to,
-    icon: Shield,
-    isAuthRequired: false,
-    isAdminOnly: true,
-  },
+  //{
+  //  name: 'Admin Dashboard',
+  //  to: routes.AdminRoute.to,
+  //  icon: Shield,
+  //  isAuthRequired: false,
+  //  isAdminOnly: true,
+  //},
 ] as const;
