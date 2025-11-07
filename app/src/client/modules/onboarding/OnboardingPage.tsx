@@ -49,7 +49,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-white via-purple-50/20 to-white dark:from-black dark:via-purple-950/20 dark:to-black transition-colors duration-300">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-white via-brand-50/20 to-white dark:from-black dark:via-brand-950/20 dark:to-black transition-colors duration-300">
       {/* NavBar */}
       <header className='sticky top-0 z-50 bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
@@ -76,7 +76,7 @@ export default function OnboardingPage() {
       <div className="relative flex-1 flex items-center justify-center p-4 overflow-hidden">
         {/* Glow Effects */}
         <GlowEffect position="top-left" size="xl" color="brand" animated />
-        <GlowEffect position="bottom-right" size="xl" color="purple" animated />
+        <GlowEffect position="bottom-right" size="xl" color="brand" animated />
 
       <div ref={ref} className="w-full max-w-5xl relative z-10">
         {/* Header */}
@@ -121,7 +121,7 @@ export default function OnboardingPage() {
                     ⚡ Trial 14 dias
                   </span>
                 </div>
-                <CardTitle className="text-2xl md:text-3xl font-bold mt-4 bg-gradient-to-r from-brand-500 to-brand-600 bg-clip-text text-transparent">
+                <CardTitle className="text-2xl md:text-3xl font-bold mt-4 bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">
                   Criar Meu Negócio
                 </CardTitle>
                 <CardDescription className="text-base text-gray-600 dark:text-gray-400">
@@ -169,12 +169,12 @@ export default function OnboardingPage() {
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <Card className="group h-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md hover:shadow-2xl hover:shadow-purple-500/20 dark:hover:shadow-purple-500/10 transition-all duration-500 border-2 border-gray-200 dark:border-gray-800 hover:border-purple-400 dark:hover:border-purple-600 hover:-translate-y-2">
+            <Card className="group h-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md hover:shadow-2xl hover:shadow-brand-500/20 dark:hover:shadow-brand-500/10 transition-all duration-500 border-2 border-gray-200 dark:border-gray-800 hover:border-brand-400 dark:hover:border-brand-600 hover:-translate-y-2">
               <CardHeader className="space-y-4 pb-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-400 to-purple-600 text-white shadow-xl shadow-purple-500/30 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-400 to-brand-600 text-white shadow-xl shadow-brand-500/30 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
                   <Users className="h-7 w-7" />
                 </div>
-                <CardTitle className="text-2xl md:text-3xl font-bold mt-4 bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">
+                <CardTitle className="text-2xl md:text-3xl font-bold mt-4 bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">
                   Aguardar Convite
                 </CardTitle>
                 <CardDescription className="text-base text-gray-600 dark:text-gray-400">
@@ -184,30 +184,30 @@ export default function OnboardingPage() {
               <CardContent>
                 <ul className="space-y-3 mb-8 text-sm">
                   <li className="flex items-start text-gray-700 dark:text-gray-300">
-                    <span className="mr-3 mt-0.5 text-purple-500 text-lg">✓</span>
+                    <span className="mr-3 mt-0.5 text-brand-500 text-lg">✓</span>
                     <span>Receba convites de proprietários</span>
                   </li>
                   <li className="flex items-start text-gray-700 dark:text-gray-300">
-                    <span className="mr-3 mt-0.5 text-purple-500 text-lg">✓</span>
+                    <span className="mr-3 mt-0.5 text-brand-500 text-lg">✓</span>
                     <span>Aceite ou recuse convites</span>
                   </li>
                   <li className="flex items-start text-gray-700 dark:text-gray-300">
-                    <span className="mr-3 mt-0.5 text-purple-500 text-lg">✓</span>
+                    <span className="mr-3 mt-0.5 text-brand-500 text-lg">✓</span>
                     <span>Trabalhe em múltiplos salões</span>
                   </li>
                   <li className="flex items-start text-gray-700 dark:text-gray-300">
-                    <span className="mr-3 mt-0.5 text-purple-500 text-lg">✓</span>
+                    <span className="mr-3 mt-0.5 text-brand-500 text-lg">✓</span>
                     <span>Gerencie suas permissões</span>
                   </li>
                   <li className="flex items-start text-gray-700 dark:text-gray-300">
-                    <span className="mr-3 mt-0.5 text-purple-500 text-lg">✓</span>
+                    <span className="mr-3 mt-0.5 text-brand-500 text-lg">✓</span>
                     <span>Visualize convites pendentes</span>
                   </li>
                 </ul>
 
                 <Button
                   onClick={handleWaitForInvite}
-                  className="w-full bg-white dark:bg-gray-800 border-2 border-purple-300 dark:border-purple-700 text-gray-900 dark:text-white hover:bg-purple-50 dark:hover:bg-purple-950/30 hover:border-purple-400 dark:hover:border-purple-500 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] text-base py-6 rounded-xl font-semibold"
+                  className="w-full bg-transparent dark:bg-transparent border-2 border-brand-500 dark:border-brand-500 text-brand-500 dark:text-brand-500 hover:bg-brand-100 dark:hover:bg-brand-950/30 hover:border-brand-500 dark:hover:border-brand-500 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] text-base py-6 rounded-xl font-semibold"
                 >
                   Ver Convites
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />

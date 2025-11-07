@@ -55,6 +55,12 @@ const PERMISSIONS = [
   { name: 'can_remove_staff', description: 'Remove staff members' },
   { name: 'can_manage_roles', description: 'Manage roles and permissions' },
 
+  // Employee permissions
+  { name: 'employees:read', description: 'View employees list and details' },
+  { name: 'employees:create', description: 'Create new employees' },
+  { name: 'employees:update', description: 'Edit existing employees' },
+  { name: 'employees:delete', description: 'Delete employees' },
+
   // Salon settings permissions
   { name: 'can_edit_salon_settings', description: 'Edit salon settings' },
   { name: 'can_view_logs', description: 'View audit logs' },
@@ -77,6 +83,7 @@ const DEFAULT_ROLES = [
       'can_view_cash', 'can_open_cash', 'can_close_cash', 'can_record_cash_movement',
       'can_view_reports', 'can_view_commission_reports', 'can_export_reports',
       'can_view_staff', 'can_invite_staff', 'can_edit_staff',
+      'employees:read', 'employees:create', 'employees:update', 'employees:delete',
       'can_view_logs',
     ],
   },
