@@ -325,8 +325,9 @@ export const resendInvite: ResendInvite<ResendInviteInput, void> = async (args, 
 
   // Send email notification to invitee
   try {
-    const acceptUrl = `${process.env.WASP_WEB_CLIENT_URL}/invite/accept/${invite.id}`;
-    const rejectUrl = `${process.env.WASP_WEB_CLIENT_URL}/invite/reject/${invite.id}`;
+    const clientUrl = process.env.WASP_WEB_CLIENT_URL || 'http://localhost:3000';
+    const acceptUrl = `${clientUrl}/invite/accept/${invite.id}`;
+    const rejectUrl = `${clientUrl}/invite/reject/${invite.id}`;
 
     const emailContent = getInviteReceivedEmail({
       salonName: invite.salon.name,

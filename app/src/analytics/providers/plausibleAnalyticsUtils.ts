@@ -1,6 +1,9 @@
-const PLAUSIBLE_API_KEY = process.env.PLAUSIBLE_API_KEY!;
-const PLAUSIBLE_SITE_ID = process.env.PLAUSIBLE_SITE_ID!;
+const PLAUSIBLE_API_KEY = process.env.PLAUSIBLE_API_KEY;
+const PLAUSIBLE_SITE_ID = process.env.PLAUSIBLE_SITE_ID;
 const PLAUSIBLE_BASE_URL = process.env.PLAUSIBLE_BASE_URL;
+
+// Check if Plausible is configured
+const isPlausibleConfigured = !!(PLAUSIBLE_API_KEY && PLAUSIBLE_SITE_ID);
 
 const headers = {
   'Content-Type': 'application/json',
@@ -25,6 +28,14 @@ type PageViewSourcesResult = {
 };
 
 export async function getDailyPageViews() {
+  if (!isPlausibleConfigured) {
+    console.warn('Plausible Analytics is not configured. Skipping page views calculation.');
+    return {
+      totalViews: 0,
+      prevDayViewsChangePercent: '0',
+    };
+  }
+
   const totalViews = await getTotalPageViews();
   const prevDayViewsChangePercent = await getPrevDayViewsChangePercent();
 
@@ -93,6 +104,11 @@ async function getPageviewsForDate(date: string) {
 }
 
 export async function getSources() {
+  if (!isPlausibleConfigured) {
+    console.warn('Plausible Analytics is not configured. Skipping sources calculation.');
+    return [];
+  }
+
   const url = `${PLAUSIBLE_BASE_URL}/v1/stats/breakdown?site_id=${PLAUSIBLE_SITE_ID}&property=visit:source&metrics=visitors`;
   const response = await fetch(url, {
     method: 'GET',

@@ -9,7 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../../../components/ui/select';
-import { User, Mail, Phone, Instagram, Calendar, FileText, CreditCard, MapPin } from 'lucide-react';
+import { User, Mail, Phone, Instagram, Calendar, FileText, CreditCard, MapPin, Check } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
 
 type PersonalDataStepProps = {
   formData: EmployeeFormData;
@@ -42,9 +43,31 @@ const BRAZILIAN_STATES = [
 ];
 
 export function PersonalDataStep({ formData, updateFormData }: PersonalDataStepProps) {
+  const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
+  const colorPickerRef = useRef<HTMLDivElement>(null);
+
   const handleChange = (field: keyof EmployeeFormData, value: any) => {
     updateFormData({ [field]: value });
   };
+
+  // Fechar o color picker ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (colorPickerRef.current && !colorPickerRef.current.contains(event.target as Node)) {
+        setIsColorPickerOpen(false);
+      }
+    };
+
+    if (isColorPickerOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isColorPickerOpen]);
+
+  const selectedColor = EMPLOYEE_COLORS.find((c) => c.value === formData.color) || EMPLOYEE_COLORS[0];
 
   const formatCPF = (value: string) => {
     const numbers = value.replace(/\D/g, '');
@@ -111,29 +134,58 @@ export function PersonalDataStep({ formData, updateFormData }: PersonalDataStepP
 
           <div className='md:col-span-2'>
             <Label htmlFor='color'>Cor para Agenda</Label>
-            <div className='grid grid-cols-5 gap-2 mt-2'>
-              {EMPLOYEE_COLORS.map((color) => (
-                <button
-                  key={color.value}
-                  type='button'
-                  onClick={() => handleChange('color', color.value)}
-                  className={`group relative h-12 rounded-lg border-2 transition-all ${
-                    formData.color === color.value
-                      ? 'border-gray-900 dark:border-white scale-105'
-                      : 'border-gray-200 dark:border-gray-700 hover:scale-105'
-                  }`}
-                  style={{ backgroundColor: color.value }}
-                  title={color.name}
+            <div className='relative mt-2' ref={colorPickerRef}>
+              <button
+                type='button'
+                onClick={() => setIsColorPickerOpen(!isColorPickerOpen)}
+                className='flex items-center gap-3 px-4 py-3 w-full md:w-auto border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-gray-300 dark:hover:border-gray-600 transition-all bg-white dark:bg-gray-800'
+              >
+                <div
+                  className='w-8 h-8 rounded-full border-2 border-white dark:border-gray-900 shadow-sm'
+                  style={{ backgroundColor: formData.color || '#6B7280' }}
+                />
+                <span className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                  {selectedColor.name}
+                </span>
+                <svg
+                  className={`w-4 h-4 ml-auto text-gray-400 transition-transform ${isColorPickerOpen ? 'rotate-180' : ''}`}
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
                 >
-                  {formData.color === color.value && (
-                    <div className='absolute inset-0 flex items-center justify-center'>
-                      <div className='h-6 w-6 rounded-full bg-white dark:bg-gray-900 flex items-center justify-center'>
-                        <div className='h-3 w-3 rounded-full' style={{ backgroundColor: color.value }} />
-                      </div>
-                    </div>
-                  )}
-                </button>
-              ))}
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
+                </svg>
+              </button>
+
+              {/* Color Picker Popover */}
+              {isColorPickerOpen && (
+                <div className='absolute z-50 mt-2 p-4 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg shadow-xl w-full md:w-80 animate-in fade-in-0 zoom-in-95'>
+                  <p className='text-xs font-medium text-gray-500 dark:text-gray-400 mb-3'>
+                    Selecione uma cor
+                  </p>
+                  <div className='grid grid-cols-5 gap-2'>
+                    {EMPLOYEE_COLORS.map((color) => (
+                      <button
+                        key={color.value}
+                        type='button'
+                        onClick={() => {
+                          handleChange('color', color.value);
+                          setIsColorPickerOpen(false);
+                        }}
+                        className='group relative h-10 rounded-lg hover:scale-110 transition-all focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800'
+                        style={{ backgroundColor: color.value }}
+                        title={color.name}
+                      >
+                        {formData.color === color.value && (
+                          <div className='absolute inset-0 flex items-center justify-center'>
+                            <Check className='h-5 w-5 text-white drop-shadow-lg' strokeWidth={3} />
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

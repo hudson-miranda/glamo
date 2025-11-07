@@ -10,6 +10,8 @@ import type {
 } from 'wasp/server/operations';
 import { HttpError } from 'wasp/server';
 import { requirePermission } from '../rbac/requirePermission';
+import { emailSender } from 'wasp/server/email';
+import { getInviteReceivedEmail } from '../salon/emailTemplates';
 
 // ============================================================================
 // Query: listEmployees
@@ -285,28 +287,75 @@ export const createEmployee: CreateEmployee<CreateEmployeeInput, Employee> = asy
   // Se email foi fornecido e sendInvite = true, enviar convite
   if (args.email && args.sendInvite !== false) {
     try {
+      // Buscar salon para obter o nome
+      const salon = await context.entities.Salon.findUnique({
+        where: { id: salonId },
+        select: { name: true },
+      });
+
       // Buscar ou criar role padrão para colaboradores
       const defaultRole = await context.entities.Role.findFirst({
         where: {
           salonId,
-          name: { in: ['Profissional', 'Colaborador', 'Employee'] },
+          name: { in: ['professional', 'manager', 'Profissional', 'Gerente'] },
         },
       });
 
-      if (defaultRole) {
-        await context.entities.SalonInvite.create({
-          data: {
+      if (defaultRole && salon) {
+        // Verificar se já existe um convite pendente
+        const existingInvite = await context.entities.SalonInvite.findFirst({
+          where: {
             salonId,
-            invitedBy: context.user.id,
-            email: args.email,
-            roleId: defaultRole.id,
+            email: args.email.toLowerCase(),
             status: 'PENDING',
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 dias
           },
         });
+
+        if (!existingInvite) {
+          // Criar convite no banco
+          const invite = await context.entities.SalonInvite.create({
+            data: {
+              salonId,
+              invitedBy: context.user.id,
+              email: args.email.toLowerCase(),
+              roleId: defaultRole.id,
+              status: 'PENDING',
+              expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 dias
+            },
+          });
+
+          // Enviar email de convite
+          try {
+            const clientUrl = process.env.WASP_WEB_CLIENT_URL || 'http://localhost:3000';
+            const acceptUrl = `${clientUrl}/invite/accept/${invite.id}`;
+            const rejectUrl = `${clientUrl}/invite/reject/${invite.id}`;
+
+            const emailContent = getInviteReceivedEmail({
+              salonName: salon.name,
+              roleName: defaultRole.name,
+              inviterName: context.user.name || context.user.email || 'Proprietário',
+              acceptLink: acceptUrl,
+              rejectLink: rejectUrl,
+            });
+
+            await emailSender.send({
+              to: args.email,
+              subject: emailContent.subject,
+              text: emailContent.text,
+              html: emailContent.html,
+            });
+
+            console.log(`Convite enviado com sucesso para ${args.email}`);
+          } catch (emailError) {
+            console.error('Erro ao enviar email de convite:', emailError);
+            // Não falhar a criação do employee se o email falhar
+          }
+        } else {
+          console.log(`Convite já existe para ${args.email}, não enviando novamente`);
+        }
       }
     } catch (error) {
-      console.error('Erro ao enviar convite:', error);
+      console.error('Erro ao processar convite:', error);
       // Não falhar a criação do employee se o convite falhar
     }
   }

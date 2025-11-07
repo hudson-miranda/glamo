@@ -229,8 +229,9 @@ export const sendSalonInvite: SendSalonInvite<SendSalonInviteInput, SalonInvite>
 
   // Send email notification to invitee
   try {
-    const acceptUrl = `${process.env.WASP_WEB_CLIENT_URL}/invite/accept/${invite.id}`;
-    const rejectUrl = `${process.env.WASP_WEB_CLIENT_URL}/invite/reject/${invite.id}`;
+    const clientUrl = process.env.WASP_WEB_CLIENT_URL || 'http://localhost:3000';
+    const acceptUrl = `${clientUrl}/invite/accept/${invite.id}`;
+    const rejectUrl = `${clientUrl}/invite/reject/${invite.id}`;
 
     const emailContent = getInviteReceivedEmail({
       salonName: invite.salon.name,
@@ -378,7 +379,8 @@ export const acceptSalonInvite: AcceptSalonInvite<AcceptSalonInviteInput, void> 
   // Send email notification to inviter (if they have notifications enabled)
   if (invite.inviter?.emailNotifications && invite.inviter?.email) {
     try {
-      const dashboardUrl = `${process.env.WASP_WEB_CLIENT_URL}/employees`;
+      const clientUrl = process.env.WASP_WEB_CLIENT_URL || 'http://localhost:3000';
+      const dashboardUrl = `${clientUrl}/employees`;
 
       const emailContent = getInviteAcceptedEmail({
         salonName: invite.salon.name,
@@ -479,7 +481,8 @@ export const rejectSalonInvite: RejectSalonInvite<RejectSalonInviteInput, void> 
   // Send email notification to inviter (if they have notifications enabled)
   if (invite.inviter?.emailNotifications && invite.inviter?.email) {
     try {
-      const dashboardUrl = `${process.env.WASP_WEB_CLIENT_URL}/employees`;
+      const clientUrl = process.env.WASP_WEB_CLIENT_URL || 'http://localhost:3000';
+      const dashboardUrl = `${clientUrl}/employees`;
 
       const emailContent = getInviteRejectedEmail({
         salonName: invite.salon.name,

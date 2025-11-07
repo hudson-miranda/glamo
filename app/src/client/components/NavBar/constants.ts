@@ -2,10 +2,10 @@
 import type { NavigationItem } from './NavBar';
 
 export const marketingNavigationItems: NavigationItem[] = [
-  { name: 'Recursos', to: '/#features' },
-  { name: 'Como funciona', to: '/#como-funciona' },
-  { name: 'Por que diferente', to: '/#por-que-diferente' },
+  { name: 'Funcionalidades', to: '/#funcionalidades' },
+  { name: 'Planos e Preços', to: '/#planos-precos' },
   { name: 'Depoimentos', to: '/#depoimentos' },
+  { name: 'Integrações', to: '/#integracoes' },
   { name: 'FAQ', to: '/#faq' },
   { name: 'Contato', to: '/#contato' },
 ] as const;

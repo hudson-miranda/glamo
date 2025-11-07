@@ -82,7 +82,7 @@ export default function FAQ() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <Badge variant="glow" className="mb-6">
+          <Badge variant="glow" className="mb-6" id="faq">
             PERGUNTAS FREQUENTES
           </Badge>
           <h2 className="text-4xl md:text-6xl font-bold mb-4">

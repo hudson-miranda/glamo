@@ -5,10 +5,11 @@ import { GradientText } from '../../client/components/ui/GradientText';
 import { Badge } from '../../client/components/ui/Badge';
 import { Button } from '../../client/components/ui/Button';
 import { GlowEffect } from '../../client/components/ui/GlowEffect';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, ReactNode } from 'react';
+import { FaCalendarAlt, FaRobot, FaChartBar, FaBox, FaUsers, FaDollarSign } from "react-icons/fa";
 
 interface Feature {
-  icon: string;
+  icon: ReactNode;
   title: string;
   description: string;
   color: string;
@@ -16,40 +17,40 @@ interface Feature {
 
 const features: Feature[] = [
   {
-    icon: '📅',
+    icon: <FaCalendarAlt />,
     title: 'Agendamento 24/7',
     description: 'Seus clientes agendam a qualquer hora com confirmação automática',
-    color: 'from-blue-500 to-cyan-500',
+    color: 'from-brand-400 to-brand-600',
   },
   {
-    icon: '👥',
+    icon: <FaUsers />,
     title: 'CRM Completo',
     description: 'Gestão completa de clientes com histórico e fidelidade',
-    color: 'from-brand-500 to-rose-500',
+    color: 'from-brand-400 to-brand-600',
   },
   {
-    icon: '💰',
+    icon: <FaDollarSign />,
     title: 'Controle Financeiro',
     description: 'Caixa, vendas e comissões com Mercado Pago e Stripe',
-    color: 'from-green-500 to-emerald-500',
+    color: 'from-brand-400 to-brand-600',
   },
   {
-    icon: '📦',
+    icon: <FaBox />,
     title: 'Gestão de Estoque',
     description: 'Controle de produtos com alertas inteligentes',
-    color: 'from-orange-500 to-red-500',
+    color: 'from-brand-400 to-brand-600',
   },
   {
-    icon: '📊',
+    icon: <FaChartBar />,
     title: 'Relatórios em Tempo Real',
     description: 'Dashboards automáticos com métricas do negócio',
-    color: 'from-brand-500 to-indigo-500',
+    color: 'from-brand-400 to-brand-600',
   },
   {
-    icon: '🤖',
+    icon: <FaRobot />,
     title: 'Assistente com IA',
     description: 'Agente inteligente OpenAI para insights automáticos',
-    color: 'from-brand-500 to-brand-500',
+    color: 'from-brand-400 to-brand-600',
   },
 ];
 
@@ -85,7 +86,7 @@ export default function Features() {
           transition={{ duration: 0.6 }}
           className="text-center mb-20"
         >
-          <Badge variant="glow" className="mb-6">
+          <Badge variant="glow" className="mb-6" id="funcionalidades">
             FUNCIONALIDADES
           </Badge>
           <h2 className="text-4xl md:text-6xl font-bold mb-4">

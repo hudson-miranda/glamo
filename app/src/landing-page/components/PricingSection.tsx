@@ -109,7 +109,7 @@ export default function PricingSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-20"
         >
-          <Badge variant="glow" className="mb-6">
+          <Badge variant="glow" className="mb-6" id="planos-precos">
             PLANOS E PREÇOS
           </Badge>
           <h2 className="text-4xl md:text-6xl font-bold mb-4 text-gray-900 dark:text-white">
