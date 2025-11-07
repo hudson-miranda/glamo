@@ -399,12 +399,8 @@ action rejectSalonInvite {
   entities: [SalonInvite, Log]
 }
 
-// Employee Management
-query listEmployees {
-  fn: import { listEmployees } from "@src/salon/employees",
-  entities: [User, UserSalon, UserRole, Role]
-}
-
+// Employee Management (RBAC - Role/Permission management)
+// Note: listEmployees is now defined in the Employees Module section
 action updateEmployeeRole {
   fn: import { updateEmployeeRole } from "@src/salon/employees",
   entities: [User, UserSalon, UserRole, Role, Log]
@@ -492,6 +488,43 @@ action deleteServiceVariant {
 action manageCommissionConfig {
   fn: import { manageCommissionConfig } from "@src/services/operations",
   entities: [User, Service, CommissionConfig, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+//#endregion
+
+//#region Glamo - Employees Module
+query listEmployees {
+  fn: import { listEmployees } from "@src/employees/operations",
+  entities: [User, Employee, EmployeeSchedule, EmployeeService, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+query getEmployee {
+  fn: import { getEmployee } from "@src/employees/operations",
+  entities: [User, Employee, EmployeeSchedule, EmployeeService, Service, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action createEmployee {
+  fn: import { createEmployee } from "@src/employees/operations",
+  entities: [User, Employee, EmployeeSchedule, SalonInvite, Role, Log, UserSalon, Permission, RolePermission, UserRole]
+}
+
+action updateEmployee {
+  fn: import { updateEmployee } from "@src/employees/operations",
+  entities: [User, Employee, EmployeeSchedule, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action deleteEmployee {
+  fn: import { deleteEmployee } from "@src/employees/operations",
+  entities: [User, Employee, Appointment, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action updateEmployeeSchedules {
+  fn: import { updateEmployeeSchedules } from "@src/employees/operations",
+  entities: [User, Employee, EmployeeSchedule, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action updateEmployeeServices {
+  fn: import { updateEmployeeServices } from "@src/employees/operations",
+  entities: [User, Employee, EmployeeService, Service, Log, UserSalon, Role, Permission, RolePermission, UserRole]
 }
 //#endregion
 
@@ -766,6 +799,24 @@ route EmployeesRoute { path: "/employees", to: EmployeesPage }
 page EmployeesPage {
   authRequired: true,
   component: import EmployeesPage from "@src/client/modules/employees/EmployeesPage"
+}
+
+route CreateEmployeeRoute { path: "/employees/new", to: CreateEmployeePage }
+page CreateEmployeePage {
+  authRequired: true,
+  component: import CreateEmployeePage from "@src/client/modules/employees/CreateEmployeePage"
+}
+
+route EditEmployeeRoute { path: "/employees/:id/edit", to: EditEmployeePage }
+page EditEmployeePage {
+  authRequired: true,
+  component: import EditEmployeePage from "@src/client/modules/employees/EditEmployeePage"
+}
+
+route EmployeeSchedulesRoute { path: "/employees/:id/schedules", to: EmployeeSchedulesPage }
+page EmployeeSchedulesPage {
+  authRequired: true,
+  component: import EmployeeSchedulesPage from "@src/client/modules/employees/EmployeeSchedulesPage"
 }
 
 route NotificationsRoute { path: "/notifications", to: NotificationsPage }

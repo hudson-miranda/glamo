@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { useQuery, getPendingInvites, listEmployees } from 'wasp/client/operations';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../../components/ui/card';
 import { EmptyState } from '../../../components/ui/empty-state';
 import { Users, UserPlus, Mail } from 'lucide-react';
 import { useSalonContext } from '../../hooks/useSalonContext';
-import { EmployeesTable } from './components/EmployeesTable';
 import { InvitesTable } from './components/InvitesTable';
 import { InviteEmployeeDialog } from './components/InviteEmployeeDialog';
 import { PlanLimitsBadge } from './components/PlanLimitsBadge';
 
 export default function EmployeesPage() {
+  const navigate = useNavigate();
   const { activeSalonId } = useSalonContext();
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
 
@@ -50,10 +51,20 @@ export default function EmployeesPage() {
           </p>
         </div>
         <div className='flex items-center gap-3'>
-          <PlanLimitsBadge currentCount={employees?.length || 0} />
-          <Button onClick={() => setIsInviteDialogOpen(true)}>
+          <PlanLimitsBadge currentCount={employees?.employees?.length || 0} />
+          <Button 
+            onClick={() => navigate('/employees/new')}
+            className='bg-gradient-to-r from-brand-400 to-brand-600 hover:from-brand-500 hover:to-brand-700 text-white shadow-lg shadow-brand-500/30'
+          >
             <UserPlus className='mr-2 h-4 w-4' />
-            Convidar Funcionário
+            Cadastrar Colaborador
+          </Button>
+          <Button 
+            onClick={() => setIsInviteDialogOpen(true)}
+            variant='outline'
+          >
+            <Mail className='mr-2 h-4 w-4' />
+            Enviar Convite
           </Button>
         </div>
       </div>
@@ -80,7 +91,7 @@ export default function EmployeesPage() {
                 Erro ao carregar funcionários: {employeesError.message}
               </p>
             </div>
-          ) : !employees || employees.length === 0 ? (
+          ) : !employees || employees.employees.length === 0 ? (
             <EmptyState
               icon={Users}
               title='Nenhum funcionário'
@@ -93,7 +104,31 @@ export default function EmployeesPage() {
               }
             />
           ) : (
-            <EmployeesTable employees={employees} onRefresh={handleRefresh} />
+            <div className='p-4'>
+              <div className='space-y-2'>
+                {employees.employees.map((employee: any) => (
+                  <div key={employee.id} className='flex items-center justify-between p-3 border rounded-lg'>
+                    <div>
+                      <p className='font-medium'>{employee.name}</p>
+                      {employee.email && <p className='text-sm text-gray-500'>{employee.email}</p>}
+                      {employee.phone && <p className='text-sm text-gray-500'>{employee.phone}</p>}
+                    </div>
+                    <div className='flex items-center gap-2'>
+                      <span className={`px-2 py-1 rounded text-xs ${employee.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                        {employee.isActive ? 'Ativo' : 'Inativo'}
+                      </span>
+                      <Button 
+                        size='sm' 
+                        variant='outline'
+                        onClick={() => navigate(`/employees/${employee.id}/edit` as any)}
+                      >
+                        Editar
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>

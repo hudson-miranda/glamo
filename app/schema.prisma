@@ -71,6 +71,7 @@ model User {
   cashSessionsClosed       CashRegisterSession[]  @relation("SessionClosedBy")
   createdVouchers          Voucher[]
   sentInvites              SalonInvite[]
+  employeeProfile          Employee[] // Relação com perfil de colaborador
 }
 
 model GptResponse {
@@ -224,6 +225,7 @@ model Salon {
   productBrands      ProductBrand[]
   suppliers          Supplier[]
   invitesSent        SalonInvite[]        @relation("InvitesSent")
+  employees          Employee[] // Colaboradores do salão
 }
 
 enum InviteStatus {
@@ -477,6 +479,7 @@ model Service {
   appointmentServices AppointmentService[]
   saleServices        SaleService[]
   packageServices     PackageService[]
+  employeeServices    EmployeeService[] // Relação com colaboradores que podem executar este serviço
 }
 
 model ServiceVariant {
@@ -575,6 +578,7 @@ model Appointment {
   salonId        String
   clientId       String
   professionalId String
+  employeeId     String? // Opcional: referência ao Employee (se o profissional for um colaborador cadastrado)
   voucherId      String?
   startAt        DateTime
   endAt          DateTime
@@ -586,6 +590,7 @@ model Appointment {
   salon        Salon                  @relation(fields: [salonId], references: [id], onDelete: Restrict)
   client       Client                 @relation(fields: [clientId], references: [id], onDelete: Restrict)
   professional User                   @relation("ProfessionalAppointments", fields: [professionalId], references: [id], onDelete: Restrict)
+  employee     Employee?              @relation("EmployeeAppointments", fields: [employeeId], references: [id], onDelete: SetNull)
   voucher      Voucher?               @relation(fields: [voucherId], references: [id], onDelete: SetNull)
   services     AppointmentService[]
   assistants   AppointmentAssistant[]
@@ -1002,4 +1007,120 @@ model CashMovement {
   notes     String?
 
   session CashRegisterSession @relation(fields: [sessionId], references: [id], onDelete: Restrict)
+}
+
+// ============================================================================
+// Employee Models
+// ============================================================================
+
+model Employee {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos principais
+  salonId String
+  userId  String? // Opcional - apenas se o colaborador tiver acesso ao sistema
+
+  // Dados pessoais
+  name       String
+  email      String?
+  phone      String?
+  phone2     String?
+  instagram  String?
+  birthDate  DateTime?
+  color      String? // Cor para exibição na agenda (hex color)
+
+  // Documentos
+  cpf             String?
+  rg              String?
+  rgIssuingBody   String? // Órgão Expedidor
+
+  // Dados bancários
+  pixKey        String?
+  bankName      String?
+  bankAgency    String?
+  bankAccount   String?
+  bankDigit     String?
+  accountType   String? // Corrente, Poupança
+  personType    String? // Pessoa Física, Pessoa Jurídica
+  companyName   String? // Razão Social (se PJ)
+  cnpj          String? // CNPJ (se PJ)
+
+  // Endereço
+  address       String?
+  addressNumber String?
+  complement    String?
+  neighborhood  String? // Bairro
+  city          String?
+  state         String?
+  zipCode       String?
+
+  // Configurações profissionais
+  position    String? // Cargo/Função (relacionado com Role)
+  permissions String[] // Array de permissionIds temporário até termos relação formal
+
+  // Configurações de comissão e gorjeta (mockup)
+  commissionType           String? // Tipo de comissão
+  commissionValue          Float?  // Valor ou percentual de comissão
+  tipRule                  String? // Regra de gorjeta
+  canReceiveTips           Boolean @default(true)
+  tipsOnlyFromAppointments Boolean @default(true)
+
+  // Controle
+  isActive  Boolean   @default(true)
+  deletedAt DateTime?
+
+  // Relações
+  salon            Salon                @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  user             User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
+  schedules        EmployeeSchedule[]
+  serviceAssignments EmployeeService[]
+  appointments     Appointment[]        @relation("EmployeeAppointments")
+
+  @@index([salonId])
+  @@index([userId])
+  @@index([email])
+}
+
+model EmployeeSchedule {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  employeeId String
+  dayOfWeek  Int // 0 = Domingo, 1 = Segunda, ..., 6 = Sábado
+  
+  // Período da manhã/tarde/noite
+  startTime String // Formato HH:mm
+  endTime   String // Formato HH:mm
+
+  // Permite múltiplos períodos no mesmo dia
+  isActive Boolean @default(true)
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+  @@index([dayOfWeek])
+}
+
+// Tabela de relação entre Employee e Service (quais serviços cada profissional pode realizar)
+model EmployeeService {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  employeeId String
+  serviceId  String
+
+  // Configurações específicas do serviço para este profissional
+  customDuration Int? // Duração personalizada (em minutos)
+  customPrice    Float? // Preço personalizado
+  commission     Float? // Comissão específica para este serviço
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  service  Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, serviceId])
+  @@index([employeeId])
+  @@index([serviceId])
 }
