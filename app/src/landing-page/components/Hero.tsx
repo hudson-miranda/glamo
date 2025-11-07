@@ -181,7 +181,7 @@ export default function Hero() {
               <motion.div
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 3, repeat: Infinity }}
-                className="absolute -top-6 -right-6 border border-brand-500/30 p-4 bg-transparent dark:bg-transparent"
+                className="absolute -top-6 -right-6 border border-brand-500/30 p-4 bg-transparent dark:bg-transparent rounded-2xl"
               >
                 <div className="text-2xl font-bold text-brand-500">+40%</div>
                 <div className="text-xs text-gray-600 dark:text-zinc-400">Efficiency</div>
@@ -190,7 +190,7 @@ export default function Hero() {
               <motion.div
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
-                className="absolute -bottom-6 -left-6 p-4 border border-brand-500/30 bg-transparent dark:bg-transparent"
+                className="absolute -bottom-6 -left-6 p-4 border border-brand-500/30 bg-transparent dark:bg-transparent rounded-2xl"
               >
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-gradient-to-br from-brand-500 to-brand-500 rounded-full flex items-center justify-center">

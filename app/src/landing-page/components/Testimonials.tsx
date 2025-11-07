@@ -87,7 +87,7 @@ export default function Testimonials() {
           transition={{ duration: 0.6 }}
           className="text-center mb-20"
         >
-          <Badge variant="glow" className="mb-6">
+          <Badge variant="glow" className="mb-6" id="depoimentos">
             DEPOIMENTOS
           </Badge>
           <h2 className="text-4xl md:text-6xl font-bold mb-4">

@@ -7,13 +7,11 @@ import { EmptyState } from '../../../components/ui/empty-state';
 import { Users, UserPlus, Mail } from 'lucide-react';
 import { useSalonContext } from '../../hooks/useSalonContext';
 import { InvitesTable } from './components/InvitesTable';
-import { InviteEmployeeDialog } from './components/InviteEmployeeDialog';
 import { PlanLimitsBadge } from './components/PlanLimitsBadge';
 
 export default function EmployeesPage() {
   const navigate = useNavigate();
   const { activeSalonId } = useSalonContext();
-  const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
 
   // Fetch employees
   const {
@@ -47,7 +45,7 @@ export default function EmployeesPage() {
         <div className='space-y-1'>
           <h1 className='text-3xl font-bold tracking-tight'>Equipe</h1>
           <p className='text-muted-foreground'>
-            Gerencie os funcionários e convites do seu negócio
+            Gerencie os colaboradores do seu negócio. Ao cadastrar um colaborador com e-mail, um convite será enviado automaticamente.
           </p>
         </div>
         <div className='flex items-center gap-3'>
@@ -58,13 +56,6 @@ export default function EmployeesPage() {
           >
             <UserPlus className='mr-2 h-4 w-4' />
             Cadastrar Colaborador
-          </Button>
-          <Button 
-            onClick={() => setIsInviteDialogOpen(true)}
-            variant='outline'
-          >
-            <Mail className='mr-2 h-4 w-4' />
-            Enviar Convite
           </Button>
         </div>
       </div>
@@ -94,12 +85,12 @@ export default function EmployeesPage() {
           ) : !employees || employees.employees.length === 0 ? (
             <EmptyState
               icon={Users}
-              title='Nenhum funcionário'
-              description='Comece enviando convites para sua equipe'
+              title='Nenhum colaborador cadastrado'
+              description='Cadastre seu primeiro colaborador para começar a gerenciar sua equipe'
               action={
-                <Button onClick={() => setIsInviteDialogOpen(true)}>
+                <Button onClick={() => navigate('/employees/new')}>
                   <UserPlus className='mr-2 h-4 w-4' />
-                  Convidar Funcionário
+                  Cadastrar Colaborador
                 </Button>
               }
             />
@@ -162,13 +153,6 @@ export default function EmployeesPage() {
           </CardContent>
         </Card>
       )}
-
-      {/* Invite Dialog */}
-      <InviteEmployeeDialog
-        open={isInviteDialogOpen}
-        onOpenChange={setIsInviteDialogOpen}
-        onSuccess={handleRefresh}
-      />
     </div>
   );
 }

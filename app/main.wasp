@@ -504,7 +504,7 @@ query getEmployee {
 
 action createEmployee {
   fn: import { createEmployee } from "@src/employees/operations",
-  entities: [User, Employee, EmployeeSchedule, SalonInvite, Role, Log, UserSalon, Permission, RolePermission, UserRole]
+  entities: [User, Salon, Employee, EmployeeSchedule, SalonInvite, Role, Log, UserSalon, Permission, RolePermission, UserRole]
 }
 
 action updateEmployee {
