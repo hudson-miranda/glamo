@@ -921,4 +921,172 @@ page ReportsPage {
   authRequired: true,
   component: import ReportsPage from "@src/client/modules/reports/ReportsPage"
 }
+
+// ============================================================================
+// Phase 2: Communication & Engagement
+// ============================================================================
+
+// Communication Log Queries
+query listCommunicationLogs {
+  fn: import { listCommunicationLogs } from "@src/communication/operations",
+  entities: [CommunicationLog, Client, User, MarketingCampaign]
+}
+
+query getCommunicationLog {
+  fn: import { getCommunicationLog } from "@src/communication/operations",
+  entities: [CommunicationLog, Client, User, MarketingCampaign]
+}
+
+// Communication Actions
+action sendManualMessage {
+  fn: import { sendManualMessage } from "@src/communication/operations",
+  entities: [CommunicationLog, Client]
+}
+
+// Marketing Campaign Queries
+query listCampaigns {
+  fn: import { listCampaigns } from "@src/communication/operations",
+  entities: [MarketingCampaign, User, ClientSegment]
+}
+
+query getCampaign {
+  fn: import { getCampaign } from "@src/communication/operations",
+  entities: [MarketingCampaign, User, ClientSegment, CommunicationLog]
+}
+
+// Marketing Campaign Actions
+action createCampaign {
+  fn: import { createCampaign } from "@src/communication/operations",
+  entities: [MarketingCampaign, ClientSegment]
+}
+
+action updateCampaign {
+  fn: import { updateCampaign } from "@src/communication/operations",
+  entities: [MarketingCampaign]
+}
+
+action deleteCampaign {
+  fn: import { deleteCampaign } from "@src/communication/operations",
+  entities: [MarketingCampaign]
+}
+
+// Client Segment Queries
+query listSegments {
+  fn: import { listSegments } from "@src/communication/operations",
+  entities: [ClientSegment, User]
+}
+
+query getSegment {
+  fn: import { getSegment } from "@src/communication/operations",
+  entities: [ClientSegment, User, MarketingCampaign]
+}
+
+query evaluateSegment {
+  fn: import { evaluateSegment } from "@src/communication/operations",
+  entities: [ClientSegment, Client]
+}
+
+// Client Segment Actions
+action createSegment {
+  fn: import { createSegment } from "@src/communication/operations",
+  entities: [ClientSegment, Client]
+}
+
+action updateSegment {
+  fn: import { updateSegment } from "@src/communication/operations",
+  entities: [ClientSegment, Client]
+}
+
+action deleteSegment {
+  fn: import { deleteSegment } from "@src/communication/operations",
+  entities: [ClientSegment]
+}
+
+// Campaign Template Queries
+query listCampaignTemplates {
+  fn: import { listCampaignTemplates } from "@src/communication/operations",
+  entities: [CampaignTemplate]
+}
+
+// Campaign Template Actions
+action createCampaignTemplate {
+  fn: import { createCampaignTemplate } from "@src/communication/operations",
+  entities: [CampaignTemplate]
+}
+
+// ============================================================================
+// Phase 2: Automated Campaign Jobs
+// ============================================================================
+
+job sendBirthdayCampaigns {
+  executor: PgBoss,
+  perform: {
+    fn: import { sendBirthdayCampaigns } from "@src/communication/jobs/birthdayCampaign"
+  },
+  schedule: {
+    cron: "0 9 * * *" // Daily at 9 AM
+  },
+  entities: [Client, CommunicationLog, Salon]
+}
+
+job sendReactivationCampaigns {
+  executor: PgBoss,
+  perform: {
+    fn: import { sendReactivationCampaigns } from "@src/communication/jobs/reactivationCampaign"
+  },
+  schedule: {
+    cron: "0 10 * * 1" // Weekly on Monday at 10 AM
+  },
+  entities: [Client, CommunicationLog, Salon]
+}
+
+job sendAppointmentReminders {
+  executor: PgBoss,
+  perform: {
+    fn: import { sendAppointmentReminders } from "@src/communication/jobs/appointmentReminders"
+  },
+  schedule: {
+    cron: "0 * * * *" // Every hour
+  },
+  entities: [Appointment, Client, CommunicationLog, User, Salon]
+}
+
+job sendFollowUpMessages {
+  executor: PgBoss,
+  perform: {
+    fn: import { sendFollowUpMessages } from "@src/communication/jobs/followUpMessages"
+  },
+  schedule: {
+    cron: "0 * * * *" // Every hour
+  },
+  entities: [Appointment, Client, CommunicationLog, User, Salon]
+}
+
+// ============================================================================
+// Phase 2: Campaign Management Routes
+// ============================================================================
+
+route CampaignsListRoute { path: "/campaigns", to: CampaignsListPage }
+page CampaignsListPage {
+  authRequired: true,
+  component: import CampaignsListPage from "@src/client/modules/campaigns/CampaignsListPage"
+}
+
+route CreateCampaignRoute { path: "/campaigns/new", to: CreateCampaignPage }
+page CreateCampaignPage {
+  authRequired: true,
+  component: import CreateCampaignPage from "@src/client/modules/campaigns/CreateCampaignPage"
+}
+
+route CampaignDetailRoute { path: "/campaigns/:id", to: CampaignDetailPage }
+page CampaignDetailPage {
+  authRequired: true,
+  component: import CampaignDetailPage from "@src/client/modules/campaigns/CampaignDetailPage"
+}
+
+route ClientSegmentsRoute { path: "/segments", to: ClientSegmentsPage }
+page ClientSegmentsPage {
+  authRequired: true,
+  component: import ClientSegmentsPage from "@src/client/modules/campaigns/ClientSegmentsPage"
+}
 //#endregion

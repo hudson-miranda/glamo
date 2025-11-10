@@ -78,6 +78,12 @@ model User {
   clientUser               Client[]               @relation("ClientUser")
   clientNotes              ClientNote[]           @relation("ClientNoteAuthor")
   clientDocuments          ClientDocument[]       @relation("ClientDocumentUploader")
+  
+  // Phase 2: Communication & Engagement relations
+  sentCommunications     CommunicationLog[]  @relation("CommunicationSender")
+  createdCampaigns       MarketingCampaign[] @relation("CampaignCreator")
+  createdSegments        ClientSegment[]     @relation("SegmentCreator")
+  createdTemplates       CampaignTemplate[]  @relation("TemplateCreator")
   clientHistory            ClientHistory[]        @relation("ClientHistoryUser")
 }
 
@@ -235,6 +241,12 @@ model Salon {
   employees          Employee[] // Colaboradores do salão
   timeBlocks         TimeBlock[]
   waitingLists       WaitingList[]
+  
+  // Phase 2: Communication & Engagement relations
+  communicationLogs  CommunicationLog[]
+  marketingCampaigns MarketingCampaign[]
+  clientSegments     ClientSegment[]
+  campaignTemplates  CampaignTemplate[]
   bookingConfig      BookingConfig?
 }
 
@@ -461,6 +473,9 @@ model Client {
   tags          ClientTag[]
   notes         ClientNote[]
   documents     ClientDocument[]
+  
+  // Phase 2: Communication & Engagement relations
+  communicationLogs CommunicationLog[]
   history       ClientHistory[]
 
   @@unique([salonId, email])
@@ -1581,4 +1596,225 @@ model EmployeeService {
   @@unique([employeeId, serviceId])
   @@index([employeeId])
   @@index([serviceId])
+}
+
+// ============================================================================
+// Client Management Phase 2 - Communication & Engagement
+// ============================================================================
+
+// Communication Log - Track all client communications
+model CommunicationLog {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  clientId String
+  salonId  String
+  userId   String? // User who sent (null for automated)
+
+  type              CommunicationType
+  channel           CommunicationChannel
+  direction         CommunicationDirection
+  
+  subject           String?
+  message           String            @db.Text
+  recipientPhone    String?
+  recipientEmail    String?
+  
+  status            CommunicationStatus @default(PENDING)
+  sentAt            DateTime?
+  deliveredAt       DateTime?
+  readAt            DateTime?
+  clickedAt         DateTime?
+  
+  failureReason     String?           @db.Text
+  externalId        String?           // Provider's message ID (Twilio, SendGrid, etc.)
+  cost              Float?            // Communication cost
+  
+  // Link to campaign if part of one
+  campaignId        String?
+  
+  metadata          Json?             // Additional data (template vars, etc.)
+  
+  client   Client             @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  salon    Salon              @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  user     User?              @relation("CommunicationSender", fields: [userId], references: [id], onDelete: SetNull)
+  campaign MarketingCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  
+  @@index([clientId, createdAt])
+  @@index([salonId, type, createdAt])
+  @@index([status])
+  @@index([campaignId])
+  @@index([externalId])
+}
+
+enum CommunicationType {
+  APPOINTMENT_REMINDER
+  APPOINTMENT_CONFIRMATION
+  APPOINTMENT_CANCELLED
+  BIRTHDAY_GREETING
+  PROMOTIONAL_CAMPAIGN
+  REACTIVATION_CAMPAIGN
+  FEEDBACK_REQUEST
+  LOYALTY_REWARD_NOTIFICATION
+  CUSTOM_MESSAGE
+  FOLLOW_UP
+  THANK_YOU
+}
+
+enum CommunicationChannel {
+  EMAIL
+  SMS
+  WHATSAPP
+  PUSH_NOTIFICATION
+  IN_APP
+}
+
+enum CommunicationDirection {
+  OUTBOUND  // Salon to client
+  INBOUND   // Client to salon
+}
+
+enum CommunicationStatus {
+  PENDING
+  QUEUED
+  SENT
+  DELIVERED
+  READ
+  CLICKED
+  FAILED
+  BOUNCED
+  UNSUBSCRIBED
+}
+
+// Marketing Campaign - Campaign management
+model MarketingCampaign {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  salonId String
+  
+  name        String
+  description String?        @db.Text
+  type        CampaignType
+  status      CampaignStatus @default(DRAFT)
+  
+  // Targeting
+  segmentId       String?    // Client segment ID
+  targetClientIds String[]   // Or specific client IDs
+  
+  // Content
+  subject         String?
+  messageTemplate String     @db.Text
+  channel         CommunicationChannel
+  
+  // Scheduling
+  scheduledAt DateTime?
+  sentAt      DateTime?
+  completedAt DateTime?
+  
+  // Metrics
+  targetCount     Int @default(0)
+  sentCount       Int @default(0)
+  deliveredCount  Int @default(0)
+  openCount       Int @default(0)
+  clickCount      Int @default(0)
+  conversionCount Int @default(0)
+  
+  // Budget
+  estimatedCost Float?
+  actualCost    Float?
+  
+  createdBy String
+  
+  salon         Salon              @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  creator       User               @relation("CampaignCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+  segment       ClientSegment?     @relation(fields: [segmentId], references: [id], onDelete: SetNull)
+  communications CommunicationLog[]
+  
+  @@index([salonId, status])
+  @@index([salonId, type])
+  @@index([scheduledAt])
+}
+
+enum CampaignType {
+  BIRTHDAY
+  REACTIVATION
+  PROMOTIONAL
+  ANNOUNCEMENT
+  FEEDBACK_REQUEST
+  CUSTOM
+  APPOINTMENT_REMINDER
+  FOLLOW_UP
+}
+
+enum CampaignStatus {
+  DRAFT
+  SCHEDULED
+  SENDING
+  COMPLETED
+  CANCELLED
+  FAILED
+  PAUSED
+}
+
+// Client Segment - Dynamic client groups for targeting
+model ClientSegment {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  salonId String
+  
+  name        String
+  description String? @db.Text
+  
+  // Segment Criteria (JSON with rules)
+  criteria Json
+  
+  // Cached Results
+  clientCount      Int       @default(0)
+  lastCalculatedAt DateTime?
+  
+  isActive  Boolean @default(true)
+  createdBy String
+  
+  salon     Salon               @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  creator   User                @relation("SegmentCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+  campaigns MarketingCampaign[]
+  
+  @@index([salonId, isActive])
+}
+
+// Campaign Template - Reusable campaign templates
+model CampaignTemplate {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  salonId String?   // null = system template, available to all
+  
+  name        String
+  description String?        @db.Text
+  type        CampaignType
+  channel     CommunicationChannel
+  
+  subject         String?
+  messageTemplate String @db.Text
+  
+  // Placeholders documentation
+  placeholders    String[] // ["{{clientName}}", "{{salonName}}", etc.]
+  
+  isActive  Boolean @default(true)
+  isSystem  Boolean @default(false) // System templates can't be edited
+  usageCount Int    @default(0)
+  
+  createdBy String?
+  
+  salon   Salon? @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  creator User?  @relation("TemplateCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  
+  @@index([salonId])
+  @@index([type])
 }
