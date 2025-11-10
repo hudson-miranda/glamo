@@ -72,6 +72,7 @@ model User {
   createdVouchers          Voucher[]
   sentInvites              SalonInvite[]
   employeeProfile          Employee[] // Relação com perfil de colaborador
+  appointmentHistory       AppointmentHistory[]   @relation("AppointmentHistoryUser")
 }
 
 model GptResponse {
@@ -226,6 +227,9 @@ model Salon {
   suppliers          Supplier[]
   invitesSent        SalonInvite[]        @relation("InvitesSent")
   employees          Employee[] // Colaboradores do salão
+  timeBlocks         TimeBlock[]
+  waitingLists       WaitingList[]
+  bookingConfig      BookingConfig?
 }
 
 enum InviteStatus {
@@ -401,6 +405,7 @@ model Client {
   appointments  Appointment[]
   sales         Sale[]
   clientCredits ClientCredit[]
+  waitingLists  WaitingList[]
 
   @@unique([salonId, email])
 }
@@ -585,7 +590,35 @@ model Appointment {
   status         AppointmentStatus @default(PENDING)
   paymentStatus  PaymentStatus     @default(PENDING)
   notes          String?
-  deletedAt      DateTime?
+  
+  // Enhanced scheduling fields
+  bookedOnline      Boolean @default(false)
+  bookingSource     String? // STAFF, CLIENT_ONLINE, CLIENT_PHONE, WALK_IN
+  confirmationCode  String? @unique
+  
+  // Client confirmation
+  clientConfirmed   Boolean  @default(false)
+  clientConfirmedAt DateTime?
+  
+  // Cancellation tracking
+  cancelledBy       String? // CLIENT, STAFF, SYSTEM
+  cancellationReason String?
+  cancellationFee   Float?  @default(0)
+  
+  // Rescheduling tracking
+  rescheduleCount       Int     @default(0)
+  originalAppointmentId String?
+  
+  // No-show tracking
+  isNoShow   Boolean @default(false)
+  noShowFee  Float?
+  
+  // Pricing
+  totalPrice     Float?
+  discountAmount Float?  @default(0)
+  finalPrice     Float?
+  
+  deletedAt DateTime?
 
   salon        Salon                  @relation(fields: [salonId], references: [id], onDelete: Restrict)
   client       Client                 @relation(fields: [clientId], references: [id], onDelete: Restrict)
@@ -596,6 +629,13 @@ model Appointment {
   assistants   AppointmentAssistant[]
   repetition   AppointmentRepetition?
   statusLogs   AppointmentStatusLog[]
+  reminders    AppointmentReminder[]
+  history      AppointmentHistory[]
+  
+  @@index([salonId, startAt])
+  @@index([employeeId, startAt])
+  @@index([status])
+  @@index([confirmationCode])
 }
 
 model AppointmentService {
@@ -1010,6 +1050,208 @@ model CashMovement {
 }
 
 // ============================================================================
+// Advanced Scheduling Models
+// ============================================================================
+
+// Time blocks for employee unavailability (vacation, breaks, etc.)
+model TimeBlock {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  salonId    String
+  employeeId String?  // null = salon-wide block (holiday, maintenance)
+  startTime  DateTime
+  endTime    DateTime
+  reason     String?
+  type       TimeBlockType @default(CUSTOM)
+  
+  // Recurrence support
+  isRecurring      Boolean  @default(false)
+  recurrenceRule   String?  // RRULE format
+  recurrenceEndDate DateTime?
+  parentBlockId    String?  // For recurring blocks
+  
+  deletedAt  DateTime?
+
+  salon    Salon     @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  employee Employee? @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  
+  @@index([salonId])
+  @@index([employeeId])
+  @@index([startTime, endTime])
+}
+
+enum TimeBlockType {
+  VACATION
+  SICK_LEAVE
+  BREAK
+  LUNCH
+  MAINTENANCE
+  HOLIDAY
+  PERSONAL
+  CUSTOM
+}
+
+// Waiting list for unavailable appointment slots
+model WaitingList {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  salonId        String
+  clientId       String
+  employeeId     String?  // Preferred employee
+  serviceIds     String[] // Desired services
+  
+  // Preferred time preferences
+  preferredDate      DateTime?
+  preferredStartTime String?   // HH:mm format
+  preferredEndTime   String?   // HH:mm format
+  flexibleTiming     Boolean   @default(true)
+  
+  // Status tracking
+  status       WaitingListStatus @default(WAITING)
+  notifiedAt   DateTime?
+  expiresAt    DateTime?
+  priority     Int               @default(0) // Higher = more priority
+  
+  notes     String?
+  deletedAt DateTime?
+
+  salon    Salon     @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  client   Client    @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  employee Employee? @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+  
+  @@index([salonId, status])
+  @@index([clientId])
+  @@index([employeeId])
+}
+
+enum WaitingListStatus {
+  WAITING
+  NOTIFIED
+  ACCEPTED
+  EXPIRED
+  CANCELLED
+}
+
+// Appointment reminders tracking
+model AppointmentReminder {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  appointmentId String
+  type          ReminderType
+  channel       NotificationChannel
+  scheduledFor  DateTime
+  sentAt        DateTime?
+  status        ReminderStatus     @default(PENDING)
+  
+  // Message content
+  subject       String?
+  message       String  @db.Text
+  recipient     String  // Phone or email
+  
+  // External tracking
+  externalId    String?
+  failureReason String?
+  
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  
+  @@index([appointmentId])
+  @@index([scheduledFor, status])
+}
+
+enum ReminderType {
+  CONFIRMATION
+  REMINDER_24H
+  REMINDER_2H
+  REMINDER_1H
+  REMINDER_CUSTOM
+}
+
+enum ReminderStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+  CANCELLED
+}
+
+// Complete audit trail for appointment changes
+model AppointmentHistory {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  appointmentId String
+  userId        String?
+  action        AppointmentAction
+  field         String?
+  oldValue      String?
+  newValue      String?
+  notes         String?
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  user        User?       @relation("AppointmentHistoryUser", fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([appointmentId])
+  @@index([createdAt])
+}
+
+enum AppointmentAction {
+  CREATED
+  UPDATED
+  CANCELLED
+  RESCHEDULED
+  CONFIRMED
+  COMPLETED
+  NO_SHOW
+  STATUS_CHANGED
+}
+
+// Booking configuration for salon
+model BookingConfig {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  salonId String @unique
+  
+  // Booking window
+  minAdvanceHours   Int @default(2)   // Minimum advance booking
+  maxAdvanceDays    Int @default(90)  // Maximum advance booking
+  
+  // Cancellation policy
+  freeCancellationHours Int @default(24)
+  lateCancellationHours Int @default(12)
+  lateCancellationFee   Int @default(50) // Percentage
+  
+  // Rescheduling policy
+  allowRescheduling    Boolean @default(true)
+  maxRescheduleCount   Int     @default(2)
+  minRescheduleHours   Int     @default(24)
+  
+  // No-show policy
+  noShowFeePercent     Int     @default(100)
+  autoMarkNoShowMinutes Int    @default(15)
+  
+  // General settings
+  allowSameDayBooking  Boolean @default(true)
+  slotInterval         Int     @default(15) // Minutes
+  bufferTimeMinutes    Int     @default(0)
+  
+  // Reminders
+  enableReminders      Boolean @default(true)
+  reminder24h          Boolean @default(true)
+  reminder2h           Boolean @default(true)
+  reminderChannels     String[] // SMS, EMAIL, WHATSAPP
+  
+  salon Salon @relation(fields: [salonId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================================
 // Employee Models
 // ============================================================================
 
@@ -1077,6 +1319,8 @@ model Employee {
   schedules        EmployeeSchedule[]
   serviceAssignments EmployeeService[]
   appointments     Appointment[]        @relation("EmployeeAppointments")
+  timeBlocks       TimeBlock[]
+  waitingLists     WaitingList[]
 
   @@index([salonId])
   @@index([userId])
