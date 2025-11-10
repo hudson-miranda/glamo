@@ -1090,3 +1090,370 @@ page ClientSegmentsPage {
   component: import ClientSegmentsPage from "@src/client/modules/campaigns/ClientSegmentsPage"
 }
 //#endregion
+
+
+// ============================================================================
+// Phase 3: Loyalty & Advanced Features
+// ============================================================================
+
+// ============================================================================
+// Loyalty Program Queries & Actions
+// ============================================================================
+
+// Loyalty Program Queries
+query listLoyaltyPrograms {
+  fn: import { listLoyaltyPrograms } from "@src/loyalty/operations",
+  entities: [LoyaltyProgram, LoyaltyTier]
+}
+
+query getLoyaltyProgram {
+  fn: import { getLoyaltyProgram } from "@src/loyalty/operations",
+  entities: [LoyaltyProgram, LoyaltyTier]
+}
+
+query getClientLoyaltyBalance {
+  fn: import { getClientLoyaltyBalance } from "@src/loyalty/operations",
+  entities: [ClientLoyaltyBalance, LoyaltyProgram, LoyaltyTier, Client]
+}
+
+query getLoyaltyTransactions {
+  fn: import { getLoyaltyTransactions } from "@src/loyalty/operations",
+  entities: [LoyaltyTransaction, Client, LoyaltyProgram]
+}
+
+query getLoyaltyProgramStats {
+  fn: import { getLoyaltyProgramStats } from "@src/loyalty/operations",
+  entities: [ClientLoyaltyBalance, LoyaltyTransaction]
+}
+
+// Loyalty Program Actions
+action createLoyaltyProgram {
+  fn: import { createLoyaltyProgram } from "@src/loyalty/operations",
+  entities: [LoyaltyProgram]
+}
+
+action updateLoyaltyProgram {
+  fn: import { updateLoyaltyProgram } from "@src/loyalty/operations",
+  entities: [LoyaltyProgram]
+}
+
+action deleteLoyaltyProgram {
+  fn: import { deleteLoyaltyProgram } from "@src/loyalty/operations",
+  entities: [LoyaltyProgram]
+}
+
+action createLoyaltyTier {
+  fn: import { createLoyaltyTier } from "@src/loyalty/operations",
+  entities: [LoyaltyTier]
+}
+
+action updateLoyaltyTier {
+  fn: import { updateLoyaltyTier } from "@src/loyalty/operations",
+  entities: [LoyaltyTier]
+}
+
+action deleteLoyaltyTier {
+  fn: import { deleteLoyaltyTier } from "@src/loyalty/operations",
+  entities: [LoyaltyTier]
+}
+
+action adjustLoyaltyBalance {
+  fn: import { adjustLoyaltyBalance } from "@src/loyalty/operations",
+  entities: [ClientLoyaltyBalance, LoyaltyTransaction, LoyaltyProgram]
+}
+
+action processCashbackEarning {
+  fn: import { processCashbackEarning } from "@src/loyalty/operations",
+  entities: [ClientLoyaltyBalance, LoyaltyTransaction, LoyaltyProgram, LoyaltyTier]
+}
+
+action redeemLoyalty {
+  fn: import { redeemLoyalty } from "@src/loyalty/operations",
+  entities: [ClientLoyaltyBalance, LoyaltyTransaction]
+}
+
+// ============================================================================
+// Referral Program Queries & Actions
+// ============================================================================
+
+// Referral Program Queries
+query listReferralPrograms {
+  fn: import { listReferralPrograms } from "@src/referral/operations",
+  entities: [ReferralProgram]
+}
+
+query getReferralProgram {
+  fn: import { getReferralProgram } from "@src/referral/operations",
+  entities: [ReferralProgram]
+}
+
+query listReferrals {
+  fn: import { listReferrals } from "@src/referral/operations",
+  entities: [Referral, Client, ReferralProgram]
+}
+
+query getClientReferralCode {
+  fn: import { getClientReferralCode } from "@src/referral/operations",
+  entities: [Referral, Client, ReferralProgram]
+}
+
+query getReferralStats {
+  fn: import { getReferralStats } from "@src/referral/operations",
+  entities: [Referral]
+}
+
+query getReferralLeaderboard {
+  fn: import { getReferralLeaderboard } from "@src/referral/operations",
+  entities: [Referral, Client]
+}
+
+// Referral Program Actions
+action createReferralProgram {
+  fn: import { createReferralProgram } from "@src/referral/operations",
+  entities: [ReferralProgram]
+}
+
+action updateReferralProgram {
+  fn: import { updateReferralProgram } from "@src/referral/operations",
+  entities: [ReferralProgram]
+}
+
+action deleteReferralProgram {
+  fn: import { deleteReferralProgram } from "@src/referral/operations",
+  entities: [ReferralProgram]
+}
+
+action createReferral {
+  fn: import { createReferral } from "@src/referral/operations",
+  entities: [Referral, Client, ReferralProgram]
+}
+
+action trackReferralClick {
+  fn: import { trackReferralClick } from "@src/referral/operations",
+  entities: [Referral]
+}
+
+action completeReferralSignup {
+  fn: import { completeReferralSignup } from "@src/referral/operations",
+  entities: [Referral, ReferralProgram]
+}
+
+action qualifyReferral {
+  fn: import { qualifyReferral } from "@src/referral/operations",
+  entities: [Referral, ReferralProgram, ClientLoyaltyBalance, LoyaltyTransaction]
+}
+
+// ============================================================================
+// Photo Management Queries & Actions
+// ============================================================================
+
+// Photo Queries
+query getClientPhotos {
+  fn: import { getClientPhotos } from "@src/photos/operations",
+  entities: [ClientPhoto, Client, User]
+}
+
+query getClientPhoto {
+  fn: import { getClientPhoto } from "@src/photos/operations",
+  entities: [ClientPhoto, Client, User, Appointment]
+}
+
+query searchClientPhotos {
+  fn: import { searchClientPhotos } from "@src/photos/operations",
+  entities: [ClientPhoto, Client, User]
+}
+
+query getPhotoGallery {
+  fn: import { getPhotoGallery } from "@src/photos/operations",
+  entities: [ClientPhoto, Client]
+}
+
+// Photo Actions
+action uploadClientPhoto {
+  fn: import { uploadClientPhoto } from "@src/photos/operations",
+  entities: [ClientPhoto, Client, User]
+}
+
+action updateClientPhoto {
+  fn: import { updateClientPhoto } from "@src/photos/operations",
+  entities: [ClientPhoto, Client]
+}
+
+action deleteClientPhoto {
+  fn: import { deleteClientPhoto } from "@src/photos/operations",
+  entities: [ClientPhoto]
+}
+
+action createBeforeAfterPair {
+  fn: import { createBeforeAfterPair } from "@src/photos/operations",
+  entities: [ClientPhoto]
+}
+
+action updatePhotoApproval {
+  fn: import { updatePhotoApproval } from "@src/photos/operations",
+  entities: [ClientPhoto]
+}
+
+// ============================================================================
+// Anamnesis System Queries & Actions
+// ============================================================================
+
+// Anamnesis Form Queries
+query listAnamnesisForms {
+  fn: import { listAnamnesisForms } from "@src/anamnesis/operations",
+  entities: [AnamnesisForm, User]
+}
+
+query getAnamnesisForm {
+  fn: import { getAnamnesisForm } from "@src/anamnesis/operations",
+  entities: [AnamnesisForm, User]
+}
+
+query listClientAnamnesis {
+  fn: import { listClientAnamnesis } from "@src/anamnesis/operations",
+  entities: [ClientAnamnesis, AnamnesisForm, User]
+}
+
+query getClientAnamnesis {
+  fn: import { getClientAnamnesis } from "@src/anamnesis/operations",
+  entities: [ClientAnamnesis, Client, AnamnesisForm, User, Appointment]
+}
+
+query getClientAnamnesisHistory {
+  fn: import { getClientAnamnesisHistory } from "@src/anamnesis/operations",
+  entities: [ClientAnamnesis, AnamnesisForm, User]
+}
+
+// Anamnesis Form Actions
+action createAnamnesisForm {
+  fn: import { createAnamnesisForm } from "@src/anamnesis/operations",
+  entities: [AnamnesisForm, User]
+}
+
+action updateAnamnesisForm {
+  fn: import { updateAnamnesisForm } from "@src/anamnesis/operations",
+  entities: [AnamnesisForm]
+}
+
+action deleteAnamnesisForm {
+  fn: import { deleteAnamnesisForm } from "@src/anamnesis/operations",
+  entities: [AnamnesisForm]
+}
+
+action duplicateAnamnesisForm {
+  fn: import { duplicateAnamnesisForm } from "@src/anamnesis/operations",
+  entities: [AnamnesisForm, User]
+}
+
+action createClientAnamnesis {
+  fn: import { createClientAnamnesis } from "@src/anamnesis/operations",
+  entities: [ClientAnamnesis, Client, AnamnesisForm, User]
+}
+
+action updateClientAnamnesis {
+  fn: import { updateClientAnamnesis } from "@src/anamnesis/operations",
+  entities: [ClientAnamnesis]
+}
+
+action signClientAnamnesis {
+  fn: import { signClientAnamnesis } from "@src/anamnesis/operations",
+  entities: [ClientAnamnesis, AnamnesisForm]
+}
+
+action generateAnamnesisPDF {
+  fn: import { generateAnamnesisPDF } from "@src/anamnesis/operations",
+  entities: [ClientAnamnesis, Client, AnamnesisForm, User]
+}
+
+// ============================================================================
+// Advanced Analytics Queries & Actions
+// ============================================================================
+
+// Analytics Queries
+query getClientMetrics {
+  fn: import { getClientMetrics } from "@src/analytics-advanced/operations",
+  entities: [ClientMetrics, Client]
+}
+
+query getClientChurnRisk {
+  fn: import { getClientChurnRisk } from "@src/analytics-advanced/operations",
+  entities: [ClientMetrics, Client]
+}
+
+query getClientCLV {
+  fn: import { getClientCLV } from "@src/analytics-advanced/operations",
+  entities: [ClientMetrics, Client]
+}
+
+query getRetentionAnalytics {
+  fn: import { getRetentionAnalytics } from "@src/analytics-advanced/operations",
+  entities: [ClientMetrics]
+}
+
+query getCohortAnalysis {
+  fn: import { getCohortAnalysis } from "@src/analytics-advanced/operations",
+  entities: [ClientMetrics]
+}
+
+query getSalonDashboard {
+  fn: import { getSalonDashboard } from "@src/analytics-advanced/operations",
+  entities: [SalonAnalytics, ClientMetrics]
+}
+
+query getTopClients {
+  fn: import { getTopClients } from "@src/analytics-advanced/operations",
+  entities: [ClientMetrics, Client]
+}
+
+query getClientPreferences {
+  fn: import { getClientPreferences } from "@src/analytics-advanced/operations",
+  entities: [ClientMetrics]
+}
+
+// Analytics Actions
+action calculateClientMetrics {
+  fn: import { calculateClientMetrics } from "@src/analytics-advanced/operations",
+  entities: [ClientMetrics, Client, Appointment, Sale]
+}
+
+action updateSalonAnalytics {
+  fn: import { updateSalonAnalytics } from "@src/analytics-advanced/operations",
+  entities: [SalonAnalytics, Client, ClientMetrics, Appointment, Sale]
+}
+
+// ============================================================================
+// Phase 3: Automated Jobs
+// ============================================================================
+
+job processExpiredCashback {
+  executor: PgBoss,
+  perform: {
+    fn: import { processExpiredCashback } from "@src/loyalty/jobs/expiredCashback"
+  },
+  schedule: {
+    cron: "0 2 * * *" // Daily at 2 AM
+  },
+  entities: [LoyaltyTransaction, ClientLoyaltyBalance]
+}
+
+job calculateDailyMetrics {
+  executor: PgBoss,
+  perform: {
+    fn: import { calculateDailyMetrics } from "@src/analytics-advanced/jobs/dailyMetrics"
+  },
+  schedule: {
+    cron: "0 1 * * *" // Daily at 1 AM
+  },
+  entities: [ClientMetrics, Client, Appointment, Sale, SalonAnalytics]
+}
+
+job checkTierUpgrades {
+  executor: PgBoss,
+  perform: {
+    fn: import { checkTierUpgrades } from "@src/loyalty/jobs/tierUpgrades"
+  },
+  schedule: {
+    cron: "0 3 * * *" // Daily at 3 AM
+  },
+  entities: [ClientLoyaltyBalance, LoyaltyTier, LoyaltyProgram]
+}
