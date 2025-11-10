@@ -331,29 +331,84 @@ page AdminMessagesPage {
 //#endregion
 
 //#region Glamo - Clients Module
+// Client CRUD Operations
 query listClients {
   fn: import { listClients } from "@src/clients/operations",
-  entities: [User, Client, UserSalon, Role, Permission, RolePermission, UserRole]
+  entities: [User, Client, ClientTag, UserSalon, Role, Permission, RolePermission, UserRole]
 }
 
 query getClient {
   fn: import { getClient } from "@src/clients/operations",
-  entities: [User, Client, Appointment, Sale, ClientCredit, UserSalon, Role, Permission, RolePermission, UserRole]
+  entities: [User, Client, ClientTag, ClientNote, ClientDocument, ClientHistory, Appointment, Sale, ClientCredit, UserSalon, Role, Permission, RolePermission, UserRole]
 }
 
 action createClient {
   fn: import { createClient } from "@src/clients/operations",
-  entities: [User, Client, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+  entities: [User, Client, ClientHistory, Log, UserSalon, Role, Permission, RolePermission, UserRole]
 }
 
 action updateClient {
   fn: import { updateClient } from "@src/clients/operations",
-  entities: [User, Client, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+  entities: [User, Client, ClientHistory, Log, UserSalon, Role, Permission, RolePermission, UserRole]
 }
 
 action deleteClient {
   fn: import { deleteClient } from "@src/clients/operations",
-  entities: [User, Client, Appointment, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+  entities: [User, Client, Appointment, ClientHistory, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+// Client Notes Operations
+query getClientNotes {
+  fn: import { getClientNotes } from "@src/clients/operations",
+  entities: [User, Client, ClientNote, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action addClientNote {
+  fn: import { addClientNote } from "@src/clients/operations",
+  entities: [User, Client, ClientNote, ClientHistory, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action updateClientNote {
+  fn: import { updateClientNote } from "@src/clients/operations",
+  entities: [User, Client, ClientNote, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action deleteClientNote {
+  fn: import { deleteClientNote } from "@src/clients/operations",
+  entities: [User, Client, ClientNote, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+// Client Tags Operations
+action addClientTag {
+  fn: import { addClientTag } from "@src/clients/operations",
+  entities: [User, Client, ClientTag, ClientHistory, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action removeClientTag {
+  fn: import { removeClientTag } from "@src/clients/operations",
+  entities: [User, Client, ClientTag, ClientHistory, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+// Client Documents Operations
+query getClientDocuments {
+  fn: import { getClientDocuments } from "@src/clients/operations",
+  entities: [User, Client, ClientDocument, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action uploadClientDocument {
+  fn: import { uploadClientDocument } from "@src/clients/operations",
+  entities: [User, Client, ClientDocument, ClientHistory, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action deleteClientDocument {
+  fn: import { deleteClientDocument } from "@src/clients/operations",
+  entities: [User, Client, ClientDocument, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+// Client History Operations
+query getClientHistory {
+  fn: import { getClientHistory } from "@src/clients/operations",
+  entities: [User, Client, ClientHistory, UserSalon, Role, Permission, RolePermission, UserRole]
 }
 //#endregion
 
@@ -793,6 +848,12 @@ route ClientsListRoute { path: "/clients", to: ClientsListPage }
 page ClientsListPage {
   authRequired: true,
   component: import ClientsListPage from "@src/client/modules/clients/ClientsListPage"
+}
+
+route ClientDetailRoute { path: "/clients/:id", to: ClientDetailPage }
+page ClientDetailPage {
+  authRequired: true,
+  component: import ClientDetailPage from "@src/client/modules/clients/ClientDetailPage"
 }
 
 route EmployeesRoute { path: "/employees", to: EmployeesPage }
