@@ -331,29 +331,84 @@ page AdminMessagesPage {
 //#endregion
 
 //#region Glamo - Clients Module
+// Client CRUD Operations
 query listClients {
   fn: import { listClients } from "@src/clients/operations",
-  entities: [User, Client, UserSalon, Role, Permission, RolePermission, UserRole]
+  entities: [User, Client, ClientTag, UserSalon, Role, Permission, RolePermission, UserRole]
 }
 
 query getClient {
   fn: import { getClient } from "@src/clients/operations",
-  entities: [User, Client, Appointment, Sale, ClientCredit, UserSalon, Role, Permission, RolePermission, UserRole]
+  entities: [User, Client, ClientTag, ClientNote, ClientDocument, ClientHistory, Appointment, Sale, ClientCredit, UserSalon, Role, Permission, RolePermission, UserRole]
 }
 
 action createClient {
   fn: import { createClient } from "@src/clients/operations",
-  entities: [User, Client, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+  entities: [User, Client, ClientHistory, Log, UserSalon, Role, Permission, RolePermission, UserRole]
 }
 
 action updateClient {
   fn: import { updateClient } from "@src/clients/operations",
-  entities: [User, Client, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+  entities: [User, Client, ClientHistory, Log, UserSalon, Role, Permission, RolePermission, UserRole]
 }
 
 action deleteClient {
   fn: import { deleteClient } from "@src/clients/operations",
-  entities: [User, Client, Appointment, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+  entities: [User, Client, Appointment, ClientHistory, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+// Client Notes Operations
+query getClientNotes {
+  fn: import { getClientNotes } from "@src/clients/operations",
+  entities: [User, Client, ClientNote, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action addClientNote {
+  fn: import { addClientNote } from "@src/clients/operations",
+  entities: [User, Client, ClientNote, ClientHistory, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action updateClientNote {
+  fn: import { updateClientNote } from "@src/clients/operations",
+  entities: [User, Client, ClientNote, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action deleteClientNote {
+  fn: import { deleteClientNote } from "@src/clients/operations",
+  entities: [User, Client, ClientNote, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+// Client Tags Operations
+action addClientTag {
+  fn: import { addClientTag } from "@src/clients/operations",
+  entities: [User, Client, ClientTag, ClientHistory, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action removeClientTag {
+  fn: import { removeClientTag } from "@src/clients/operations",
+  entities: [User, Client, ClientTag, ClientHistory, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+// Client Documents Operations
+query getClientDocuments {
+  fn: import { getClientDocuments } from "@src/clients/operations",
+  entities: [User, Client, ClientDocument, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action uploadClientDocument {
+  fn: import { uploadClientDocument } from "@src/clients/operations",
+  entities: [User, Client, ClientDocument, ClientHistory, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action deleteClientDocument {
+  fn: import { deleteClientDocument } from "@src/clients/operations",
+  entities: [User, Client, ClientDocument, Log, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+// Client History Operations
+query getClientHistory {
+  fn: import { getClientHistory } from "@src/clients/operations",
+  entities: [User, Client, ClientHistory, UserSalon, Role, Permission, RolePermission, UserRole]
 }
 //#endregion
 
@@ -795,6 +850,12 @@ page ClientsListPage {
   component: import ClientsListPage from "@src/client/modules/clients/ClientsListPage"
 }
 
+route ClientDetailRoute { path: "/clients/:id", to: ClientDetailPage }
+page ClientDetailPage {
+  authRequired: true,
+  component: import ClientDetailPage from "@src/client/modules/clients/ClientDetailPage"
+}
+
 route EmployeesRoute { path: "/employees", to: EmployeesPage }
 page EmployeesPage {
   authRequired: true,
@@ -859,5 +920,173 @@ route ReportsRoute { path: "/reports", to: ReportsPage }
 page ReportsPage {
   authRequired: true,
   component: import ReportsPage from "@src/client/modules/reports/ReportsPage"
+}
+
+// ============================================================================
+// Phase 2: Communication & Engagement
+// ============================================================================
+
+// Communication Log Queries
+query listCommunicationLogs {
+  fn: import { listCommunicationLogs } from "@src/communication/operations",
+  entities: [CommunicationLog, Client, User, MarketingCampaign]
+}
+
+query getCommunicationLog {
+  fn: import { getCommunicationLog } from "@src/communication/operations",
+  entities: [CommunicationLog, Client, User, MarketingCampaign]
+}
+
+// Communication Actions
+action sendManualMessage {
+  fn: import { sendManualMessage } from "@src/communication/operations",
+  entities: [CommunicationLog, Client]
+}
+
+// Marketing Campaign Queries
+query listCampaigns {
+  fn: import { listCampaigns } from "@src/communication/operations",
+  entities: [MarketingCampaign, User, ClientSegment]
+}
+
+query getCampaign {
+  fn: import { getCampaign } from "@src/communication/operations",
+  entities: [MarketingCampaign, User, ClientSegment, CommunicationLog]
+}
+
+// Marketing Campaign Actions
+action createCampaign {
+  fn: import { createCampaign } from "@src/communication/operations",
+  entities: [MarketingCampaign, ClientSegment]
+}
+
+action updateCampaign {
+  fn: import { updateCampaign } from "@src/communication/operations",
+  entities: [MarketingCampaign]
+}
+
+action deleteCampaign {
+  fn: import { deleteCampaign } from "@src/communication/operations",
+  entities: [MarketingCampaign]
+}
+
+// Client Segment Queries
+query listSegments {
+  fn: import { listSegments } from "@src/communication/operations",
+  entities: [ClientSegment, User]
+}
+
+query getSegment {
+  fn: import { getSegment } from "@src/communication/operations",
+  entities: [ClientSegment, User, MarketingCampaign]
+}
+
+query evaluateSegment {
+  fn: import { evaluateSegment } from "@src/communication/operations",
+  entities: [ClientSegment, Client]
+}
+
+// Client Segment Actions
+action createSegment {
+  fn: import { createSegment } from "@src/communication/operations",
+  entities: [ClientSegment, Client]
+}
+
+action updateSegment {
+  fn: import { updateSegment } from "@src/communication/operations",
+  entities: [ClientSegment, Client]
+}
+
+action deleteSegment {
+  fn: import { deleteSegment } from "@src/communication/operations",
+  entities: [ClientSegment]
+}
+
+// Campaign Template Queries
+query listCampaignTemplates {
+  fn: import { listCampaignTemplates } from "@src/communication/operations",
+  entities: [CampaignTemplate]
+}
+
+// Campaign Template Actions
+action createCampaignTemplate {
+  fn: import { createCampaignTemplate } from "@src/communication/operations",
+  entities: [CampaignTemplate]
+}
+
+// ============================================================================
+// Phase 2: Automated Campaign Jobs
+// ============================================================================
+
+job sendBirthdayCampaigns {
+  executor: PgBoss,
+  perform: {
+    fn: import { sendBirthdayCampaigns } from "@src/communication/jobs/birthdayCampaign"
+  },
+  schedule: {
+    cron: "0 9 * * *" // Daily at 9 AM
+  },
+  entities: [Client, CommunicationLog, Salon]
+}
+
+job sendReactivationCampaigns {
+  executor: PgBoss,
+  perform: {
+    fn: import { sendReactivationCampaigns } from "@src/communication/jobs/reactivationCampaign"
+  },
+  schedule: {
+    cron: "0 10 * * 1" // Weekly on Monday at 10 AM
+  },
+  entities: [Client, CommunicationLog, Salon]
+}
+
+job sendAppointmentReminders {
+  executor: PgBoss,
+  perform: {
+    fn: import { sendAppointmentReminders } from "@src/communication/jobs/appointmentReminders"
+  },
+  schedule: {
+    cron: "0 * * * *" // Every hour
+  },
+  entities: [Appointment, Client, CommunicationLog, User, Salon]
+}
+
+job sendFollowUpMessages {
+  executor: PgBoss,
+  perform: {
+    fn: import { sendFollowUpMessages } from "@src/communication/jobs/followUpMessages"
+  },
+  schedule: {
+    cron: "0 * * * *" // Every hour
+  },
+  entities: [Appointment, Client, CommunicationLog, User, Salon]
+}
+
+// ============================================================================
+// Phase 2: Campaign Management Routes
+// ============================================================================
+
+route CampaignsListRoute { path: "/campaigns", to: CampaignsListPage }
+page CampaignsListPage {
+  authRequired: true,
+  component: import CampaignsListPage from "@src/client/modules/campaigns/CampaignsListPage"
+}
+
+route CreateCampaignRoute { path: "/campaigns/new", to: CreateCampaignPage }
+page CreateCampaignPage {
+  authRequired: true,
+  component: import CreateCampaignPage from "@src/client/modules/campaigns/CreateCampaignPage"
+}
+
+route CampaignDetailRoute { path: "/campaigns/:id", to: CampaignDetailPage }
+page CampaignDetailPage {
+  authRequired: true,
+  component: import CampaignDetailPage from "@src/client/modules/campaigns/CampaignDetailPage"
+}
+
+route ClientSegmentsRoute { path: "/segments", to: ClientSegmentsPage }
+page ClientSegmentsPage {
+  authRequired: true,
+  component: import ClientSegmentsPage from "@src/client/modules/campaigns/ClientSegmentsPage"
 }
 //#endregion
