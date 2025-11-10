@@ -1,0 +1,235 @@
+// ============================================================================
+// ADVANCED SCHEDULING MODULE - Wasp Configuration Additions
+// ============================================================================
+// Add these to main.wasp file
+
+// ============================================================================
+// APPOINTMENT OPERATIONS
+// ============================================================================
+
+query getAppointment {
+  fn: import { getAppointment } from "@src/scheduling/operations",
+  entities: [User, Appointment, Client, Employee, Service, ServiceVariant, AppointmentService, AppointmentAssistant, AppointmentRepetition, AppointmentStatusLog, AppointmentHistory, AppointmentReminder]
+}
+
+query listAppointments {
+  fn: import { listAppointments } from "@src/scheduling/operations",
+  entities: [User, Appointment, Client, Employee, Service, AppointmentService]
+}
+
+query calculateAvailableSlots {
+  fn: import { calculateAvailableSlots } from "@src/scheduling/operations",
+  entities: [Service, Employee, EmployeeService, EmployeeSchedule, Appointment, AppointmentAssistant, TimeBlock, BookingConfig]
+}
+
+query getMultiEmployeeAvailability {
+  fn: import { getMultiEmployeeAvailability } from "@src/scheduling/operations",
+  entities: [Service, Employee, EmployeeService, EmployeeSchedule, Appointment, TimeBlock, User, BookingConfig]
+}
+
+query isSlotAvailable {
+  fn: import { isSlotAvailable } from "@src/scheduling/operations",
+  entities: [Service, Employee, EmployeeService, EmployeeSchedule, Appointment, TimeBlock, BookingConfig]
+}
+
+query findNextAvailableSlot {
+  fn: import { findNextAvailableSlot } from "@src/scheduling/operations",
+  entities: [Service, Employee, EmployeeService, EmployeeSchedule, Appointment, TimeBlock, BookingConfig]
+}
+
+query checkAdvancedConflicts {
+  fn: import { checkAdvancedConflicts } from "@src/scheduling/operations",
+  entities: [Appointment, AppointmentAssistant, TimeBlock, EmployeeSchedule, EmployeeService, BookingConfig]
+}
+
+query getOccupiedTimeBlocks {
+  fn: import { getOccupiedTimeBlocks } from "@src/scheduling/operations",
+  entities: [Appointment, Client, Service, AppointmentService, TimeBlock, Employee]
+}
+
+action createAppointment {
+  fn: import { createAppointment } from "@src/scheduling/operations",
+  entities: [User, Appointment, Client, Employee, Service, EmployeeService, AppointmentService, AppointmentHistory, BookingConfig, AppointmentReminder]
+}
+
+action createRecurringAppointment {
+  fn: import { createRecurringAppointment } from "@src/scheduling/operations",
+  entities: [User, Appointment, Client, Employee, Service, EmployeeService, AppointmentService, AppointmentRepetition, AppointmentHistory, BookingConfig, AppointmentReminder]
+}
+
+action updateAppointment {
+  fn: import { updateAppointment } from "@src/scheduling/operations",
+  entities: [User, Appointment, Service, AppointmentService, AppointmentHistory]
+}
+
+action cancelAppointment {
+  fn: import { cancelAppointment } from "@src/scheduling/operations",
+  entities: [User, Appointment, Salon, BookingConfig, AppointmentHistory, AppointmentReminder, Client, Employee, Service]
+}
+
+// ============================================================================
+// TIME BLOCK OPERATIONS
+// ============================================================================
+
+query listTimeBlocks {
+  fn: import { listTimeBlocks } from "@src/scheduling/timeBlockOperations",
+  entities: [TimeBlock, Employee, User]
+}
+
+query getTimeBlock {
+  fn: import { getTimeBlock } from "@src/scheduling/timeBlockOperations",
+  entities: [TimeBlock, Employee, User]
+}
+
+action createTimeBlock {
+  fn: import { createTimeBlock } from "@src/scheduling/timeBlockOperations",
+  entities: [User, TimeBlock, Employee]
+}
+
+action updateTimeBlock {
+  fn: import { updateTimeBlock } from "@src/scheduling/timeBlockOperations",
+  entities: [User, TimeBlock, Employee]
+}
+
+action deleteTimeBlock {
+  fn: import { deleteTimeBlock } from "@src/scheduling/timeBlockOperations",
+  entities: [User, TimeBlock]
+}
+
+action createRecurringTimeBlock {
+  fn: import { createRecurringTimeBlock } from "@src/scheduling/timeBlockOperations",
+  entities: [User, TimeBlock, Employee]
+}
+
+// ============================================================================
+// WAITING LIST OPERATIONS
+// ============================================================================
+
+query listWaitingList {
+  fn: import { listWaitingList } from "@src/scheduling/waitingListOperations",
+  entities: [WaitingList, Client, Employee, User]
+}
+
+query getWaitingListEntry {
+  fn: import { getWaitingListEntry } from "@src/scheduling/waitingListOperations",
+  entities: [WaitingList, Client, Employee, User]
+}
+
+action addToWaitingList {
+  fn: import { addToWaitingList } from "@src/scheduling/waitingListOperations",
+  entities: [User, WaitingList, Client, Employee]
+}
+
+action updateWaitingListEntry {
+  fn: import { updateWaitingListEntry } from "@src/scheduling/waitingListOperations",
+  entities: [User, WaitingList, Client, Employee]
+}
+
+action notifyWaitingListClient {
+  fn: import { notifyWaitingListClient } from "@src/scheduling/waitingListOperations",
+  entities: [User, WaitingList, Client, Employee]
+}
+
+action acceptWaitingListSlot {
+  fn: import { acceptWaitingListSlot } from "@src/scheduling/waitingListOperations",
+  entities: [User, WaitingList, Client, Employee, Appointment, Service, EmployeeService, AppointmentService, AppointmentHistory]
+}
+
+action cancelWaitingListEntry {
+  fn: import { cancelWaitingListEntry } from "@src/scheduling/waitingListOperations",
+  entities: [User, WaitingList]
+}
+
+action expireWaitingListOffers {
+  fn: import { expireWaitingListOffers } from "@src/scheduling/waitingListOperations",
+  entities: [WaitingList]
+}
+
+// ============================================================================
+// BOOKING CONFIGURATION OPERATIONS
+// ============================================================================
+
+query getBookingConfig {
+  fn: import { getBookingConfig } from "@src/scheduling/bookingConfigOperations",
+  entities: [User, BookingConfig]
+}
+
+query getDefaultBookingConfig {
+  fn: import { getDefaultBookingConfig } from "@src/scheduling/bookingConfigOperations",
+  entities: [User]
+}
+
+action updateBookingConfig {
+  fn: import { updateBookingConfig } from "@src/scheduling/bookingConfigOperations",
+  entities: [User, BookingConfig]
+}
+
+action resetBookingConfig {
+  fn: import { resetBookingConfig } from "@src/scheduling/bookingConfigOperations",
+  entities: [User, BookingConfig]
+}
+
+// ============================================================================
+// ROUTES
+// ============================================================================
+
+route SchedulingCalendarRoute { path: "/scheduling/calendar", to: SchedulingCalendarPage }
+page SchedulingCalendarPage {
+  component: import { SchedulingCalendarPage } from "@src/client/modules/scheduling/SchedulingCalendarPage",
+  authRequired: true
+}
+
+route SchedulingTimeBlocksRoute { path: "/scheduling/time-blocks", to: SchedulingTimeBlocksPage }
+page SchedulingTimeBlocksPage {
+  component: import { SchedulingTimeBlocksPage } from "@src/client/modules/scheduling/SchedulingTimeBlocksPage",
+  authRequired: true
+}
+
+route SchedulingWaitingListRoute { path: "/scheduling/waiting-list", to: SchedulingWaitingListPage }
+page SchedulingWaitingListPage {
+  component: import { SchedulingWaitingListPage } from "@src/client/modules/scheduling/SchedulingWaitingListPage",
+  authRequired: true
+}
+
+route SchedulingSettingsRoute { path: "/scheduling/settings", to: SchedulingSettingsPage }
+page SchedulingSettingsPage {
+  component: import { SchedulingSettingsPage } from "@src/client/modules/scheduling/SchedulingSettingsPage",
+  authRequired: true
+}
+
+// ============================================================================
+// BACKGROUND JOBS
+// ============================================================================
+
+job sendAppointmentReminders {
+  executor: PgBoss,
+  perform: {
+    fn: import { sendAppointmentReminders } from "@src/scheduling/jobs/reminders"
+  },
+  schedule: {
+    cron: "*/15 * * * *" // Every 15 minutes
+  },
+  entities: [Appointment, AppointmentReminder, Client, Employee, BookingConfig]
+}
+
+job checkNoShows {
+  executor: PgBoss,
+  perform: {
+    fn: import { checkNoShows } from "@src/scheduling/jobs/noshow"
+  },
+  schedule: {
+    cron: "*/10 * * * *" // Every 10 minutes
+  },
+  entities: [Appointment, BookingConfig, AppointmentHistory]
+}
+
+job expireWaitingListOffersJob {
+  executor: PgBoss,
+  perform: {
+    fn: import { expireWaitingListOffersJob } from "@src/scheduling/jobs/waitingList"
+  },
+  schedule: {
+    cron: "*/5 * * * *" // Every 5 minutes
+  },
+  entities: [WaitingList]
+}
