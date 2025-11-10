@@ -84,7 +84,12 @@ model User {
   createdCampaigns       MarketingCampaign[] @relation("CampaignCreator")
   createdSegments        ClientSegment[]     @relation("SegmentCreator")
   createdTemplates       CampaignTemplate[]  @relation("TemplateCreator")
-  clientHistory            ClientHistory[]        @relation("ClientHistoryUser")
+  clientHistory          ClientHistory[]     @relation("ClientHistoryUser")
+  
+  // Phase 3: Loyalty & Advanced Features relations
+  uploadedPhotos         ClientPhoto[]       @relation("PhotoUploader")
+  createdAnamnesisForms  AnamnesisForm[]     @relation("AnamnesisFormCreator")
+  filledAnamnesis        ClientAnamnesis[]   @relation("AnamnesisFilledBy")
 }
 
 model GptResponse {
@@ -248,6 +253,18 @@ model Salon {
   clientSegments     ClientSegment[]
   campaignTemplates  CampaignTemplate[]
   bookingConfig      BookingConfig?
+  
+  // Phase 3: Loyalty & Advanced Features relations
+  loyaltyPrograms       LoyaltyProgram[]
+  clientLoyaltyBalances ClientLoyaltyBalance[]
+  loyaltyTransactions   LoyaltyTransaction[]
+  referralPrograms      ReferralProgram[]
+  referrals             Referral[]
+  clientPhotos          ClientPhoto[]
+  anamnesisForms        AnamnesisForm[]
+  clientAnamnesis       ClientAnamnesis[]
+  clientMetrics         ClientMetrics[]
+  salonAnalytics        SalonAnalytics[]
 }
 
 enum InviteStatus {
@@ -477,6 +494,15 @@ model Client {
   // Phase 2: Communication & Engagement relations
   communicationLogs CommunicationLog[]
   history       ClientHistory[]
+  
+  // Phase 3: Loyalty & Advanced Features relations
+  loyaltyBalances   ClientLoyaltyBalance[]
+  loyaltyTransactions LoyaltyTransaction[]
+  referralsAsReferrer Referral[]  @relation("Referrer")
+  referralsAsReferee  Referral[]  @relation("Referee")
+  photos            ClientPhoto[]
+  anamnesisSubmissions ClientAnamnesis[]
+  metrics           ClientMetrics?
 
   @@unique([salonId, email])
   @@index([salonId, status])
@@ -860,6 +886,10 @@ model Appointment {
   statusLogs   AppointmentStatusLog[]
   reminders    AppointmentReminder[]
   history      AppointmentHistory[]
+  
+  // Phase 3: Loyalty & Advanced Features relations
+  photos       ClientPhoto[]
+  anamnesis    ClientAnamnesis[]
   
   @@index([salonId, startAt])
   @@index([employeeId, startAt])
@@ -1817,4 +1847,626 @@ model CampaignTemplate {
   
   @@index([salonId])
   @@index([type])
+}
+
+// ============================================================================
+// Client Management Phase 3 - Loyalty & Advanced Features
+// ============================================================================
+
+// ============================================================================
+// Loyalty Program Models
+// ============================================================================
+
+// Loyalty Program Configuration
+model LoyaltyProgram {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  salonId String
+  
+  name        String
+  description String? @db.Text
+  isActive    Boolean @default(true)
+  
+  // Cashback Configuration
+  cashbackEnabled       Boolean @default(true)
+  cashbackType          CashbackType @default(PERCENTAGE)
+  cashbackValue         Float // Percentage (e.g., 5.0 = 5%) or fixed amount
+  minPurchaseForCashback Float   @default(0)
+  maxCashbackPerTransaction Float?
+  
+  // Redemption Rules
+  minBalanceToRedeem    Float   @default(0)
+  maxRedemptionPercentage Int   @default(100) // Max % of purchase that can be paid with cashback
+  cashbackExpiryDays    Int?    // Days until cashback expires (null = never)
+  
+  // Points System (Optional - for future enhancement)
+  pointsEnabled         Boolean @default(false)
+  pointsPerReal         Float   @default(1.0) // Points earned per R$1
+  reaisPerPoint         Float   @default(0.01) // R$ value per point
+  
+  // VIP Tiers
+  vipTiersEnabled       Boolean @default(false)
+  
+  deletedAt DateTime?
+  
+  salon      Salon                  @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  tiers      LoyaltyTier[]
+  balances   ClientLoyaltyBalance[]
+  transactions LoyaltyTransaction[]
+  
+  @@index([salonId, isActive])
+}
+
+enum CashbackType {
+  PERCENTAGE
+  FIXED
+  POINTS
+}
+
+// VIP Tiers Configuration
+model LoyaltyTier {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  programId String
+  
+  name        String
+  description String? @db.Text
+  color       String? // Hex color for UI
+  icon        String? // Icon name or emoji
+  
+  // Tier Requirements
+  minTotalSpent       Float?
+  minVisits           Int?
+  minMonthlySpent     Float?
+  
+  // Tier Benefits
+  cashbackMultiplier  Float @default(1.0) // 1.5 = 50% bonus cashback
+  discountPercentage  Float @default(0)
+  priorityBooking     Boolean @default(false)
+  exclusiveServices   Boolean @default(false)
+  
+  // Display order
+  order Int @default(0)
+  
+  program  LoyaltyProgram         @relation(fields: [programId], references: [id], onDelete: Cascade)
+  clients  ClientLoyaltyBalance[]
+  
+  @@index([programId])
+  @@index([minTotalSpent])
+}
+
+// Client Loyalty Balance
+model ClientLoyaltyBalance {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  clientId  String
+  salonId   String
+  programId String
+  
+  // Current Balance
+  availableBalance Float @default(0)
+  pendingBalance   Float @default(0) // Cashback waiting confirmation
+  lifetimeEarned   Float @default(0)
+  lifetimeRedeemed Float @default(0)
+  
+  // VIP Tier
+  currentTierId    String?
+  tierAchievedAt   DateTime?
+  
+  // Statistics for tier calculation
+  totalSpent       Float    @default(0)
+  totalVisits      Int      @default(0)
+  lastActivityAt   DateTime @default(now())
+  
+  client  Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  salon   Salon           @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  program LoyaltyProgram  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  tier    LoyaltyTier?    @relation(fields: [currentTierId], references: [id], onDelete: SetNull)
+  transactions LoyaltyTransaction[]
+  
+  @@unique([clientId, programId])
+  @@index([salonId])
+  @@index([programId])
+  @@index([currentTierId])
+}
+
+// Loyalty Transaction History
+model LoyaltyTransaction {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  
+  balanceId String
+  programId String
+  salonId   String
+  clientId  String
+  
+  type              LoyaltyTransactionType
+  amount            Float
+  balanceAfter      Float
+  
+  description       String?
+  
+  // Related entities
+  saleId            String? // If earned from sale
+  redemptionSaleId  String? // If redeemed in sale
+  
+  expiresAt         DateTime?
+  expiredAt         DateTime?
+  
+  metadata          Json? // Additional data
+  
+  balance ClientLoyaltyBalance @relation(fields: [balanceId], references: [id], onDelete: Cascade)
+  program LoyaltyProgram       @relation(fields: [programId], references: [id], onDelete: Cascade)
+  salon   Salon                @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  client  Client               @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  @@index([balanceId, createdAt])
+  @@index([clientId, createdAt])
+  @@index([salonId, type])
+  @@index([expiresAt])
+}
+
+enum LoyaltyTransactionType {
+  EARNED            // Cashback earned from purchase
+  REDEEMED          // Cashback redeemed
+  EXPIRED           // Cashback expired
+  ADJUSTED          // Manual adjustment
+  BONUS             // Promotional bonus
+  REFUNDED          // Refund from cancelled sale
+  TIER_BONUS        // VIP tier bonus
+}
+
+// ============================================================================
+// Referral Program Models
+// ============================================================================
+
+// Referral Program Configuration
+model ReferralProgram {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  salonId String
+  
+  name        String
+  description String? @db.Text
+  isActive    Boolean @default(true)
+  
+  // Referrer Rewards (who refers)
+  referrerRewardType    ReferralRewardType
+  referrerRewardValue   Float // Amount or percentage
+  referrerRewardDelay   Int @default(0) // Days to wait before giving reward
+  
+  // Referee Rewards (who was referred)
+  refereeRewardType     ReferralRewardType
+  refereeRewardValue    Float
+  refereeRewardOnFirstVisit Boolean @default(true)
+  
+  // Qualification Rules
+  minPurchaseAmount     Float? // Minimum referee purchase to qualify
+  maxRewardPerReferrer  Float? // Max total rewards per referrer
+  expiryDays            Int? // Days until referral expires
+  
+  // Tracking
+  requireFirstVisit     Boolean @default(true)
+  trackingCookie        Boolean @default(true)
+  
+  deletedAt DateTime?
+  
+  salon     Salon      @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  referrals Referral[]
+  
+  @@index([salonId, isActive])
+}
+
+enum ReferralRewardType {
+  CASHBACK         // Add to loyalty balance
+  DISCOUNT_PERCENT // Percentage discount on next purchase
+  DISCOUNT_FIXED   // Fixed amount discount
+  FREE_SERVICE     // Free service credit
+  POINTS           // Loyalty points
+}
+
+// Referral Tracking
+model Referral {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  programId   String
+  salonId     String
+  
+  // Referrer (existing client)
+  referrerId  String
+  referrerCode String @unique // e.g., "MARIA2024"
+  
+  // Referee (new client)
+  refereeId   String?
+  refereeName String? // Name before client created
+  refereePhone String?
+  refereeEmail String?
+  
+  // Status Tracking
+  status      ReferralStatus @default(PENDING)
+  
+  // Qualification Tracking
+  sharedAt      DateTime  @default(now())
+  sharedVia     ReferralChannel?
+  clickedAt     DateTime?
+  signedUpAt    DateTime?
+  firstVisitAt  DateTime?
+  qualifiedAt   DateTime?
+  
+  // Rewards
+  referrerRewardIssued    Boolean @default(false)
+  referrerRewardIssuedAt  DateTime?
+  referrerRewardAmount    Float?
+  
+  refereeRewardIssued     Boolean @default(false)
+  refereeRewardIssuedAt   DateTime?
+  refereeRewardAmount     Float?
+  
+  // Expiry
+  expiresAt    DateTime?
+  
+  metadata     Json? // Additional tracking data
+  
+  program  ReferralProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  salon    Salon           @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  referrer Client          @relation("Referrer", fields: [referrerId], references: [id], onDelete: Cascade)
+  referee  Client?         @relation("Referee", fields: [refereeId], references: [id], onDelete: Cascade)
+  
+  @@index([salonId, status])
+  @@index([referrerId])
+  @@index([refereeId])
+  @@index([referrerCode])
+  @@index([qualifiedAt])
+}
+
+enum ReferralStatus {
+  PENDING       // Referral shared, waiting for signup
+  CLICKED       // Link clicked
+  SIGNED_UP     // Referee created account
+  FIRST_VISIT   // Referee completed first visit
+  QUALIFIED     // Referral qualified for rewards
+  REWARDED      // Rewards issued
+  EXPIRED       // Referral expired
+  CANCELLED     // Referral cancelled
+}
+
+enum ReferralChannel {
+  WHATSAPP
+  EMAIL
+  SMS
+  LINK
+  QR_CODE
+  IN_PERSON
+}
+
+// ============================================================================
+// Photo Management Models
+// ============================================================================
+
+// Client Photos
+model ClientPhoto {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  clientId String
+  salonId  String
+  uploadedBy String
+  
+  // File Information
+  fileUrl      String
+  thumbnailUrl String?
+  fileName     String
+  fileSize     Int // bytes
+  mimeType     String
+  width        Int?
+  height       Int?
+  
+  // Photo Classification
+  photoType    PhotoType @default(GENERAL)
+  category     String? // Hair, Nails, Makeup, etc.
+  
+  // Before/After Grouping
+  isBeforeAfter    Boolean @default(false)
+  beforeAfterPairId String? // Links before & after photos
+  position         PhotoPosition?
+  
+  // Metadata
+  title        String?
+  description  String? @db.Text
+  tags         String[] // searchable tags
+  takenAt      DateTime? // When photo was taken (vs uploaded)
+  
+  // Related Entities
+  appointmentId String? // Photo taken during appointment
+  serviceIds    String[] // Services shown in photo
+  
+  // Visibility & Permissions
+  isPublic     Boolean @default(false) // Can be shown in portfolio
+  showInGallery Boolean @default(true)
+  clientApproved Boolean @default(false) // Client approved for public use
+  
+  // AI Analysis (Future enhancement)
+  aiTags       String[]
+  aiDescription String?
+  
+  deletedAt DateTime?
+  
+  client       Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  salon        Salon        @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  uploader     User         @relation("PhotoUploader", fields: [uploadedBy], references: [id], onDelete: Restrict)
+  appointment  Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  
+  @@index([clientId, createdAt])
+  @@index([salonId, photoType])
+  @@index([beforeAfterPairId])
+  @@index([appointmentId])
+  @@index([isPublic, clientApproved])
+}
+
+enum PhotoType {
+  GENERAL
+  BEFORE
+  AFTER
+  PROGRESS
+  PORTFOLIO
+  RESULT
+}
+
+enum PhotoPosition {
+  BEFORE
+  AFTER
+}
+
+// ============================================================================
+// Anamnesis System Models
+// ============================================================================
+
+// Anamnesis Form Template
+model AnamnesisForm {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  salonId String
+  createdBy String
+  
+  name        String
+  description String? @db.Text
+  
+  // Form Configuration
+  formData    Json // Form structure (fields, sections, validations)
+  version     Int  @default(1)
+  
+  // Usage Settings
+  isActive    Boolean @default(true)
+  isDefault   Boolean @default(false)
+  isTemplate  Boolean @default(false) // System template
+  
+  // Requirements
+  requireSignature       Boolean @default(true)
+  requireWitnessSignature Boolean @default(false)
+  
+  // Categories this form applies to
+  serviceCategories String[] // Which services require this form
+  
+  usageCount  Int @default(0)
+  
+  deletedAt DateTime?
+  
+  salon       Salon             @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  creator     User              @relation("AnamnesisFormCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+  submissions ClientAnamnesis[]
+  
+  @@index([salonId, isActive])
+  @@index([isDefault])
+}
+
+// Client Anamnesis Submission
+model ClientAnamnesis {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  clientId  String
+  salonId   String
+  formId    String
+  filledBy  String? // User who helped fill (if staff-assisted)
+  
+  // Form Data
+  formData  Json // Filled form data
+  
+  // Signatures
+  clientSignature         String? // Base64 or URL
+  clientSignedAt          DateTime?
+  
+  witnessSignature        String?
+  witnessName             String?
+  witnessSignedAt         DateTime?
+  
+  staffSignature          String?
+  staffName               String?
+  staffSignedAt           DateTime?
+  
+  // Status
+  status                  AnamnesisStatus @default(DRAFT)
+  completedAt             DateTime?
+  
+  // Version tracking
+  version                 Int @default(1)
+  previousVersionId       String?
+  
+  // Related
+  appointmentId           String? // If filled for specific appointment
+  
+  // Export
+  pdfUrl                  String? // Generated PDF URL
+  pdfGeneratedAt          DateTime?
+  
+  // LGPD Compliance
+  dataRetentionDate       DateTime? // When data should be deleted
+  
+  deletedAt DateTime?
+  
+  client      Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  salon       Salon        @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  form        AnamnesisForm @relation(fields: [formId], references: [id], onDelete: Restrict)
+  filler      User?        @relation("AnamnesisFilledBy", fields: [filledBy], references: [id], onDelete: SetNull)
+  appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  
+  @@index([clientId, createdAt])
+  @@index([salonId, status])
+  @@index([formId])
+  @@index([appointmentId])
+}
+
+enum AnamnesisStatus {
+  DRAFT
+  COMPLETED
+  SIGNED
+  ARCHIVED
+  EXPIRED
+}
+
+// ============================================================================
+// Advanced Analytics Models
+// ============================================================================
+
+// Client Lifetime Value Calculation Cache
+model ClientMetrics {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  clientId String @unique
+  salonId  String
+  
+  // Lifetime Value (CLV)
+  lifetimeValue       Float @default(0)
+  predictedLTV        Float @default(0)
+  avgTransactionValue Float @default(0)
+  
+  // Visit Metrics
+  totalVisits         Int @default(0)
+  visitFrequency      Float @default(0) // Visits per month
+  daysSinceLastVisit  Int @default(0)
+  avgDaysBetweenVisits Float @default(0)
+  
+  // Spending Metrics
+  totalSpent          Float @default(0)
+  avgMonthlySpending  Float @default(0)
+  lastPurchaseAmount  Float @default(0)
+  
+  // Engagement Metrics
+  appointmentShowRate    Float @default(100) // Percentage
+  cancellationRate       Float @default(0)
+  rescheduleRate         Float @default(0)
+  
+  // Retention Metrics
+  retentionStatus        RetentionStatus @default(NEW)
+  churnRisk             Float @default(0) // 0-100 score
+  churnReasonPredicted  String?
+  
+  // Cohort Information
+  cohortMonth           String? // YYYY-MM of first visit
+  monthsSinceFirstVisit Int @default(0)
+  
+  // Preferences
+  preferredServices     String[] // Service IDs
+  preferredProfessional String? // User ID
+  preferredDayOfWeek    Int?
+  preferredTimeOfDay    String? // MORNING, AFTERNOON, EVENING
+  
+  // Scores
+  satisfactionScore     Float? // 0-10
+  loyaltyScore          Float? // 0-100
+  referralScore         Float? // 0-100 (likelihood to refer)
+  
+  // Flags
+  isVIP                 Boolean @default(false)
+  isAtRisk              Boolean @default(false)
+  needsAttention        Boolean @default(false)
+  
+  lastCalculatedAt      DateTime @default(now())
+  
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  salon  Salon  @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  
+  @@index([salonId, churnRisk])
+  @@index([salonId, lifetimeValue])
+  @@index([salonId, retentionStatus])
+  @@index([isAtRisk])
+}
+
+enum RetentionStatus {
+  NEW           // 0-30 days
+  ACTIVE        // Regular visits
+  AT_RISK       // Longer than usual since last visit
+  DORMANT       // 90+ days
+  CHURNED       // 180+ days
+  REACTIVATED   // Returned after being dormant
+}
+
+// Salon-wide Analytics Snapshots
+model SalonAnalytics {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  
+  salonId String
+  date    DateTime @default(now())
+  period  AnalyticsPeriod
+  
+  // Client Metrics
+  totalClients           Int @default(0)
+  activeClients          Int @default(0)
+  newClients             Int @default(0)
+  churnedClients         Int @default(0)
+  reactivatedClients     Int @default(0)
+  
+  // Revenue Metrics
+  totalRevenue           Float @default(0)
+  avgTransactionValue    Float @default(0)
+  avgClientLTV           Float @default(0)
+  
+  // Visit Metrics
+  totalAppointments      Int @default(0)
+  completedAppointments  Int @default(0)
+  cancelledAppointments  Int @default(0)
+  noShowAppointments     Int @default(0)
+  
+  // Retention Metrics
+  retentionRate          Float @default(0)
+  churnRate              Float @default(0)
+  repeatClientRate       Float @default(0)
+  
+  // Cohort Data
+  cohortData             Json? // Cohort analysis data
+  
+  // Top Performers
+  topServices            Json? // Most popular services
+  topProfessionals       Json? // Best performing staff
+  topClients             Json? // Highest value clients
+  
+  salon Salon @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  
+  @@unique([salonId, date, period])
+  @@index([salonId, period, date])
+}
+
+enum AnalyticsPeriod {
+  DAILY
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
 }
