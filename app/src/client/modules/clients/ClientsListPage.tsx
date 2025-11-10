@@ -1,168 +1,208 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, listClients } from 'wasp/client/operations';
 import { Button } from '../../../components/ui/button';
-import { Input } from '../../../components/ui/input';
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '../../../components/ui/table';
-import { Badge } from '../../../components/ui/badge';
 import { EmptyState } from '../../../components/ui/empty-state';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
-import { Plus, Search, Users } from 'lucide-react';
+import { Card, CardContent } from '../../../components/ui/card';
+import { Plus, Users, Download } from 'lucide-react';
 import { useSalonContext } from '../../hooks/useSalonContext';
-import { Link } from 'wasp/client/router';
+import { ClientFilters } from './components/ClientFilters';
+import { ClientStatsCards } from './components/ClientStatsCards';
+import { ClientTableRow } from './components/ClientTableRow';
+
+type FilterState = {
+  search: string;
+  status?: string;
+  clientType?: string;
+  tags: string[];
+};
 
 export default function ClientsListPage() {
   const { activeSalonId } = useSalonContext();
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-
-  const { data, isLoading, error } = useQuery(listClients, {
-    salonId: activeSalonId || '',
-    search,
-    page,
-    perPage: 20,
-  }, {
-    enabled: !!activeSalonId,
+  const [filters, setFilters] = useState<FilterState>({
+    search: '',
+    status: undefined,
+    clientType: undefined,
+    tags: [],
   });
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [page, setPage] = useState(1);
+  const perPage = 20;
+
+  const { data, isLoading, error } = useQuery(
+    listClients,
+    {
+      salonId: activeSalonId || '',
+      search: filters.search,
+      status: filters.status,
+      clientType: filters.clientType,
+      tags: filters.tags,
+      page,
+      perPage,
+    },
+    {
+      enabled: !!activeSalonId,
+    }
+  );
+
+  // Calculate stats from data
+  const stats = useMemo(() => {
+    if (!data?.clients) {
+      return { total: 0, active: 0, inactive: 0, vip: 0 };
+    }
+
+    return {
+      total: data.total || 0,
+      active: data.clients.filter((c: any) => c.status === 'ACTIVE').length,
+      inactive: data.clients.filter((c: any) => c.status === 'INACTIVE').length,
+      vip: data.clients.filter((c: any) => c.status === 'VIP' || c.clientType === 'VIP').length,
+    };
+  }, [data]);
+
+  const handleExport = () => {
+    // TODO: Implement export to CSV
+    console.log('Export clients to CSV');
+  };
+
+  const hasClients = data && data.clients && data.clients.length > 0;
+  const hasFilters = filters.search || filters.status || filters.clientType || filters.tags.length > 0;
 
   return (
-      <div className='space-y-6'>
-        {/* Header */}
-        <div className='flex items-center justify-between'>
-          <div>
-            <h1 className='text-3xl font-bold tracking-tight'>Clients</h1>
-            <p className='text-muted-foreground'>
-              Manage your salon clients
-            </p>
-          </div>
+    <div className='space-y-6'>
+      {/* Header */}
+      <div className='flex items-center justify-between'>
+        <div>
+          <h1 className='text-3xl font-bold tracking-tight'>Clients</h1>
+          <p className='text-muted-foreground'>
+            Manage and track your salon clients
+          </p>
+        </div>
+        <div className='flex items-center gap-2'>
+          <Button variant='outline' onClick={handleExport}>
+            <Download className='mr-2 h-4 w-4' />
+            Export
+          </Button>
           <Button>
             <Plus className='mr-2 h-4 w-4' />
             New Client
           </Button>
         </div>
+      </div>
 
-        {/* Search and Filters */}
-        <Card>
-          <CardHeader>
-            <CardTitle className='text-base'>Search Clients</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className='relative'>
-              <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
-              <Input
-                placeholder='Search by name, email, phone, CPF or CNPJ...'
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className='pl-10'
-              />
-            </div>
-          </CardContent>
-        </Card>
+      {/* Stats Cards */}
+      <ClientStatsCards stats={stats} isLoading={isLoading} />
 
-        {/* Clients Table */}
-        <Card>
-          <CardContent className='p-0'>
-            {isLoading ? (
-              <div className='flex items-center justify-center p-8'>
+      {/* Filters */}
+      <ClientFilters
+        filters={filters}
+        onFiltersChange={setFilters}
+        showAdvanced={showAdvancedFilters}
+        onToggleAdvanced={() => setShowAdvancedFilters(!showAdvancedFilters)}
+      />
+
+      {/* Clients Table */}
+      <Card>
+        <CardContent className='p-0'>
+          {isLoading ? (
+            <div className='flex items-center justify-center p-8'>
+              <div className='flex flex-col items-center gap-2'>
+                <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent' />
                 <p className='text-sm text-muted-foreground'>Loading clients...</p>
               </div>
-            ) : error ? (
-              <div className='flex items-center justify-center p-8'>
-                <p className='text-sm text-destructive'>
-                  Error loading clients: {error.message}
-                </p>
-              </div>
-            ) : !data?.clients || data.clients.length === 0 ? (
-              <EmptyState
-                icon={Users}
-                title='No clients found'
-                description={
-                  search
-                    ? 'Try adjusting your search filters'
-                    : 'Get started by creating your first client'
-                }
-                action={
-                  !search && (
-                    <Button>
-                      <Plus className='mr-2 h-4 w-4' />
-                      New Client
-                    </Button>
-                  )
-                }
-              />
-            ) : (
-              <>
+            </div>
+          ) : error ? (
+            <div className='flex items-center justify-center p-8'>
+              <p className='text-sm text-destructive'>
+                Error loading clients: {error.message}
+              </p>
+            </div>
+          ) : !hasClients ? (
+            <EmptyState
+              icon={Users}
+              title='No clients found'
+              description={
+                hasFilters
+                  ? 'Try adjusting your search filters'
+                  : 'Get started by creating your first client'
+              }
+              action={
+                !hasFilters && (
+                  <Button>
+                    <Plus className='mr-2 h-4 w-4' />
+                    New Client
+                  </Button>
+                )
+              }
+            />
+          ) : (
+            <>
+              <div className='overflow-x-auto'>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Name</TableHead>
+                      <TableHead>Client</TableHead>
                       <TableHead>Email</TableHead>
                       <TableHead>Phone</TableHead>
-                      <TableHead>CPF/CNPJ</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead className='text-right'>Visits</TableHead>
+                      <TableHead className='text-right'>Total Spent</TableHead>
+                      <TableHead>Last Visit</TableHead>
                       <TableHead className='text-right'>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {data.clients.map((client: any) => (
-                      <TableRow key={client.id}>
-                        <TableCell className='font-medium'>
-                          {client.name}
-                        </TableCell>
-                        <TableCell>{client.email || '-'}</TableCell>
-                        <TableCell>{client.phone || '-'}</TableCell>
-                        <TableCell>{client.cpf || client.cnpj || '-'}</TableCell>
-                        <TableCell>
-                          <Badge variant='success'>Active</Badge>
-                        </TableCell>
-                        <TableCell className='text-right'>
-                          <Link to={`/clients/${client.id}` as any}>
-                            <Button variant='ghost' size='sm'>
-                              View
-                            </Button>
-                          </Link>
-                        </TableCell>
-                      </TableRow>
+                      <ClientTableRow
+                        key={client.id}
+                        client={client}
+                        onEdit={(client) => console.log('Edit client:', client)}
+                        onDelete={(client) => console.log('Delete client:', client)}
+                      />
                     ))}
                   </TableBody>
                 </Table>
+              </div>
 
-                {/* Pagination */}
-                <div className='flex items-center justify-between border-t px-6 py-4'>
-                  <div className='text-sm text-muted-foreground'>
-                    Showing {data.clients.length} of {data.total} clients
-                  </div>
-                  <div className='flex items-center space-x-2'>
-                    <Button
-                      variant='outline'
-                      size='sm'
-                      onClick={() => setPage(page - 1)}
-                      disabled={page === 1}
-                    >
-                      Previous
-                    </Button>
-                    <Button
-                      variant='outline'
-                      size='sm'
-                      onClick={() => setPage(page + 1)}
-                      disabled={
-                        !data.total || page * data.perPage >= data.total
-                      }
-                    >
-                      Next
-                    </Button>
-                  </div>
+              {/* Pagination */}
+              <div className='flex items-center justify-between border-t px-6 py-4'>
+                <div className='text-sm text-muted-foreground'>
+                  Showing {(page - 1) * perPage + 1} to{' '}
+                  {Math.min(page * perPage, data.total)} of {data.total} clients
                 </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+                <div className='flex items-center space-x-2'>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => setPage(page - 1)}
+                    disabled={page === 1}
+                  >
+                    Previous
+                  </Button>
+                  <div className='flex items-center gap-1 px-2'>
+                    <span className='text-sm'>
+                      Page {page} of {Math.ceil(data.total / perPage)}
+                    </span>
+                  </div>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => setPage(page + 1)}
+                    disabled={page * perPage >= data.total}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
