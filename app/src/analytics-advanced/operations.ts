@@ -7,7 +7,6 @@ import type {
   GetClientCLV,
   GetRetentionAnalytics,
   GetCohortAnalysis,
-  GetClientSegmentMetrics,
   UpdateSalonAnalytics,
   GetSalonDashboard,
   GetTopClients,
@@ -101,7 +100,7 @@ export const getClientMetrics: GetClientMetrics<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:view');
+  await requirePermission(context.user, args.salonId, 'clients:view', context.entities);
 
   let metrics = await context.entities.ClientMetrics.findUnique({
     where: {
@@ -125,7 +124,7 @@ export const calculateClientMetrics: CalculateClientMetrics<CalculateClientMetri
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:view');
+  await requirePermission(context.user, args.salonId, 'clients:view', context.entities);
 
   // Get client with related data
   const client = await context.entities.Client.findUnique({
@@ -315,7 +314,7 @@ export const getClientChurnRisk: GetClientChurnRisk<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:view');
+  await requirePermission(context.user, args.salonId, 'clients:view', context.entities);
 
   const minRisk = args.minRisk || 60;
   const limit = args.limit || 50;
@@ -356,7 +355,7 @@ export const getClientCLV: GetClientCLV<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:view');
+  await requirePermission(context.user, args.salonId, 'clients:view', context.entities);
 
   const limit = args.limit || 50;
   const orderField = args.orderBy === 'predicted' ? 'predictedLTV' : 'lifetimeValue';
@@ -396,7 +395,7 @@ export const getRetentionAnalytics: GetRetentionAnalytics<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'analytics:view');
+  await requirePermission(context.user, args.salonId, 'analytics:view', context.entities);
 
   // Get metrics grouped by retention status
   const statusCounts = await context.entities.ClientMetrics.groupBy({
@@ -447,7 +446,7 @@ export const getCohortAnalysis: GetCohortAnalysis<GetCohortAnalysisInput, any> =
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'analytics:view');
+  await requirePermission(context.user, args.salonId, 'analytics:view', context.entities);
 
   // Group clients by cohort month
   const cohortData = await context.entities.ClientMetrics.groupBy({
@@ -488,7 +487,7 @@ export const updateSalonAnalytics: UpdateSalonAnalytics<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'analytics:manage');
+  await requirePermission(context.user, args.salonId, 'analytics:manage', context.entities);
 
   const date = args.date ? new Date(args.date) : new Date();
 
@@ -607,7 +606,7 @@ export const getSalonDashboard: GetSalonDashboard<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'analytics:view');
+  await requirePermission(context.user, args.salonId, 'analytics:view', context.entities);
 
   const period = args.period || 'MONTHLY';
 
@@ -658,7 +657,7 @@ export const getTopClients: GetTopClients<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:view');
+  await requirePermission(context.user, args.salonId, 'clients:view', context.entities);
 
   const limit = args.limit || 10;
   let orderField: any = { lifetimeValue: 'desc' };
@@ -699,7 +698,7 @@ export const getClientPreferences: GetClientPreferences<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:view');
+  await requirePermission(context.user, args.salonId, 'clients:view', context.entities);
 
   const metrics = await context.entities.ClientMetrics.findUnique({
     where: { clientId: args.clientId }
@@ -717,3 +716,4 @@ export const getClientPreferences: GetClientPreferences<{
     avgDaysBetweenVisits: metrics.avgDaysBetweenVisits
   };
 };
+

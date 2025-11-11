@@ -20,12 +20,11 @@ export const sendFollowUpMessages: SendFollowUpMessages<any, any> = async (args,
     const appointments = await context.entities.Appointment.findMany({
       where: {
         deletedAt: null,
-        status: 'COMPLETED',
+        status: 'DONE',
         endAt: {
           gte: twoDaysAgo,
           lte: yesterday,
         },
-        clientId: { not: null },
       },
       include: {
         client: true,
@@ -37,7 +36,7 @@ export const sendFollowUpMessages: SendFollowUpMessages<any, any> = async (args,
           },
         },
       },
-    });
+    }) as any[];
 
     console.log(`Found ${appointments.length} completed appointments for follow-up`);
 
@@ -81,7 +80,7 @@ export const sendFollowUpMessages: SendFollowUpMessages<any, any> = async (args,
         );
 
         // Get service names
-        const serviceNames = appointment.services.map((s) => s.service.name).join(', ');
+        const serviceNames = appointment.services.map((s: any) => s.service.name).join(', ');
 
         // Follow-up message template
         const messageTemplate = `Olá, {{clientFirstName}}! 💙

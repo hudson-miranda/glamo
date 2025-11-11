@@ -86,7 +86,7 @@ export const uploadClientPhoto: UploadClientPhoto<UploadClientPhotoInput, any> =
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:manage');
+  await requirePermission(context.user, args.salonId, 'clients:manage', context.entities);
 
   const photo = await context.entities.ClientPhoto.create({
     data: {
@@ -142,7 +142,7 @@ export const updateClientPhoto: UpdateClientPhoto<UpdateClientPhotoInput, any> =
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:manage');
+  await requirePermission(context.user, args.salonId, 'clients:manage', context.entities);
 
   const photo = await context.entities.ClientPhoto.update({
     where: {
@@ -179,7 +179,7 @@ export const deleteClientPhoto: DeleteClientPhoto<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:manage');
+  await requirePermission(context.user, args.salonId, 'clients:manage', context.entities);
 
   const photo = await context.entities.ClientPhoto.update({
     where: {
@@ -201,7 +201,7 @@ export const getClientPhoto: GetClientPhoto<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:view');
+  await requirePermission(context.user, args.salonId, 'clients:view', context.entities);
 
   const photo = await context.entities.ClientPhoto.findFirst({
     where: {
@@ -251,7 +251,7 @@ export const getClientPhotos: GetClientPhotos<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:view');
+  await requirePermission(context.user, args.salonId, 'clients:view', context.entities);
 
   const page = args.page || 1;
   const perPage = args.perPage || 20;
@@ -309,7 +309,7 @@ export const createBeforeAfterPair: CreateBeforeAfterPair<CreateBeforeAfterPairI
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:manage');
+  await requirePermission(context.user, args.salonId, 'clients:manage', context.entities);
 
   // Generate unique pair ID
   const pairId = `pair_${Date.now()}_${Math.random().toString(36).substring(7)}`;
@@ -353,7 +353,7 @@ export const searchClientPhotos: SearchClientPhotos<SearchClientPhotosInput, any
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:view');
+  await requirePermission(context.user, args.salonId, 'clients:view', context.entities);
 
   const page = args.page || 1;
   const perPage = args.perPage || 20;
@@ -530,7 +530,7 @@ export const updatePhotoApproval: UpdatePhotoApproval<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:manage');
+  await requirePermission(context.user, args.salonId, 'clients:manage', context.entities);
 
   const photo = await context.entities.ClientPhoto.update({
     where: {

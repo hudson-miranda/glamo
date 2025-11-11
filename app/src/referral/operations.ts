@@ -151,7 +151,7 @@ export const createReferralProgram: CreateReferralProgram<CreateReferralProgramI
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'referral:manage');
+  await requirePermission(context.user, args.salonId, 'referral:manage', context.entities);
 
   const program = await context.entities.ReferralProgram.create({
     data: {
@@ -184,7 +184,7 @@ export const updateReferralProgram: UpdateReferralProgram<CreateReferralProgramI
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'referral:manage');
+  await requirePermission(context.user, args.salonId, 'referral:manage', context.entities);
 
   const program = await context.entities.ReferralProgram.update({
     where: {
@@ -218,7 +218,7 @@ export const getReferralProgram: GetReferralProgram<{ programId: string; salonId
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'referral:view');
+  await requirePermission(context.user, args.salonId, 'referral:view', context.entities);
 
   const program = await context.entities.ReferralProgram.findFirst({
     where: {
@@ -249,7 +249,7 @@ export const listReferralPrograms: ListReferralPrograms<{ salonId: string }, any
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'referral:view');
+  await requirePermission(context.user, args.salonId, 'referral:view', context.entities);
 
   const programs = await context.entities.ReferralProgram.findMany({
     where: {
@@ -279,7 +279,7 @@ export const deleteReferralProgram: DeleteReferralProgram<{ programId: string; s
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'referral:manage');
+  await requirePermission(context.user, args.salonId, 'referral:manage', context.entities);
 
   const program = await context.entities.ReferralProgram.update({
     where: {
@@ -306,7 +306,7 @@ export const createReferral: CreateReferral<CreateReferralInput, any> = async (
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:manage');
+  await requirePermission(context.user, args.salonId, 'clients:manage', context.entities);
 
   // Get active referral program
   const program = await context.entities.ReferralProgram.findFirst({
@@ -389,7 +389,7 @@ export const getClientReferralCode: GetClientReferralCode<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:view');
+  await requirePermission(context.user, args.salonId, 'clients:view', context.entities);
 
   // Get or create referral code
   let referral = await context.entities.Referral.findFirst({
@@ -519,7 +519,7 @@ export const qualifyReferral: QualifyReferral<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'referral:manage');
+  await requirePermission(context.user, args.salonId, 'referral:manage', context.entities);
 
   const referral = await context.entities.Referral.findFirst({
     where: {
@@ -583,7 +583,7 @@ export const listReferrals: ListReferrals<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'referral:view');
+  await requirePermission(context.user, args.salonId, 'referral:view', context.entities);
 
   const page = args.page || 1;
   const perPage = args.perPage || 20;
@@ -653,7 +653,7 @@ export const getReferralStats: GetReferralStats<{ salonId: string }, any> = asyn
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'referral:view');
+  await requirePermission(context.user, args.salonId, 'referral:view', context.entities);
 
   const [
     totalReferrals,
@@ -705,7 +705,7 @@ export const getReferralLeaderboard: GetReferralLeaderboard<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'referral:view');
+  await requirePermission(context.user, args.salonId, 'referral:view', context.entities);
 
   const limit = args.limit || 10;
 

@@ -618,6 +618,27 @@ action updateAppointmentStatus {
   fn: import { updateAppointmentStatus } from "@src/appointments/operations",
   entities: [User, Appointment, AppointmentStatusLog, Log, UserSalon, Role, Permission, RolePermission, UserRole]
 }
+
+// Scheduling Advanced Queries
+query listTimeBlocks {
+  fn: import { listTimeBlocks } from "@src/scheduling/timeBlockOperations",
+  entities: [TimeBlock, User, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+query listWaitingList {
+  fn: import { listWaitingList } from "@src/scheduling/waitingListOperations",
+  entities: [WaitingList, Client, Service, User, UserSalon, Role, Permission, RolePermission, UserRole]
+}
+
+action createTimeBlock {
+  fn: import { createTimeBlock } from "@src/scheduling/timeBlockOperations",
+  entities: [TimeBlock, User, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
+
+action addToWaitingList {
+  fn: import { addToWaitingList } from "@src/scheduling/waitingListOperations",
+  entities: [WaitingList, Client, Service, User, UserSalon, Role, Permission, RolePermission, UserRole, Log]
+}
 //#endregion
 
 //#region Glamo - Sales Module
@@ -850,11 +871,12 @@ page ClientsListPage {
   component: import ClientsListPage from "@src/client/modules/clients/ClientsListPage"
 }
 
-route ClientDetailRoute { path: "/clients/:id", to: ClientDetailPage }
-page ClientDetailPage {
-  authRequired: true,
-  component: import ClientDetailPage from "@src/client/modules/clients/ClientDetailPage"
-}
+// TODO: Temporarily disabled - missing ui/tabs component and useParams hook
+// route ClientDetailRoute { path: "/clients/:id", to: ClientDetailPage }
+// page ClientDetailPage {
+//   authRequired: true,
+//   component: import ClientDetailPage from "@src/client/modules/clients/ClientDetailPage"
+// }
 
 route EmployeesRoute { path: "/employees", to: EmployeesPage }
 page EmployeesPage {
@@ -920,6 +942,52 @@ route ReportsRoute { path: "/reports", to: ReportsPage }
 page ReportsPage {
   authRequired: true,
   component: import ReportsPage from "@src/client/modules/reports/ReportsPage"
+}
+
+// ============================================================================
+// ADVANCED MODULES - Phase 1-3 Implementation
+// ============================================================================
+
+// Advanced Scheduling Module
+route AdvancedSchedulingRoute { path: "/scheduling/advanced", to: AdvancedSchedulingPage }
+page AdvancedSchedulingPage {
+  authRequired: true,
+  component: import AdvancedSchedulingPage from "@src/client/modules/scheduling/AdvancedSchedulingPage"
+}
+
+// Loyalty Program Module
+route LoyaltyProgramRoute { path: "/programs/loyalty", to: LoyaltyProgramPage }
+page LoyaltyProgramPage {
+  authRequired: true,
+  component: import LoyaltyProgramPage from "@src/client/modules/loyalty/LoyaltyProgramPage"
+}
+
+// Referral Program Module
+route ReferralProgramRoute { path: "/programs/referral", to: ReferralProgramPage }
+page ReferralProgramPage {
+  authRequired: true,
+  component: import ReferralProgramPage from "@src/client/modules/referral/ReferralProgramPage"
+}
+
+// Photo Gallery Module
+route PhotoGalleryRoute { path: "/gallery/photos", to: PhotoGalleryPage }
+page PhotoGalleryPage {
+  authRequired: true,
+  component: import PhotoGalleryPage from "@src/client/modules/photos/PhotoGalleryPage"
+}
+
+// Anamnesis Forms Module
+route AnamnesisFormsRoute { path: "/forms/anamnesis", to: AnamnesisFormsPage }
+page AnamnesisFormsPage {
+  authRequired: true,
+  component: import AnamnesisFormsPage from "@src/client/modules/anamnesis/AnamnesisFormsPage"
+}
+
+// Advanced Analytics Module
+route AdvancedAnalyticsRoute { path: "/analytics/advanced", to: AdvancedAnalyticsPage }
+page AdvancedAnalyticsPage {
+  authRequired: true,
+  component: import AdvancedAnalyticsPage from "@src/client/modules/analytics/AnalyticsDashboard"
 }
 
 // ============================================================================
@@ -1048,7 +1116,7 @@ job sendAppointmentReminders {
   schedule: {
     cron: "0 * * * *" // Every hour
   },
-  entities: [Appointment, Client, CommunicationLog, User, Salon]
+  entities: [Appointment, AppointmentService, Service, Client, CommunicationLog, User, Salon]
 }
 
 job sendFollowUpMessages {
@@ -1059,36 +1127,37 @@ job sendFollowUpMessages {
   schedule: {
     cron: "0 * * * *" // Every hour
   },
-  entities: [Appointment, Client, CommunicationLog, User, Salon]
+  entities: [Appointment, AppointmentService, Service, Client, CommunicationLog, User, Salon]
 }
 
 // ============================================================================
 // Phase 2: Campaign Management Routes
 // ============================================================================
 
-route CampaignsListRoute { path: "/campaigns", to: CampaignsListPage }
-page CampaignsListPage {
-  authRequired: true,
-  component: import CampaignsListPage from "@src/client/modules/campaigns/CampaignsListPage"
-}
+// TODO: Temporarily disabled - missing @/components/ui/* components
+// route CampaignsListRoute { path: "/campaigns", to: CampaignsListPage }
+// page CampaignsListPage {
+//   authRequired: true,
+//   component: import CampaignsListPage from "@src/client/modules/campaigns/CampaignsListPage"
+// }
 
-route CreateCampaignRoute { path: "/campaigns/new", to: CreateCampaignPage }
-page CreateCampaignPage {
-  authRequired: true,
-  component: import CreateCampaignPage from "@src/client/modules/campaigns/CreateCampaignPage"
-}
+// route CreateCampaignRoute { path: "/campaigns/new", to: CreateCampaignPage }
+// page CreateCampaignPage {
+//   authRequired: true,
+//   component: import CreateCampaignPage from "@src/client/modules/campaigns/CreateCampaignPage"
+// }
 
-route CampaignDetailRoute { path: "/campaigns/:id", to: CampaignDetailPage }
-page CampaignDetailPage {
-  authRequired: true,
-  component: import CampaignDetailPage from "@src/client/modules/campaigns/CampaignDetailPage"
-}
+// route CampaignDetailRoute { path: "/campaigns/:id", to: CampaignDetailPage }
+// page CampaignDetailPage {
+//   authRequired: true,
+//   component: import CampaignDetailPage from "@src/client/modules/campaigns/CampaignDetailPage"
+// }
 
-route ClientSegmentsRoute { path: "/segments", to: ClientSegmentsPage }
-page ClientSegmentsPage {
-  authRequired: true,
-  component: import ClientSegmentsPage from "@src/client/modules/campaigns/ClientSegmentsPage"
-}
+// route ClientSegmentsRoute { path: "/segments", to: ClientSegmentsPage }
+// page ClientSegmentsPage {
+//   authRequired: true,
+//   component: import ClientSegmentsPage from "@src/client/modules/campaigns/ClientSegmentsPage"
+// }
 //#endregion
 
 
@@ -1103,73 +1172,73 @@ page ClientSegmentsPage {
 // Loyalty Program Queries
 query listLoyaltyPrograms {
   fn: import { listLoyaltyPrograms } from "@src/loyalty/operations",
-  entities: [LoyaltyProgram, LoyaltyTier]
+  entities: [LoyaltyProgram, LoyaltyTier, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query getLoyaltyProgram {
   fn: import { getLoyaltyProgram } from "@src/loyalty/operations",
-  entities: [LoyaltyProgram, LoyaltyTier]
+  entities: [LoyaltyProgram, LoyaltyTier, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query getClientLoyaltyBalance {
   fn: import { getClientLoyaltyBalance } from "@src/loyalty/operations",
-  entities: [ClientLoyaltyBalance, LoyaltyProgram, LoyaltyTier, Client]
+  entities: [ClientLoyaltyBalance, LoyaltyProgram, LoyaltyTier, Client, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query getLoyaltyTransactions {
   fn: import { getLoyaltyTransactions } from "@src/loyalty/operations",
-  entities: [LoyaltyTransaction, Client, LoyaltyProgram]
+  entities: [LoyaltyTransaction, Client, LoyaltyProgram, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query getLoyaltyProgramStats {
   fn: import { getLoyaltyProgramStats } from "@src/loyalty/operations",
-  entities: [ClientLoyaltyBalance, LoyaltyTransaction]
+  entities: [ClientLoyaltyBalance, LoyaltyTransaction, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 // Loyalty Program Actions
 action createLoyaltyProgram {
   fn: import { createLoyaltyProgram } from "@src/loyalty/operations",
-  entities: [LoyaltyProgram]
+  entities: [LoyaltyProgram, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action updateLoyaltyProgram {
   fn: import { updateLoyaltyProgram } from "@src/loyalty/operations",
-  entities: [LoyaltyProgram]
+  entities: [LoyaltyProgram, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action deleteLoyaltyProgram {
   fn: import { deleteLoyaltyProgram } from "@src/loyalty/operations",
-  entities: [LoyaltyProgram]
+  entities: [LoyaltyProgram, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action createLoyaltyTier {
   fn: import { createLoyaltyTier } from "@src/loyalty/operations",
-  entities: [LoyaltyTier]
+  entities: [LoyaltyTier, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action updateLoyaltyTier {
   fn: import { updateLoyaltyTier } from "@src/loyalty/operations",
-  entities: [LoyaltyTier]
+  entities: [LoyaltyTier, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action deleteLoyaltyTier {
   fn: import { deleteLoyaltyTier } from "@src/loyalty/operations",
-  entities: [LoyaltyTier]
+  entities: [LoyaltyTier, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action adjustLoyaltyBalance {
   fn: import { adjustLoyaltyBalance } from "@src/loyalty/operations",
-  entities: [ClientLoyaltyBalance, LoyaltyTransaction, LoyaltyProgram]
+  entities: [ClientLoyaltyBalance, LoyaltyTransaction, LoyaltyProgram, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action processCashbackEarning {
   fn: import { processCashbackEarning } from "@src/loyalty/operations",
-  entities: [ClientLoyaltyBalance, LoyaltyTransaction, LoyaltyProgram, LoyaltyTier]
+  entities: [ClientLoyaltyBalance, LoyaltyTransaction, LoyaltyProgram, LoyaltyTier, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action redeemLoyalty {
   fn: import { redeemLoyalty } from "@src/loyalty/operations",
-  entities: [ClientLoyaltyBalance, LoyaltyTransaction]
+  entities: [ClientLoyaltyBalance, LoyaltyTransaction, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 // ============================================================================
@@ -1179,68 +1248,68 @@ action redeemLoyalty {
 // Referral Program Queries
 query listReferralPrograms {
   fn: import { listReferralPrograms } from "@src/referral/operations",
-  entities: [ReferralProgram]
+  entities: [ReferralProgram, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query getReferralProgram {
   fn: import { getReferralProgram } from "@src/referral/operations",
-  entities: [ReferralProgram]
+  entities: [ReferralProgram, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query listReferrals {
   fn: import { listReferrals } from "@src/referral/operations",
-  entities: [Referral, Client, ReferralProgram]
+  entities: [Referral, Client, ReferralProgram, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query getClientReferralCode {
   fn: import { getClientReferralCode } from "@src/referral/operations",
-  entities: [Referral, Client, ReferralProgram]
+  entities: [Referral, Client, ReferralProgram, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query getReferralStats {
   fn: import { getReferralStats } from "@src/referral/operations",
-  entities: [Referral]
+  entities: [Referral, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query getReferralLeaderboard {
   fn: import { getReferralLeaderboard } from "@src/referral/operations",
-  entities: [Referral, Client]
+  entities: [Referral, Client, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 // Referral Program Actions
 action createReferralProgram {
   fn: import { createReferralProgram } from "@src/referral/operations",
-  entities: [ReferralProgram]
+  entities: [ReferralProgram, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action updateReferralProgram {
   fn: import { updateReferralProgram } from "@src/referral/operations",
-  entities: [ReferralProgram]
+  entities: [ReferralProgram, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action deleteReferralProgram {
   fn: import { deleteReferralProgram } from "@src/referral/operations",
-  entities: [ReferralProgram]
+  entities: [ReferralProgram, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action createReferral {
   fn: import { createReferral } from "@src/referral/operations",
-  entities: [Referral, Client, ReferralProgram]
+  entities: [Referral, Client, ReferralProgram, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action trackReferralClick {
   fn: import { trackReferralClick } from "@src/referral/operations",
-  entities: [Referral]
+  entities: [Referral, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action completeReferralSignup {
   fn: import { completeReferralSignup } from "@src/referral/operations",
-  entities: [Referral, ReferralProgram]
+  entities: [Referral, ReferralProgram, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action qualifyReferral {
   fn: import { qualifyReferral } from "@src/referral/operations",
-  entities: [Referral, ReferralProgram, ClientLoyaltyBalance, LoyaltyTransaction]
+  entities: [Referral, ReferralProgram, ClientLoyaltyBalance, LoyaltyTransaction, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 // ============================================================================
@@ -1250,48 +1319,48 @@ action qualifyReferral {
 // Photo Queries
 query getClientPhotos {
   fn: import { getClientPhotos } from "@src/photos/operations",
-  entities: [ClientPhoto, Client, User]
+  entities: [ClientPhoto, Client, User, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query getClientPhoto {
   fn: import { getClientPhoto } from "@src/photos/operations",
-  entities: [ClientPhoto, Client, User, Appointment]
+  entities: [ClientPhoto, Client, User, Appointment, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query searchClientPhotos {
   fn: import { searchClientPhotos } from "@src/photos/operations",
-  entities: [ClientPhoto, Client, User]
+  entities: [ClientPhoto, Client, User, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query getPhotoGallery {
   fn: import { getPhotoGallery } from "@src/photos/operations",
-  entities: [ClientPhoto, Client]
+  entities: [ClientPhoto, Client, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 // Photo Actions
 action uploadClientPhoto {
   fn: import { uploadClientPhoto } from "@src/photos/operations",
-  entities: [ClientPhoto, Client, User]
+  entities: [ClientPhoto, Client, User, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action updateClientPhoto {
   fn: import { updateClientPhoto } from "@src/photos/operations",
-  entities: [ClientPhoto, Client]
+  entities: [ClientPhoto, Client, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action deleteClientPhoto {
   fn: import { deleteClientPhoto } from "@src/photos/operations",
-  entities: [ClientPhoto]
+  entities: [ClientPhoto, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action createBeforeAfterPair {
   fn: import { createBeforeAfterPair } from "@src/photos/operations",
-  entities: [ClientPhoto]
+  entities: [ClientPhoto, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action updatePhotoApproval {
   fn: import { updatePhotoApproval } from "@src/photos/operations",
-  entities: [ClientPhoto]
+  entities: [ClientPhoto, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 // ============================================================================
@@ -1301,68 +1370,68 @@ action updatePhotoApproval {
 // Anamnesis Form Queries
 query listAnamnesisForms {
   fn: import { listAnamnesisForms } from "@src/anamnesis/operations",
-  entities: [AnamnesisForm, User]
+  entities: [AnamnesisForm, User, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query getAnamnesisForm {
   fn: import { getAnamnesisForm } from "@src/anamnesis/operations",
-  entities: [AnamnesisForm, User]
+  entities: [AnamnesisForm, User, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query listClientAnamnesis {
   fn: import { listClientAnamnesis } from "@src/anamnesis/operations",
-  entities: [ClientAnamnesis, AnamnesisForm, User]
+  entities: [ClientAnamnesis, AnamnesisForm, User, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query getClientAnamnesis {
   fn: import { getClientAnamnesis } from "@src/anamnesis/operations",
-  entities: [ClientAnamnesis, Client, AnamnesisForm, User, Appointment]
+  entities: [ClientAnamnesis, Client, AnamnesisForm, User, Appointment, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query getClientAnamnesisHistory {
   fn: import { getClientAnamnesisHistory } from "@src/anamnesis/operations",
-  entities: [ClientAnamnesis, AnamnesisForm, User]
+  entities: [ClientAnamnesis, AnamnesisForm, User, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 // Anamnesis Form Actions
 action createAnamnesisForm {
   fn: import { createAnamnesisForm } from "@src/anamnesis/operations",
-  entities: [AnamnesisForm, User]
+  entities: [AnamnesisForm, User, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action updateAnamnesisForm {
   fn: import { updateAnamnesisForm } from "@src/anamnesis/operations",
-  entities: [AnamnesisForm]
+  entities: [AnamnesisForm, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action deleteAnamnesisForm {
   fn: import { deleteAnamnesisForm } from "@src/anamnesis/operations",
-  entities: [AnamnesisForm]
+  entities: [AnamnesisForm, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action duplicateAnamnesisForm {
   fn: import { duplicateAnamnesisForm } from "@src/anamnesis/operations",
-  entities: [AnamnesisForm, User]
+  entities: [AnamnesisForm, User, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action createClientAnamnesis {
   fn: import { createClientAnamnesis } from "@src/anamnesis/operations",
-  entities: [ClientAnamnesis, Client, AnamnesisForm, User]
+  entities: [ClientAnamnesis, Client, AnamnesisForm, User, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action updateClientAnamnesis {
   fn: import { updateClientAnamnesis } from "@src/anamnesis/operations",
-  entities: [ClientAnamnesis]
+  entities: [ClientAnamnesis, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action signClientAnamnesis {
   fn: import { signClientAnamnesis } from "@src/anamnesis/operations",
-  entities: [ClientAnamnesis, AnamnesisForm]
+  entities: [ClientAnamnesis, AnamnesisForm, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action generateAnamnesisPDF {
   fn: import { generateAnamnesisPDF } from "@src/anamnesis/operations",
-  entities: [ClientAnamnesis, Client, AnamnesisForm, User]
+  entities: [ClientAnamnesis, Client, AnamnesisForm, User, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 // ============================================================================
@@ -1372,53 +1441,53 @@ action generateAnamnesisPDF {
 // Analytics Queries
 query getClientMetrics {
   fn: import { getClientMetrics } from "@src/analytics-advanced/operations",
-  entities: [ClientMetrics, Client]
+  entities: [ClientMetrics, Client, Appointment, Sale, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query getClientChurnRisk {
   fn: import { getClientChurnRisk } from "@src/analytics-advanced/operations",
-  entities: [ClientMetrics, Client]
+  entities: [ClientMetrics, Client, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query getClientCLV {
   fn: import { getClientCLV } from "@src/analytics-advanced/operations",
-  entities: [ClientMetrics, Client]
+  entities: [ClientMetrics, Client, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query getRetentionAnalytics {
   fn: import { getRetentionAnalytics } from "@src/analytics-advanced/operations",
-  entities: [ClientMetrics]
+  entities: [ClientMetrics, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query getCohortAnalysis {
   fn: import { getCohortAnalysis } from "@src/analytics-advanced/operations",
-  entities: [ClientMetrics]
+  entities: [ClientMetrics, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query getSalonDashboard {
   fn: import { getSalonDashboard } from "@src/analytics-advanced/operations",
-  entities: [SalonAnalytics, ClientMetrics]
+  entities: [SalonAnalytics, ClientMetrics, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query getTopClients {
   fn: import { getTopClients } from "@src/analytics-advanced/operations",
-  entities: [ClientMetrics, Client]
+  entities: [ClientMetrics, Client, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 query getClientPreferences {
   fn: import { getClientPreferences } from "@src/analytics-advanced/operations",
-  entities: [ClientMetrics]
+  entities: [ClientMetrics, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 // Analytics Actions
 action calculateClientMetrics {
   fn: import { calculateClientMetrics } from "@src/analytics-advanced/operations",
-  entities: [ClientMetrics, Client, Appointment, Sale]
+  entities: [ClientMetrics, Client, Appointment, Sale, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 action updateSalonAnalytics {
   fn: import { updateSalonAnalytics } from "@src/analytics-advanced/operations",
-  entities: [SalonAnalytics, Client, ClientMetrics, Appointment, Sale]
+  entities: [SalonAnalytics, Client, ClientMetrics, Appointment, Sale, UserSalon, Role, Permission, RolePermission, UserRole, Log]
 }
 
 // ============================================================================

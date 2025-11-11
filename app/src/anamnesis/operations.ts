@@ -63,7 +63,7 @@ export const createAnamnesisForm: CreateAnamnesisForm<CreateAnamnesisFormInput, 
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'anamnesis:manage');
+  await requirePermission(context.user, args.salonId, 'anamnesis:manage', context.entities);
 
   const form = await context.entities.AnamnesisForm.create({
     data: {
@@ -101,7 +101,7 @@ export const updateAnamnesisForm: UpdateAnamnesisForm<CreateAnamnesisFormInput &
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'anamnesis:manage');
+  await requirePermission(context.user, args.salonId, 'anamnesis:manage', context.entities);
 
   // Increment version for major changes
   const existingForm = await context.entities.AnamnesisForm.findUnique({
@@ -140,7 +140,7 @@ export const getAnamnesisForm: GetAnamnesisForm<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'anamnesis:view');
+  await requirePermission(context.user, args.salonId, 'anamnesis:view', context.entities);
 
   const form = await context.entities.AnamnesisForm.findFirst({
     where: {
@@ -178,7 +178,7 @@ export const listAnamnesisForms: ListAnamnesisForms<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'anamnesis:view');
+  await requirePermission(context.user, args.salonId, 'anamnesis:view', context.entities);
 
   const where: any = {
     salonId: args.salonId,
@@ -220,7 +220,7 @@ export const deleteAnamnesisForm: DeleteAnamnesisForm<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'anamnesis:manage');
+  await requirePermission(context.user, args.salonId, 'anamnesis:manage', context.entities);
 
   const form = await context.entities.AnamnesisForm.update({
     where: {
@@ -244,7 +244,7 @@ export const duplicateAnamnesisForm: DuplicateAnamnesisForm<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'anamnesis:manage');
+  await requirePermission(context.user, args.salonId, 'anamnesis:manage', context.entities);
 
   const originalForm = await context.entities.AnamnesisForm.findUnique({
     where: { id: args.formId }
@@ -260,7 +260,7 @@ export const duplicateAnamnesisForm: DuplicateAnamnesisForm<{
       createdBy: context.user.id,
       name: args.newName,
       description: originalForm.description,
-      formData: originalForm.formData,
+      formData: originalForm.formData as any,
       isActive: true,
       isDefault: false,
       isTemplate: false,
@@ -286,7 +286,7 @@ export const createClientAnamnesis: CreateClientAnamnesis<CreateClientAnamnesisI
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:manage');
+  await requirePermission(context.user, args.salonId, 'clients:manage', context.entities);
 
   // Get form to check requirements
   const form = await context.entities.AnamnesisForm.findUnique({
@@ -353,7 +353,7 @@ export const updateClientAnamnesis: UpdateClientAnamnesis<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:manage');
+  await requirePermission(context.user, args.salonId, 'clients:manage', context.entities);
 
   const updateData: any = {};
 
@@ -400,7 +400,7 @@ export const getClientAnamnesis: GetClientAnamnesis<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:view');
+  await requirePermission(context.user, args.salonId, 'clients:view', context.entities);
 
   const anamnesis = await context.entities.ClientAnamnesis.findFirst({
     where: {
@@ -450,7 +450,7 @@ export const listClientAnamnesis: ListClientAnamnesis<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:view');
+  await requirePermission(context.user, args.salonId, 'clients:view', context.entities);
 
   const page = args.page || 1;
   const perPage = args.perPage || 20;
@@ -508,7 +508,7 @@ export const signClientAnamnesis: SignClientAnamnesis<SignClientAnamnesisInput, 
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:manage');
+  await requirePermission(context.user, args.salonId, 'clients:manage', context.entities);
 
   const updateData: any = {};
 
@@ -568,7 +568,7 @@ export const generateAnamnesisPDF: GenerateAnamnesisPDF<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:view');
+  await requirePermission(context.user, args.salonId, 'clients:view', context.entities);
 
   const anamnesis = await context.entities.ClientAnamnesis.findFirst({
     where: {
@@ -614,7 +614,7 @@ export const getClientAnamnesisHistory: GetClientAnamnesisHistory<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:view');
+  await requirePermission(context.user, args.salonId, 'clients:view', context.entities);
 
   const history = await context.entities.ClientAnamnesis.findMany({
     where: {

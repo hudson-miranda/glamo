@@ -61,6 +61,30 @@ const PERMISSIONS = [
   { name: 'employees:update', description: 'Edit existing employees' },
   { name: 'employees:delete', description: 'Delete employees' },
 
+  // Loyalty Program permissions
+  { name: 'loyalty:view', description: 'View loyalty programs' },
+  { name: 'loyalty:manage', description: 'Create and manage loyalty programs' },
+  
+  // Referral Program permissions
+  { name: 'referral:view', description: 'View referral programs' },
+  { name: 'referral:manage', description: 'Create and manage referral programs' },
+  
+  // Advanced Analytics permissions
+  { name: 'analytics:view', description: 'View advanced analytics' },
+  { name: 'analytics:manage', description: 'Manage analytics settings' },
+  
+  // Photos/Gallery permissions
+  { name: 'photos:view', description: 'View photo gallery' },
+  { name: 'photos:manage', description: 'Upload and manage photos' },
+  
+  // Anamnesis permissions
+  { name: 'anamnesis:view', description: 'View anamnesis forms' },
+  { name: 'anamnesis:manage', description: 'Create and manage anamnesis forms' },
+  
+  // Advanced Scheduling permissions
+  { name: 'scheduling:view', description: 'View advanced scheduling features' },
+  { name: 'scheduling:manage', description: 'Manage time blocks and waiting lists' },
+
   // Salon settings permissions
   { name: 'can_edit_salon_settings', description: 'Edit salon settings' },
   { name: 'can_view_logs', description: 'View audit logs' },
@@ -84,6 +108,12 @@ const DEFAULT_ROLES = [
       'can_view_reports', 'can_view_commission_reports', 'can_export_reports',
       'can_view_staff', 'can_invite_staff', 'can_edit_staff',
       'employees:read', 'employees:create', 'employees:update', 'employees:delete',
+      'loyalty:view', 'loyalty:manage',
+      'referral:view', 'referral:manage',
+      'analytics:view', 'analytics:manage',
+      'photos:view', 'photos:manage',
+      'anamnesis:view', 'anamnesis:manage',
+      'scheduling:view', 'scheduling:manage',
       'can_view_logs',
     ],
   },
@@ -95,6 +125,11 @@ const DEFAULT_ROLES = [
       'can_view_services',
       'can_view_sales', 'can_create_sales',
       'can_view_commission_reports',
+      'loyalty:view',
+      'referral:view',
+      'photos:view', 'photos:manage',
+      'anamnesis:view',
+      'scheduling:view',
     ],
   },
   {
@@ -175,6 +210,17 @@ export async function createDefaultRolesForSalon(salonId: string, entities?: any
   const shouldDisconnect = !entities;
 
   try {
+    // First, ensure all permissions exist (auto-seed if missing)
+    console.log('Ensuring permissions exist...');
+    for (const perm of PERMISSIONS) {
+      await (entities ? db.Permission : db.permission).upsert({
+        where: { name: perm.name },
+        update: { description: perm.description },
+        create: perm,
+      });
+    }
+    console.log(`✅ Ensured ${PERMISSIONS.length} permissions exist`);
+
     for (const roleConfig of DEFAULT_ROLES) {
       // Create role
       const role = await (entities ? db.Role : db.role).upsert({

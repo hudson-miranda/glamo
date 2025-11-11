@@ -16,6 +16,12 @@ import {
   ChevronRight,
   LucideIcon,
   UserCog,
+  Clock,
+  Gift,
+  UserPlus,
+  Camera,
+  FileText,
+  TrendingUp,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Button } from '../../components/ui/button';
@@ -84,6 +90,42 @@ const navItems: NavItem[] = [
     title: 'Reports',
     href: '/reports',
     icon: BarChart3,
+    permission: 'can_view_reports',
+  },
+  {
+    title: 'Advanced Scheduling',
+    href: '/scheduling/advanced',
+    icon: Clock,
+    permission: 'can_view_appointments',
+  },
+  {
+    title: 'Loyalty Program',
+    href: '/programs/loyalty',
+    icon: Gift,
+    permission: 'can_view_clients',
+  },
+  {
+    title: 'Referral Program',
+    href: '/programs/referral',
+    icon: UserPlus,
+    permission: 'can_view_clients',
+  },
+  {
+    title: 'Photo Gallery',
+    href: '/gallery/photos',
+    icon: Camera,
+    permission: 'can_view_clients',
+  },
+  {
+    title: 'Anamnesis Forms',
+    href: '/forms/anamnesis',
+    icon: FileText,
+    permission: 'can_view_clients',
+  },
+  {
+    title: 'Advanced Analytics',
+    href: '/analytics/advanced',
+    icon: TrendingUp,
     permission: 'can_view_reports',
   },
 ];

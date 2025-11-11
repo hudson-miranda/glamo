@@ -1883,8 +1883,8 @@ model LoyaltyProgram {
   
   // Points System (Optional - for future enhancement)
   pointsEnabled         Boolean @default(false)
-  pointsPerReal         Float   @default(1.0) // Points earned per R$1
-  reaisPerPoint         Float   @default(0.01) // R$ value per point
+  pointsPerReal         Float   @default(1) // Points earned per R$1
+  reaisPerPoint         Float   @default(0.1) // R$ value per point (10 cents)
   
   // VIP Tiers
   vipTiersEnabled       Boolean @default(false)

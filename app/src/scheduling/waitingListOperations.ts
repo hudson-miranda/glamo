@@ -1,6 +1,6 @@
 // Waiting List Management Operations
 import type { WaitingListInput } from './types';
-import { requirePermission } from '@src/rbac/requirePermission';
+import { requirePermission } from '../rbac/requirePermission';
 import { HttpError } from 'wasp/server';
 import { addMinutes } from './utils/dateUtils';
 

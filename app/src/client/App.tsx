@@ -56,7 +56,12 @@ export default function App() {
            location.pathname.startsWith('/cash-register') ||
            location.pathname.startsWith('/reports') ||
            location.pathname.startsWith('/notifications') ||
-           location.pathname.startsWith('/employees');
+           location.pathname.startsWith('/employees') ||
+           location.pathname.startsWith('/scheduling') ||
+           location.pathname.startsWith('/programs') ||
+           location.pathname.startsWith('/gallery') ||
+           location.pathname.startsWith('/forms') ||
+           location.pathname.startsWith('/analytics');
   }, [location]);
 
   useEffect(() => {

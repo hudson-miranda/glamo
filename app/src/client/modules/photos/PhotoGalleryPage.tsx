@@ -2,43 +2,89 @@
 import React, { useState } from 'react';
 import { useQuery } from 'wasp/client/operations';
 import { getPhotoGallery } from 'wasp/client/operations';
+import { useSalonContext } from '../../hooks/useSalonContext';
+import { AlertCircle } from 'lucide-react';
+import { EmptyState } from '../../../components/ui/empty-state';
 
 export default function PhotoGalleryPage() {
+  const { activeSalonId } = useSalonContext();
   const [filter, setFilter] = useState<'all' | 'beforeAfter' | 'portfolio'>('all');
   
-  const { data, isLoading } = useQuery(getPhotoGallery, {
-    salonId: 'current-salon-id', // Would come from context
-    beforeAfterOnly: filter === 'beforeAfter',
-    publicOnly: filter === 'portfolio',
-    page: 1,
-    perPage: 30
-  });
+  const { data, isLoading } = useQuery(
+    getPhotoGallery, 
+    {
+      salonId: activeSalonId || '',
+      beforeAfterOnly: filter === 'beforeAfter',
+      publicOnly: filter === 'portfolio',
+      page: 1,
+      perPage: 30
+    },
+    { enabled: !!activeSalonId }
+  );
 
-  if (isLoading) return <div>Loading...</div>;
+  if (!activeSalonId) {
+    return (
+      <div className="container mx-auto p-6">
+        <EmptyState
+          icon={AlertCircle}
+          title="Nenhum salão selecionado"
+          description="Por favor, selecione um salão para visualizar a galeria de fotos."
+        />
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-muted-foreground">Carregando galeria...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">Galeria de Fotos</h1>
-        <p className="text-gray-600">Gerencie fotos de clientes e resultados</p>
+    <div className="container mx-auto p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Galeria de Fotos</h1>
+          <p className="text-muted-foreground mt-1">
+            Gerencie fotos de clientes e resultados
+          </p>
+        </div>
       </div>
 
-      <div className="mb-6 flex gap-2">
+      {/* Filter Tabs */}
+      <div className="flex gap-2">
         <button
           onClick={() => setFilter('all')}
-          className={`px-4 py-2 rounded-lg ${filter === 'all' ? 'bg-primary-600 text-white' : 'bg-white text-gray-700'}`}
+          className={`px-4 py-2 rounded-lg transition-colors ${
+            filter === 'all' 
+              ? 'bg-primary text-primary-foreground' 
+              : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+          }`}
         >
           Todas
         </button>
         <button
           onClick={() => setFilter('beforeAfter')}
-          className={`px-4 py-2 rounded-lg ${filter === 'beforeAfter' ? 'bg-primary-600 text-white' : 'bg-white text-gray-700'}`}
+          className={`px-4 py-2 rounded-lg transition-colors ${
+            filter === 'beforeAfter' 
+              ? 'bg-primary text-primary-foreground' 
+              : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+          }`}
         >
           Antes/Depois
         </button>
         <button
           onClick={() => setFilter('portfolio')}
-          className={`px-4 py-2 rounded-lg ${filter === 'portfolio' ? 'bg-primary-600 text-white' : 'bg-white text-gray-700'}`}
+          className={`px-4 py-2 rounded-lg transition-colors ${
+            filter === 'portfolio' 
+              ? 'bg-primary text-primary-foreground' 
+              : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+          }`}
         >
           Portfólio
         </button>

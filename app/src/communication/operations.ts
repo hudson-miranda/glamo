@@ -42,9 +42,7 @@ export const listCommunicationLogs = async (
   const skip = (page - 1) * pageSize;
 
   // Build where clause
-  const where: Prisma.CommunicationLogWhereInput = {
-    deletedAt: null,
-  };
+  const where: Prisma.CommunicationLogWhereInput = {};
 
   if (args.clientId) {
     where.clientId = args.clientId;
@@ -657,7 +655,7 @@ export const evaluateSegment = async (
   });
 
   return {
-    clientIds: clients.map((c) => c.id),
+    clientIds: clients.map((c: any) => c.id),
     count: clients.length,
   };
 };

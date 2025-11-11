@@ -76,20 +76,25 @@ export async function requirePermission(
 
   // Check if user has the required permission
   if (!userPermissions.has(permission)) {
-    // Log access denied attempt
-    await entities.Log.create({
-      data: {
-        userId: user.id,
-        entity: 'Permission',
-        entityId: salonId,
-        action: 'ACCESS_DENIED',
-        before: {},
-        after: {
-          permission,
-          userPermissions: Array.from(userPermissions),
+    // Log access denied attempt (but don't let logging failures block the permission check)
+    try {
+      await entities.Log.create({
+        data: {
+          userId: user.id,
+          entity: 'Permission',
+          entityId: salonId,
+          action: 'ACCESS_DENIED',
+          before: {},
+          after: {
+            permission,
+            userPermissions: Array.from(userPermissions),
+          },
         },
-      },
-    });
+      });
+    } catch (logError) {
+      // Silently fail logging - permission check is more important
+      console.error('Failed to log access denied attempt:', logError);
+    }
 
     throw new HttpError(403, `Access denied: missing permission '${permission}'`);
   }

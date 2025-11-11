@@ -1,6 +1,6 @@
 // Time Block Management Operations
 import type { TimeBlockInput } from './types';
-import { requirePermission } from '@src/rbac/requirePermission';
+import { requirePermission } from '../rbac/requirePermission';
 import { HttpError } from 'wasp/server';
 import { startOfDay, endOfDay } from './utils/dateUtils';
 

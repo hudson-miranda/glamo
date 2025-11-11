@@ -2,14 +2,31 @@
 import React from 'react';
 import { useQuery } from 'wasp/client/operations';
 import { getSalonDashboard, getRetentionAnalytics, getClientChurnRisk, getTopClients } from 'wasp/client/operations';
+import { useSalonContext } from '../../hooks/useSalonContext';
 
 export default function AnalyticsDashboard() {
-  const salonId = 'current-salon-id'; // Would come from context
+  const { activeSalonId } = useSalonContext();
   
-  const { data: dashboard, isLoading: loadingDashboard } = useQuery(getSalonDashboard, { salonId, period: 'MONTHLY' });
-  const { data: retention, isLoading: loadingRetention } = useQuery(getRetentionAnalytics, { salonId });
-  const { data: atRisk, isLoading: loadingRisk } = useQuery(getClientChurnRisk, { salonId, minRisk: 60, limit: 5 });
-  const { data: topClients, isLoading: loadingTop } = useQuery(getTopClients, { salonId, orderBy: 'revenue', limit: 5 });
+  const { data: dashboard, isLoading: loadingDashboard } = useQuery(
+    getSalonDashboard, 
+    { salonId: activeSalonId || '', period: 'MONTHLY' },
+    { enabled: !!activeSalonId }
+  );
+  const { data: retention, isLoading: loadingRetention } = useQuery(
+    getRetentionAnalytics, 
+    { salonId: activeSalonId || '' },
+    { enabled: !!activeSalonId }
+  );
+  const { data: atRisk, isLoading: loadingRisk } = useQuery(
+    getClientChurnRisk, 
+    { salonId: activeSalonId || '', minRisk: 60, limit: 5 },
+    { enabled: !!activeSalonId }
+  );
+  const { data: topClients, isLoading: loadingTop } = useQuery(
+    getTopClients, 
+    { salonId: activeSalonId || '', orderBy: 'revenue', limit: 5 },
+    { enabled: !!activeSalonId }
+  );
 
   if (loadingDashboard) return <div>Loading...</div>;
 
@@ -55,7 +72,7 @@ export default function AnalyticsDashboard() {
           <div className="p-6">
             {retention?.byStatus && retention.byStatus.length > 0 ? (
               <div className="space-y-3">
-                {retention.byStatus.map((item) => (
+                {retention.byStatus.map((item: any) => (
                   <div key={item.status} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <span className={`w-3 h-3 rounded-full ${
@@ -90,7 +107,7 @@ export default function AnalyticsDashboard() {
           <div className="p-6">
             {atRisk && atRisk.length > 0 ? (
               <div className="space-y-3">
-                {atRisk.map((item) => (
+                {atRisk.map((item: any) => (
                   <div key={item.clientId} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
                     <div>
                       <p className="font-semibold">{item.client?.name}</p>
@@ -120,7 +137,7 @@ export default function AnalyticsDashboard() {
         <div className="p-6">
           {topClients && topClients.length > 0 ? (
             <div className="space-y-3">
-              {topClients.map((item, index) => (
+              {topClients.map((item: any, index: number) => (
                 <div key={item.clientId} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-4">
                     <span className="font-bold text-2xl text-gray-400 w-8">{index + 1}</span>

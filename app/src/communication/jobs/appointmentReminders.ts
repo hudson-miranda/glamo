@@ -29,12 +29,11 @@ export const sendAppointmentReminders: SendAppointmentReminders<any, any> = asyn
     const appointments = await context.entities.Appointment.findMany({
       where: {
         deletedAt: null,
-        status: { in: ['SCHEDULED', 'CONFIRMED'] },
+        status: 'CONFIRMED',
         startAt: {
           gte: now,
           lte: twentyFiveHoursFromNow,
         },
-        clientId: { not: null },
       },
       include: {
         client: true,
@@ -46,7 +45,7 @@ export const sendAppointmentReminders: SendAppointmentReminders<any, any> = asyn
           },
         },
       },
-    });
+    }) as any[];
 
     console.log(`Found ${appointments.length} upcoming appointments`);
 
@@ -141,7 +140,7 @@ export const sendAppointmentReminders: SendAppointmentReminders<any, any> = asyn
         });
 
         // Get service names
-        const serviceNames = appointment.services.map((s) => s.service.name).join(', ');
+        const serviceNames = appointment.services.map((s: any) => s.service.name).join(', ');
 
         // Reminder message template
         const reminderPrefix = reminderType === '24h' ? '⏰ Lembrete: ' : '⏰ Seu agendamento é daqui a 2 horas!';

@@ -21,7 +21,6 @@ import type {
   // Transaction operations
   GetLoyaltyTransactions,
   ProcessCashbackEarning,
-  ProcessLoyaltyRedemption,
   
   // Analytics
   GetLoyaltyProgramStats
@@ -95,7 +94,7 @@ export const createLoyaltyProgram: CreateLoyaltyProgram<CreateLoyaltyProgramInpu
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'loyalty:manage');
+  await requirePermission(context.user, args.salonId, 'loyalty:manage', context.entities);
 
   const program = await context.entities.LoyaltyProgram.create({
     data: {
@@ -129,7 +128,7 @@ export const updateLoyaltyProgram: UpdateLoyaltyProgram<UpdateLoyaltyProgramInpu
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'loyalty:manage');
+  await requirePermission(context.user, args.salonId, 'loyalty:manage', context.entities);
 
   const program = await context.entities.LoyaltyProgram.update({
     where: {
@@ -165,7 +164,7 @@ export const getLoyaltyProgram: GetLoyaltyProgram<{ programId: string; salonId: 
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'loyalty:view');
+  await requirePermission(context.user, args.salonId, 'loyalty:view', context.entities);
 
   const program = await context.entities.LoyaltyProgram.findFirst({
     where: {
@@ -200,7 +199,7 @@ export const listLoyaltyPrograms: ListLoyaltyPrograms<{ salonId: string }, any> 
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'loyalty:view');
+  await requirePermission(context.user, args.salonId, 'loyalty:view', context.entities);
 
   const programs = await context.entities.LoyaltyProgram.findMany({
     where: {
@@ -234,7 +233,7 @@ export const deleteLoyaltyProgram: DeleteLoyaltyProgram<{ programId: string; sal
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'loyalty:manage');
+  await requirePermission(context.user, args.salonId, 'loyalty:manage', context.entities);
 
   const program = await context.entities.LoyaltyProgram.update({
     where: {
@@ -261,7 +260,7 @@ export const createLoyaltyTier: CreateLoyaltyTier<CreateLoyaltyTierInput, any> =
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'loyalty:manage');
+  await requirePermission(context.user, args.salonId, 'loyalty:manage', context.entities);
 
   const tier = await context.entities.LoyaltyTier.create({
     data: {
@@ -292,7 +291,7 @@ export const updateLoyaltyTier: UpdateLoyaltyTier<CreateLoyaltyTierInput & { tie
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'loyalty:manage');
+  await requirePermission(context.user, args.salonId, 'loyalty:manage', context.entities);
 
   const tier = await context.entities.LoyaltyTier.update({
     where: {
@@ -325,7 +324,7 @@ export const deleteLoyaltyTier: DeleteLoyaltyTier<{ tierId: string; salonId: str
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'loyalty:manage');
+  await requirePermission(context.user, args.salonId, 'loyalty:manage', context.entities);
 
   await context.entities.LoyaltyTier.delete({
     where: {
@@ -348,7 +347,7 @@ export const getClientLoyaltyBalance: GetClientLoyaltyBalance<{ clientId: string
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:view');
+  await requirePermission(context.user, args.salonId, 'clients:view', context.entities);
 
   const balance = await context.entities.ClientLoyaltyBalance.findFirst({
     where: {
@@ -395,7 +394,7 @@ export const adjustLoyaltyBalance: AdjustLoyaltyBalance<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'loyalty:manage');
+  await requirePermission(context.user, args.salonId, 'loyalty:manage', context.entities);
 
   // Get or create client balance
   let balance = await context.entities.ClientLoyaltyBalance.findFirst({
@@ -476,7 +475,7 @@ export const processCashbackEarning: ProcessCashbackEarning<ProcessCashbackEarni
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'sales:manage');
+  await requirePermission(context.user, args.salonId, 'sales:manage', context.entities);
 
   // Get active loyalty program
   const program = await context.entities.LoyaltyProgram.findFirst({
@@ -616,15 +615,15 @@ export const processCashbackEarning: ProcessCashbackEarning<ProcessCashbackEarni
   };
 };
 
-export const redeemLoyalty: ProcessLoyaltyRedemption<RedeemLoyaltyInput, any> = async (
-  args,
-  context
+export const redeemLoyalty = async (
+  args: RedeemLoyaltyInput,
+  context: any
 ) => {
   if (!context.user) {
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'sales:manage');
+  await requirePermission(context.user, args.salonId, 'sales:manage', context.entities);
 
   // Get client balance
   const balance = await context.entities.ClientLoyaltyBalance.findFirst({
@@ -695,7 +694,7 @@ export const getLoyaltyTransactions: GetLoyaltyTransactions<{
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'clients:view');
+  await requirePermission(context.user, args.salonId, 'clients:view', context.entities);
 
   const page = args.page || 1;
   const perPage = args.perPage || 20;
@@ -752,7 +751,7 @@ export const getLoyaltyProgramStats: GetLoyaltyProgramStats<{ programId: string;
     throw new HttpError(401, 'User must be authenticated');
   }
 
-  await requirePermission(context, args.salonId, 'loyalty:view');
+  await requirePermission(context.user, args.salonId, 'loyalty:view', context.entities);
 
   const [
     totalMembers,

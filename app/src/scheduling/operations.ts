@@ -23,7 +23,7 @@ import {
   validateRecurrenceRule,
   getRecurrenceSummary 
 } from './utils/recurrenceUtils';
-import { requirePermission } from '@src/rbac/requirePermission';
+import { requirePermission } from '../rbac/requirePermission';
 import { HttpError } from 'wasp/server';
 
 // ============================================================================
@@ -208,7 +208,7 @@ export const createRecurringAppointment = async (
   });
 
   // Create child appointments (skip first as it's the parent)
-  const childAppointments = [];
+  const childAppointments: any[] = [];
   
   for (let i = 1; i < occurrences.length; i++) {
     const occurrenceDate = occurrences[i];
@@ -632,7 +632,7 @@ export const listAppointments = async (
  * Schedule reminders for an appointment
  */
 async function scheduleReminders(appointment: any, config: any, context: any) {
-  const reminders = [];
+  const reminders: any[] = [];
 
   if (config.reminder24h) {
     const scheduledFor = new Date(appointment.startAt);

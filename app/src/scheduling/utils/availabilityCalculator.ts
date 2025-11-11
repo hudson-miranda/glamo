@@ -135,7 +135,7 @@ export async function getMultiEmployeeAvailability(
   
   // Get unique employees
   const employeeMap = new Map<string, any>();
-  employeeServices.forEach(es => {
+  employeeServices.forEach((es: any) => {
     if (!employeeMap.has(es.employeeId)) {
       employeeMap.set(es.employeeId, es.employee);
     }
@@ -325,7 +325,7 @@ export async function getOccupiedTimeBlocks(
     }
   });
   
-  appointments.forEach(apt => {
+  appointments.forEach((apt: any) => {
     blocks.push({
       start: apt.startAt,
       end: apt.endAt,
@@ -343,7 +343,7 @@ export async function getOccupiedTimeBlocks(
     }
   });
   
-  timeBlocks.forEach(block => {
+  timeBlocks.forEach((block: any) => {
     blocks.push({
       start: block.startTime,
       end: block.endTime,

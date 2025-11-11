@@ -1,6 +1,6 @@
 // Booking Configuration Operations
 import type { BookingPolicyConfig } from './types';
-import { requirePermission } from '@src/rbac/requirePermission';
+import { requirePermission } from '../rbac/requirePermission';
 import { HttpError } from 'wasp/server';
 
 /**

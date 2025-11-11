@@ -1,5 +1,5 @@
 import { HttpError } from 'wasp/server';
-import { Prisma } from '@prisma/client';
+import { Prisma, ClientNoteType, ClientDocumentType } from '@prisma/client';
 import type { 
   ListClients, 
   GetClient, 
@@ -824,7 +824,7 @@ export const addClientNote: AddClientNote<AddClientNoteInput, any> = async (
       userId: context.user.id,
       title,
       content,
-      noteType,
+      noteType: noteType as ClientNoteType,
       isAlert,
       isInternal,
     },
@@ -889,9 +889,14 @@ export const updateClientNote: UpdateClientNote<UpdateClientNoteInput, any> = as
   }
 
   // Update note
+  const updatePayload: any = { ...updateData };
+  if (updateData.noteType) {
+    updatePayload.noteType = updateData.noteType as ClientNoteType;
+  }
+  
   const updatedNote = await context.entities.ClientNote.update({
     where: { id: noteId },
-    data: updateData,
+    data: updatePayload,
     include: {
       user: {
         select: {
@@ -1116,6 +1121,7 @@ export const uploadClientDocument: UploadClientDocument<UploadClientDocumentInpu
       salonId,
       userId: context.user.id,
       ...docData,
+      documentType: docData.documentType as ClientDocumentType,
     },
     include: {
       user: {
