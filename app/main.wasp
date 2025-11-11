@@ -1526,3 +1526,153 @@ job checkTierUpgrades {
   },
   entities: [ClientLoyaltyBalance, LoyaltyTier, LoyaltyProgram]
 }
+
+// ============================================================================
+// Financial Management Queries & Actions
+// ============================================================================
+
+// Financial Categories
+query listFinancialCategories {
+  fn: import { listFinancialCategories } from "@src/financial/operations",
+  entities: [FinancialCategory, UserSalon, Log]
+}
+
+action createFinancialCategory {
+  fn: import { createFinancialCategory } from "@src/financial/operations",
+  entities: [FinancialCategory, UserSalon, Log]
+}
+
+action updateFinancialCategory {
+  fn: import { updateFinancialCategory } from "@src/financial/operations",
+  entities: [FinancialCategory, UserSalon, Log]
+}
+
+action deleteFinancialCategory {
+  fn: import { deleteFinancialCategory } from "@src/financial/operations",
+  entities: [FinancialCategory, UserSalon, Log]
+}
+
+// Accounts Receivable
+query listAccountsReceivable {
+  fn: import { listAccountsReceivable } from "@src/financial/operations",
+  entities: [AccountReceivable, Client, FinancialCategory, Sale, UserSalon, Log]
+}
+
+query getAccountReceivable {
+  fn: import { getAccountReceivable } from "@src/financial/operations",
+  entities: [AccountReceivable, Salon, Client, FinancialCategory, Sale, Service, Product, UserSalon, Log]
+}
+
+action createAccountReceivable {
+  fn: import { createAccountReceivable } from "@src/financial/operations",
+  entities: [AccountReceivable, Client, FinancialCategory, Sale, UserSalon, Log]
+}
+
+action updateAccountReceivable {
+  fn: import { updateAccountReceivable } from "@src/financial/operations",
+  entities: [AccountReceivable, Client, FinancialCategory, UserSalon, Log]
+}
+
+action receiveAccount {
+  fn: import { receiveAccount } from "@src/financial/operations",
+  entities: [AccountReceivable, UserSalon, Log]
+}
+
+action deleteAccountReceivable {
+  fn: import { deleteAccountReceivable } from "@src/financial/operations",
+  entities: [AccountReceivable, UserSalon, Log]
+}
+
+// Accounts Payable
+query listAccountsPayable {
+  fn: import { listAccountsPayable } from "@src/financial/operations",
+  entities: [AccountPayable, Supplier, FinancialCategory, UserSalon, Log]
+}
+
+query getAccountPayable {
+  fn: import { getAccountPayable } from "@src/financial/operations",
+  entities: [AccountPayable, Salon, Supplier, FinancialCategory, UserSalon, Log]
+}
+
+action createAccountPayable {
+  fn: import { createAccountPayable } from "@src/financial/operations",
+  entities: [AccountPayable, Supplier, FinancialCategory, UserSalon, Log]
+}
+
+action updateAccountPayable {
+  fn: import { updateAccountPayable } from "@src/financial/operations",
+  entities: [AccountPayable, Supplier, FinancialCategory, UserSalon, Log]
+}
+
+action payAccount {
+  fn: import { payAccount } from "@src/financial/operations",
+  entities: [AccountPayable, UserSalon, Log]
+}
+
+action deleteAccountPayable {
+  fn: import { deleteAccountPayable } from "@src/financial/operations",
+  entities: [AccountPayable, UserSalon, Log]
+}
+
+// Expenses
+query listExpenses {
+  fn: import { listExpenses } from "@src/financial/operations",
+  entities: [Expense, FinancialCategory, UserSalon, Log]
+}
+
+action createExpense {
+  fn: import { createExpense } from "@src/financial/operations",
+  entities: [Expense, FinancialCategory, UserSalon, Log]
+}
+
+action updateExpense {
+  fn: import { updateExpense } from "@src/financial/operations",
+  entities: [Expense, FinancialCategory, UserSalon, Log]
+}
+
+action deleteExpense {
+  fn: import { deleteExpense } from "@src/financial/operations",
+  entities: [Expense, UserSalon, Log]
+}
+
+// Budgets
+query listBudgets {
+  fn: import { listBudgets } from "@src/financial/operations",
+  entities: [Budget, BudgetItem, FinancialCategory, UserSalon, Log]
+}
+
+query getBudget {
+  fn: import { getBudget } from "@src/financial/operations",
+  entities: [Budget, Salon, BudgetItem, FinancialCategory, UserSalon, Log]
+}
+
+action createBudget {
+  fn: import { createBudget } from "@src/financial/operations",
+  entities: [Budget, BudgetItem, FinancialCategory, UserSalon, Log]
+}
+
+action updateBudget {
+  fn: import { updateBudget } from "@src/financial/operations",
+  entities: [Budget, BudgetItem, FinancialCategory, UserSalon, Log]
+}
+
+action deleteBudget {
+  fn: import { deleteBudget } from "@src/financial/operations",
+  entities: [Budget, UserSalon, Log]
+}
+
+// Financial Reports
+query getCashFlowReport {
+  fn: import { getCashFlowReport } from "@src/financial/operations",
+  entities: [Sale, AccountReceivable, AccountPayable, Expense, UserSalon, Log]
+}
+
+query getFinancialSummary {
+  fn: import { getFinancialSummary } from "@src/financial/operations",
+  entities: [AccountReceivable, AccountPayable, Expense, FinancialCategory, UserSalon, Log]
+}
+
+query getProfitAndLoss {
+  fn: import { getProfitAndLoss } from "@src/financial/operations",
+  entities: [Sale, Expense, AccountPayable, FinancialCategory, Service, Product, UserSalon, Log]
+}
