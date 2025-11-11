@@ -2,29 +2,53 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   server: {
-    open: true,
-    // Hot Module Replacement otimizado
+    host: '0.0.0.0', // Aceita conexões de qualquer IP
+    port: 3000,
+    open: false, // Não tenta abrir o browser automaticamente
+    strictPort: true, // Falha se a porta já estiver em uso
+    // Hot Module Replacement otimizado para servidor remoto
     hmr: {
       overlay: true, // Mostra erros na tela
       protocol: 'ws', // Usa WebSocket para HMR
-      host: 'localhost', // Host do servidor HMR
+      host: '191.252.217.98', // IP público do servidor para HMR
+      clientPort: 3000,
     },
-    // Para WSL/Windows, precisamos usar polling para detectar mudanças
+    // DESABILITA polling para melhorar performance em servidor
     watch: {
-      usePolling: true, // Necessário para WSL detectar mudanças de arquivos
-      interval: 100, // Verifica mudanças a cada 100ms (padrão é 1000ms)
+      usePolling: false, // Desabilita polling para economizar recursos
+      ignored: ['**/node_modules/**', '**/.git/**'], // Ignora pastas desnecessárias
+    },
+    // Otimizações de rede
+    cors: true,
+    headers: {
+      'Cache-Control': 'public, max-age=31536000',
     },
   },
   // Otimizações de build para desenvolvimento
   optimizeDeps: {
     exclude: ['@wasp'], // Não otimiza pacotes do Wasp (já otimizados)
-  },
-  // Melhorar performance do HMR
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: undefined,
-      },
+    include: ['react', 'react-dom'], // Pre-bundle dependências comuns
+    esbuildOptions: {
+      target: 'es2020',
     },
   },
+  // Melhorar performance do build
+  build: {
+    target: 'es2020',
+    minify: 'esbuild',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+        },
+      },
+    },
+    // Reduz verificações em dev
+    sourcemap: false,
+    chunkSizeWarningLimit: 1000,
+  },
+  // Cache agressivo para melhorar velocidade
+  cacheDir: 'node_modules/.vite',
+  // Reduz logs
+  logLevel: 'error',
 })
