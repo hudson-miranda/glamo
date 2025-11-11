@@ -1,4 +1,3 @@
-cat <<EOF > .gitignore
 # Node
 node_modules/
 npm-debug.log
@@ -19,4 +18,10 @@ prisma/migrations/
 # IDEs
 .vscode/
 .idea/
-EOF
+
+# Environment files (NEVER COMMIT THESE)
+app/.env.server
+app/.env.client
+*.env.local
+*.env.development
+*.env.production
