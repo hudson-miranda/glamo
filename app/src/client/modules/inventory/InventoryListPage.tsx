@@ -131,7 +131,7 @@ export default function InventoryListPage() {
                   </TableHeader>
                   <TableBody>
                     {data.products.map((product: any) => {
-                      const isLowStock = product.currentStock <= product.minimumStock;
+                      const isLowStock = product.stockQuantity <= product.minimumStock;
                       return (
                         <TableRow key={product.id}>
                           <TableCell className='font-medium'>
@@ -151,15 +151,15 @@ export default function InventoryListPage() {
                           </TableCell>
                           <TableCell>
                             <div className='flex items-center space-x-2'>
-                              <span>{product.currentStock}</span>
+                              <span>{product.stockQuantity}</span>
                               {isLowStock && (
                                 <AlertTriangle className='h-4 w-4 text-yellow-500' />
                               )}
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant={product.active ? 'success' : 'secondary'}>
-                              {product.active ? 'Active' : 'Inactive'}
+                            <Badge variant={product.deletedAt ? 'outline' : 'success'}>
+                              {product.deletedAt ? 'Inactive' : 'Active'}
                             </Badge>
                           </TableCell>
                           <TableCell className='text-right'>
