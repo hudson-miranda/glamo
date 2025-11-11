@@ -8,7 +8,8 @@
  * - Mock data setup
  */
 
-import { requirePermission, hasPermission, getUserPermissions } from './requirePermission';
+import { requirePermission, getUserPermissions } from './requirePermission';
+import { hasPermission } from './permissions'; // hasPermission is in permissions.ts, not requirePermission.ts
 
 // Mock types
 type TestUser = {

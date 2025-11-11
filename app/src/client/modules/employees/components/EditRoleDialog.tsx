@@ -78,7 +78,7 @@ export function EditRoleDialog({
       setIsSubmitting(true);
       await updateEmployeeRole({
         userSalonId: employee.id,
-        newRoleId,
+        newRoleTemplate: newRoleId, // Changed from newRoleId to newRoleTemplate
       });
 
       toast({

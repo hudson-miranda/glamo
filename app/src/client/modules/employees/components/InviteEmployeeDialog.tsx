@@ -67,7 +67,7 @@ export function InviteEmployeeDialog({
 
     try {
       setIsSubmitting(true);
-      await sendSalonInvite({ email, roleId });
+      await sendSalonInvite({ email, roleTemplate: roleId }); // Changed from roleId to roleTemplate
       
       toast({
         title: 'Convite enviado!',

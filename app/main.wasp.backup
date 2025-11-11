@@ -420,7 +420,7 @@ query getUserSalons {
 
 action createSalon {
   fn: import { createSalon } from "@src/salon/operations",
-  entities: [User, Salon, UserSalon, Log]
+  entities: [User, Salon, UserSalon, Role, Log]
 }
 
 action switchActiveSalon {
@@ -446,7 +446,7 @@ action sendSalonInvite {
 
 action acceptSalonInvite {
   fn: import { acceptSalonInvite } from "@src/salon/invites",
-  entities: [User, SalonInvite, Salon, UserSalon, Log]
+  entities: [User, SalonInvite, Salon, UserSalon, UserRole, Log]
 }
 
 action rejectSalonInvite {
@@ -458,12 +458,12 @@ action rejectSalonInvite {
 // Note: listEmployees is now defined in the Employees Module section
 action updateEmployeeRole {
   fn: import { updateEmployeeRole } from "@src/salon/employees",
-  entities: [User, UserSalon, Log]
+  entities: [User, UserSalon, UserRole, Role, Log]
 }
 
 action deactivateEmployee {
   fn: import { deactivateEmployee } from "@src/salon/employees",
-  entities: [User, UserSalon, Log]
+  entities: [User, UserSalon, UserRole, Role, Log]
 }
 
 action resendInvite {
@@ -559,7 +559,7 @@ query getEmployee {
 
 action createEmployee {
   fn: import { createEmployee } from "@src/employees/operations",
-  entities: [User, Salon, Employee, EmployeeSchedule, SalonInvite, Log, UserSalon]
+  entities: [User, Salon, Employee, EmployeeSchedule, SalonInvite, Role, Log, UserSalon, Permission, RolePermission, UserRole]
 }
 
 action updateEmployee {

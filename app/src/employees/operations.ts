@@ -293,15 +293,10 @@ export const createEmployee: CreateEmployee<CreateEmployeeInput, Employee> = asy
         select: { name: true },
       });
 
-      // Buscar ou criar role padrão para colaboradores
-      const defaultRole = await context.entities.Role.findFirst({
-        where: {
-          salonId,
-          name: { in: ['professional', 'manager', 'Profissional', 'Gerente'] },
-        },
-      });
+      // Use default roleTemplate for employees
+      const defaultRoleTemplate = 'professional'; // or 'manager' based on your needs
 
-      if (defaultRole && salon) {
+      if (salon) {
         // Verificar se já existe um convite pendente
         const existingInvite = await context.entities.SalonInvite.findFirst({
           where: {
@@ -312,13 +307,13 @@ export const createEmployee: CreateEmployee<CreateEmployeeInput, Employee> = asy
         });
 
         if (!existingInvite) {
-          // Criar convite no banco
+          // Criar convite no banco usando roleTemplate
           const invite = await context.entities.SalonInvite.create({
             data: {
               salonId,
               invitedBy: context.user.id,
               email: args.email.toLowerCase(),
-              roleId: defaultRole.id,
+              roleTemplate: defaultRoleTemplate, // Changed from roleId to roleTemplate
               status: 'PENDING',
               expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 dias
             },
@@ -332,7 +327,7 @@ export const createEmployee: CreateEmployee<CreateEmployeeInput, Employee> = asy
 
             const emailContent = getInviteReceivedEmail({
               salonName: salon.name,
-              roleName: defaultRole.name,
+              roleName: defaultRoleTemplate, // Use roleTemplate instead of role.name
               inviterName: context.user.name || context.user.email || 'Proprietário',
               acceptLink: acceptUrl,
               rejectLink: rejectUrl,

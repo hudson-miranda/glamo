@@ -2,7 +2,6 @@ import type { Salon, User, UserSalon } from 'wasp/entities';
 import type { GetUserSalons, CreateSalon, SwitchActiveSalon } from 'wasp/server/operations';
 import { HttpError } from 'wasp/server';
 import { Prisma } from '@prisma/client';
-import { createDefaultRolesForSalon, assignOwnerRole } from '../rbac/seed';
 import { getEffectivePlan, getPlanLimits } from '../payment/plans';
 
 /**
@@ -107,11 +106,24 @@ export const createSalon: CreateSalon<CreateSalonInput, Salon> = async (args, co
     },
   });
 
-  // Create default roles for this salon
-  await createDefaultRolesForSalon(salon.id, context.entities);
+  // Create UserSalon record with owner roleTemplate
+  // No need to create per-salon roles anymore - using global RoleTemplates
+  await context.entities.UserSalon.create({
+    data: {
+      userId: context.user.id,
+      salonId: salon.id,
+      roleTemplate: 'owner',
+      primaryPermissions: 0, // Uses roleTemplate defaults
+      secondaryPermissions: 0,
+      isActive: true,
+    },
+  });
 
-  // Assign owner role to user
-  await assignOwnerRole(context.user.id, salon.id, context.entities);
+  // Update user's active salon
+  await context.entities.User.update({
+    where: { id: context.user.id },
+    data: { activeSalonId: salon.id },
+  });
 
   // Log the action
   await context.entities.Log.create({
@@ -165,7 +177,8 @@ export const switchActiveSalon: SwitchActiveSalon<SwitchActiveSalonInput, User> 
 };
 
 /**
- * List all roles available in the active salon
+ * List all available role templates (global system roles)
+ * NOTE: Roles are now global RoleTemplates, not per-salon
  */
 export const listSalonRoles: any = async (_args: void, context: any) => {
   if (!context.user) {
@@ -176,19 +189,21 @@ export const listSalonRoles: any = async (_args: void, context: any) => {
     throw new HttpError(400, 'No active salon selected');
   }
 
-  const roles = await context.entities.Role.findMany({
+  // Return all RoleTemplates (global system roles)
+  const roleTemplates = await (context.entities as any).RoleTemplate.findMany({
     where: {
-      salonId: context.user.activeSalonId,
-      deletedAt: null,
+      isSystem: true, // Only show system templates
     },
     select: {
       id: true,
       name: true,
+      displayName: true,
+      description: true,
     },
     orderBy: {
       name: 'asc',
     },
   });
 
-  return roles;
+  return roleTemplates;
 };

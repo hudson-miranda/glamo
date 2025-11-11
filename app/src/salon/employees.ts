@@ -21,7 +21,7 @@ export const listEmployees: ListEmployees<
     userId: string;
     userName: string | null;
     userEmail: string | null;
-    roles: Array<{ id: string; name: string }>;
+    roleTemplate: string; // Changed from roles array to single roleTemplate
     isActive: boolean;
     createdAt: Date;
   }>
@@ -55,16 +55,6 @@ export const listEmployees: ListEmployees<
           email: true,
         },
       },
-      userRoles: {
-        include: {
-          role: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-        },
-      },
     },
     orderBy: [
       { isActive: 'desc' }, // Active first
@@ -72,15 +62,12 @@ export const listEmployees: ListEmployees<
     ],
   });
 
-  return employees.map((emp) => ({
+  return employees.map((emp: any) => ({
     id: emp.id,
     userId: emp.user.id,
     userName: emp.user.name,
     userEmail: emp.user.email,
-    roles: emp.userRoles.map((ur) => ({
-      id: ur.role.id,
-      name: ur.role.name,
-    })),
+    roleTemplate: emp.roleTemplate,
     isActive: emp.isActive,
     createdAt: emp.createdAt,
   }));
@@ -91,7 +78,7 @@ export const listEmployees: ListEmployees<
  */
 type UpdateEmployeeRoleInput = {
   userSalonId: string;
-  newRoleId: string;
+  newRoleTemplate: string; // Changed from newRoleId to newRoleTemplate
 };
 
 export const updateEmployeeRole: UpdateEmployeeRole<UpdateEmployeeRoleInput, void> = async (
@@ -106,7 +93,7 @@ export const updateEmployeeRole: UpdateEmployeeRole<UpdateEmployeeRoleInput, voi
     throw new HttpError(400, 'No active salon selected');
   }
 
-  const { userSalonId, newRoleId } = args;
+  const { userSalonId, newRoleTemplate } = args;
 
   // Check permission
   await requirePermission(
@@ -121,7 +108,6 @@ export const updateEmployeeRole: UpdateEmployeeRole<UpdateEmployeeRoleInput, voi
     where: { id: userSalonId },
     include: {
       user: true,
-      userRoles: true,
     },
   });
 
@@ -131,39 +117,24 @@ export const updateEmployeeRole: UpdateEmployeeRole<UpdateEmployeeRoleInput, voi
 
   // Prevent self role change if user is owner
   const currentUserIsOwner = userSalon.userId === context.user.id;
-  if (currentUserIsOwner) {
-    const ownerRole = await context.entities.Role.findFirst({
-      where: {
-        salonId: context.user.activeSalonId,
-        name: 'owner',
-      },
-    });
-
-    const hasOwnerRole = userSalon.userRoles.some((ur) => ur.roleId === ownerRole?.id);
-    if (hasOwnerRole && newRoleId !== ownerRole?.id) {
-      throw new HttpError(403, 'Owners cannot change their own role');
-    }
+  if (currentUserIsOwner && userSalon.roleTemplate === 'owner' && newRoleTemplate !== 'owner') {
+    throw new HttpError(403, 'Owners cannot change their own role');
   }
 
-  // Verify new role exists and belongs to this salon
-  const newRole = await context.entities.Role.findUnique({
-    where: { id: newRoleId },
-  });
-
-  if (!newRole || newRole.salonId !== context.user.activeSalonId) {
-    throw new HttpError(404, 'Role not found in this salon');
+  // Validate roleTemplate
+  const validRoleTemplates = ['owner', 'manager', 'professional', 'cashier', 'assistant', 'client'];
+  if (!validRoleTemplates.includes(newRoleTemplate)) {
+    throw new HttpError(400, 'Invalid role template');
   }
 
-  // Remove all current roles
-  await context.entities.UserRole.deleteMany({
-    where: { userSalonId: userSalon.id },
-  });
-
-  // Assign new role
-  await context.entities.UserRole.create({
+  // Update UserSalon with new roleTemplate
+  await context.entities.UserSalon.update({
+    where: { id: userSalonId },
     data: {
-      userSalonId: userSalon.id,
-      roleId: newRoleId,
+      roleTemplate: newRoleTemplate,
+      // Reset custom permissions when changing role template
+      primaryPermissions: 0,
+      secondaryPermissions: 0,
     },
   });
 
@@ -175,11 +146,10 @@ export const updateEmployeeRole: UpdateEmployeeRole<UpdateEmployeeRoleInput, voi
       entityId: userSalonId,
       action: 'UPDATE_ROLE',
       before: {
-        roles: userSalon.userRoles.map((ur) => ur.roleId),
+        roleTemplate: userSalon.roleTemplate,
       },
       after: {
-        roleId: newRoleId,
-        roleName: newRole.name,
+        roleTemplate: newRoleTemplate,
       },
     },
   });
@@ -217,13 +187,6 @@ export const deactivateEmployee: DeactivateEmployee<DeactivateEmployeeInput, voi
   // Verify the UserSalon belongs to the active salon
   const userSalon = await context.entities.UserSalon.findUnique({
     where: { id: userSalonId },
-    include: {
-      userRoles: {
-        include: {
-          role: true,
-        },
-      },
-    },
   });
 
   if (!userSalon || userSalon.salonId !== context.user.activeSalonId) {
@@ -231,8 +194,7 @@ export const deactivateEmployee: DeactivateEmployee<DeactivateEmployeeInput, voi
   }
 
   // Prevent deactivating owner
-  const isOwner = userSalon.userRoles.some((ur) => ur.role.name === 'owner');
-  if (isOwner) {
+  if (userSalon.roleTemplate === 'owner') {
     throw new HttpError(403, 'Cannot deactivate salon owner');
   }
 
@@ -295,11 +257,6 @@ export const resendInvite: ResendInvite<ResendInviteInput, void> = async (args, 
           name: true,
         },
       },
-      role: {
-        select: {
-          name: true,
-        },
-      },
     },
   });
 
@@ -331,7 +288,7 @@ export const resendInvite: ResendInvite<ResendInviteInput, void> = async (args, 
 
     const emailContent = getInviteReceivedEmail({
       salonName: invite.salon.name,
-      roleName: invite.role.name,
+      roleName: invite.roleTemplate, // Changed from invite.role.name to invite.roleTemplate
       inviterName: context.user.name,
       acceptLink: acceptUrl,
       rejectLink: rejectUrl,

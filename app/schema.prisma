@@ -281,7 +281,7 @@ model SalonInvite {
 
   salonId      String
   email        String
-  roleId       String
+  roleTemplate String // Changed from roleId to roleTemplate name (e.g., 'owner', 'manager', etc.)
   invitedBy    String
   status       InviteStatus @default(PENDING)
   expiresAt    DateTime
@@ -289,7 +289,6 @@ model SalonInvite {
   rejectedAt   DateTime?
 
   salon        Salon        @relation("InvitesSent", fields: [salonId], references: [id], onDelete: Cascade)
-  role         Role         @relation(fields: [roleId], references: [id], onDelete: Restrict)
   inviter      User         @relation(fields: [invitedBy], references: [id], onDelete: Restrict)
 
   @@unique([salonId, email])
@@ -302,18 +301,48 @@ model UserSalon {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  userId    String
-  salonId   String
-  isActive  Boolean   @default(true)
-  deletedAt DateTime?
+  userId       String
+  salonId      String
+  roleTemplate String   // "owner", "manager", "professional", "cashier", "assistant", "client"
+  isActive     Boolean  @default(true)
+  deletedAt    DateTime?
 
-  user      User       @relation(fields: [userId], references: [id], onDelete: Restrict)
-  salon     Salon      @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  // Bitflag permissions (for custom overrides)
+  primaryPermissions   BigInt @default(0) // Core business permissions (64 bits)
+  secondaryPermissions BigInt @default(0) // Advanced module permissions (64 bits)
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Restrict)
+  salon Salon @relation(fields: [salonId], references: [id], onDelete: Restrict)
+
+  // DEPRECATED: Keeping for backwards compatibility during migration
   userRoles UserRole[]
 
   @@unique([userId, salonId])
+  @@index([roleTemplate])
 }
 
+// ============================================================================
+// RBAC Models - Optimized with Bitflags
+// ============================================================================
+
+model RoleTemplate {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  name        String   @unique // "owner", "manager", "professional", "cashier", "assistant", "client"
+  displayName String   // Friendly name for UI
+  description String?
+  isSystem    Boolean  @default(true) // System templates cannot be deleted
+
+  // Bitflag permissions
+  primaryPermissions   BigInt // Core business permissions (64 bits)
+  secondaryPermissions BigInt // Advanced module permissions (64 bits)
+
+  @@index([isSystem])
+}
+
+// DEPRECATED: Keeping for backwards compatibility during migration
 model Role {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())

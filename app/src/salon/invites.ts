@@ -46,11 +46,6 @@ export const getPendingInvites: GetPendingInvites<
           name: true,
         },
       },
-      role: {
-        select: {
-          name: true,
-        },
-      },
       inviter: {
         select: {
           name: true,
@@ -62,10 +57,10 @@ export const getPendingInvites: GetPendingInvites<
     },
   });
 
-  return invites.map((invite) => ({
+  return invites.map((invite: any) => ({
     id: invite.id,
     salonName: invite.salon.name,
-    roleName: invite.role.name,
+    roleName: invite.roleTemplate, // Changed from invite.role.name to roleTemplate
     inviterName: invite.inviter.name,
     createdAt: invite.createdAt,
     expiresAt: invite.expiresAt,
@@ -77,7 +72,7 @@ export const getPendingInvites: GetPendingInvites<
  */
 type SendSalonInviteInput = {
   email: string;
-  roleId: string;
+  roleTemplate: string; // Changed from roleId to roleTemplate (e.g., 'owner', 'manager', etc.)
 };
 
 export const sendSalonInvite: SendSalonInvite<SendSalonInviteInput, SalonInvite> = async (
@@ -92,7 +87,7 @@ export const sendSalonInvite: SendSalonInvite<SendSalonInviteInput, SalonInvite>
     throw new HttpError(400, 'No active salon selected');
   }
 
-  const { email, roleId } = args;
+  const { email, roleTemplate } = args;
 
   // Validate email
   if (!email || !email.includes('@')) {
@@ -160,13 +155,10 @@ export const sendSalonInvite: SendSalonInvite<SendSalonInviteInput, SalonInvite>
     );
   }
 
-  // Verify role exists and belongs to this salon
-  const role = await context.entities.Role.findUnique({
-    where: { id: roleId },
-  });
-
-  if (!role || role.salonId !== context.user.activeSalonId) {
-    throw new HttpError(400, 'Invalid role');
+  // Validate roleTemplate (must be one of the system templates)
+  const validRoleTemplates = ['owner', 'manager', 'professional', 'cashier', 'assistant', 'client'];
+  if (!validRoleTemplates.includes(roleTemplate)) {
+    throw new HttpError(400, 'Invalid role template');
   }
 
   // Check if invite already exists
@@ -209,17 +201,12 @@ export const sendSalonInvite: SendSalonInvite<SendSalonInviteInput, SalonInvite>
     data: {
       salonId: context.user.activeSalonId,
       email: email.toLowerCase(),
-      roleId,
+      roleTemplate,
       invitedBy: context.user.id,
       expiresAt,
     },
     include: {
       salon: {
-        select: {
-          name: true,
-        },
-      },
-      role: {
         select: {
           name: true,
         },
@@ -235,7 +222,7 @@ export const sendSalonInvite: SendSalonInvite<SendSalonInviteInput, SalonInvite>
 
     const emailContent = getInviteReceivedEmail({
       salonName: invite.salon.name,
-      roleName: invite.role.name,
+      roleName: invite.roleTemplate, // Changed from invite.role.name to invite.roleTemplate
       inviterName: context.user.name,
       acceptLink: acceptUrl,
       rejectLink: rejectUrl,
@@ -277,11 +264,6 @@ export const acceptSalonInvite: AcceptSalonInvite<AcceptSalonInviteInput, void> 
     where: { id: inviteId },
     include: {
       salon: {
-        select: {
-          name: true,
-        },
-      },
-      role: {
         select: {
           name: true,
         },
@@ -331,20 +313,15 @@ export const acceptSalonInvite: AcceptSalonInvite<AcceptSalonInviteInput, void> 
     throw new HttpError(400, 'You are already a member of this salon');
   }
 
-  // Create UserSalon relationship
-  const userSalon = await context.entities.UserSalon.create({
+  // Create UserSalon relationship with roleTemplate
+  await context.entities.UserSalon.create({
     data: {
       userId: context.user.id,
       salonId: invite.salonId,
+      roleTemplate: invite.roleTemplate,
+      primaryPermissions: 0, // Uses roleTemplate defaults
+      secondaryPermissions: 0,
       isActive: true,
-    },
-  });
-
-  // Assign role to user
-  await context.entities.UserRole.create({
-    data: {
-      userSalonId: userSalon.id,
-      roleId: invite.roleId,
     },
   });
 
@@ -386,7 +363,7 @@ export const acceptSalonInvite: AcceptSalonInvite<AcceptSalonInviteInput, void> 
         salonName: invite.salon.name,
         userName: context.user.name || context.user.email || 'Usuário',
         userEmail: context.user.email || '',
-        roleName: invite.role.name,
+        roleName: invite.roleTemplate, // Changed from invite.role.name to invite.roleTemplate
         dashboardLink: dashboardUrl,
       });
 
@@ -425,11 +402,6 @@ export const rejectSalonInvite: RejectSalonInvite<RejectSalonInviteInput, void> 
     where: { id: inviteId },
     include: {
       salon: {
-        select: {
-          name: true,
-        },
-      },
-      role: {
         select: {
           name: true,
         },
@@ -487,7 +459,7 @@ export const rejectSalonInvite: RejectSalonInvite<RejectSalonInviteInput, void> 
       const emailContent = getInviteRejectedEmail({
         salonName: invite.salon.name,
         userEmail: context.user.email || 'usuário',
-        roleName: invite.role.name,
+        roleName: invite.roleTemplate, // Changed from invite.role.name to invite.roleTemplate
         dashboardLink: dashboardUrl,
       });
 
