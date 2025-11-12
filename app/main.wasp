@@ -719,6 +719,36 @@ action createPublicBooking {
   entities: [Salon, BookingConfig, Service, Employee, Client, Appointment, AppointmentService, User]
 }
 
+//#region Glamo - Public Booking Module (New Simplified API)
+
+query getPublicBookingPageConfig {
+  fn: import { getBookingConfig } from "@src/booking/publicOperations",
+  entities: [Salon, BookingConfig]
+}
+
+query listPublicServices {
+  fn: import { listPublicServices } from "@src/booking/publicOperations",
+  entities: [Salon, Service, Employee, EmployeeService, BookingConfig]
+}
+
+query listPublicEmployees {
+  fn: import { listPublicEmployees } from "@src/booking/publicOperations",
+  entities: [Salon, Service, Employee, EmployeeService, BookingConfig]
+}
+
+query calculateAvailability {
+  fn: import { calculateAvailability } from "@src/booking/publicOperations",
+  entities: [Salon, Employee, Service, EmployeeService, EmployeeSchedule, Appointment, BookingConfig]
+}
+
+action createPublicAppointment {
+  fn: import { createPublicAppointment } from "@src/booking/publicOperations",
+  entities: [Salon, Employee, Service, EmployeeService, EmployeeSchedule, Appointment, AppointmentService, Client, BookingConfig, Log]
+}
+
+//#endregion
+
+
 // Booking Configuration Operations (Admin)
 query getBookingConfig {
   fn: import { getBookingConfig } from "@src/scheduling/bookingConfigOperations",
