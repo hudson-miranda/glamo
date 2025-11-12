@@ -66,11 +66,6 @@ export const getPublicBookingConfig: GetPublicBookingConfig<
       description: string | null;
       duration: number;
       price: number;
-      categoryId: string | null;
-      category?: {
-        id: string;
-        name: string;
-      } | null;
     }>;
     professionals: Array<{
       id: string;
@@ -135,11 +130,10 @@ export const getPublicBookingConfig: GetPublicBookingConfig<
     throw new HttpError(404, 'Página de agendamento não encontrada ou indisponível');
   }
 
-  // Get active services
+  // Get active services (usando deletedAt ao invés de isActive)
   const services = await context.entities.Service.findMany({
     where: {
       salonId: salon.id,
-      isActive: true,
       deletedAt: null,
     },
     select: {
@@ -148,25 +142,16 @@ export const getPublicBookingConfig: GetPublicBookingConfig<
       description: true,
       duration: true,
       price: true,
-      categoryId: true,
-      category: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
     },
-    orderBy: [
-      { category: { name: 'asc' } },
-      { name: 'asc' },
-    ],
+    orderBy: {
+      name: 'asc',
+    },
   });
 
-  // Get active professionals (employees)
+  // Get active professionals (employees) - usando deletedAt ao invés de isActive
   const professionals = await context.entities.Employee.findMany({
     where: {
       salonId: salon.id,
-      isActive: true,
       acceptsOnlineBooking: true,
       deletedAt: null,
     },
@@ -205,7 +190,7 @@ export const getPublicBookingConfig: GetPublicBookingConfig<
     services,
     professionals: professionals.map((p) => ({
       id: p.id,
-      name: p.user.name || 'Profissional',
+      name: p.user?.name || 'Profissional',
       role: p.role,
       profilePhoto: p.profilePhoto,
       bio: p.bio,
@@ -260,7 +245,7 @@ export const getPublicAvailability: GetPublicAvailability<
     throw new HttpError(404, 'Página de agendamento não encontrada');
   }
 
-  // Get service details
+  // Get service details (usando deletedAt)
   const service = await context.entities.Service.findUnique({
     where: { id: serviceId },
     select: {
@@ -268,10 +253,11 @@ export const getPublicAvailability: GetPublicAvailability<
       name: true,
       duration: true,
       salonId: true,
+      deletedAt: true,
     },
   });
 
-  if (!service || service.salonId !== salon.id) {
+  if (!service || service.salonId !== salon.id || service.deletedAt) {
     throw new HttpError(404, 'Serviço não encontrado');
   }
 
@@ -298,7 +284,7 @@ export const getPublicAvailability: GetPublicAvailability<
     }
   }
 
-  // Get professionals to check
+  // Get professionals to check (usando deletedAt)
   let professionalsToCheck: string[] = [];
   if (professionalId) {
     // Verify professional exists and is active
@@ -306,13 +292,13 @@ export const getPublicAvailability: GetPublicAvailability<
       where: { id: professionalId },
       select: {
         id: true,
-        isActive: true,
         acceptsOnlineBooking: true,
         salonId: true,
+        deletedAt: true,
       },
     });
 
-    if (!professional || professional.salonId !== salon.id || !professional.isActive || !professional.acceptsOnlineBooking) {
+    if (!professional || professional.salonId !== salon.id || !professional.acceptsOnlineBooking || professional.deletedAt) {
       throw new HttpError(404, 'Profissional não disponível');
     }
 
@@ -322,7 +308,6 @@ export const getPublicAvailability: GetPublicAvailability<
     const professionals = await context.entities.Employee.findMany({
       where: {
         salonId: salon.id,
-        isActive: true,
         acceptsOnlineBooking: true,
         deletedAt: null,
       },
@@ -352,8 +337,8 @@ export const getPublicAvailability: GetPublicAvailability<
         {
           salonId: salon.id,
           employeeId: profId,
+          serviceIds: [serviceId],
           date: requestedDate,
-          serviceDuration: service.duration,
         },
         context.entities
       );
@@ -370,7 +355,7 @@ export const getPublicAvailability: GetPublicAvailability<
         },
       });
 
-      const professionalName = professional?.user.name || 'Profissional';
+      const professionalName = professional?.user?.name || 'Profissional';
 
       // Add professional info to each slot
       slots.forEach((slot) => {
@@ -466,7 +451,7 @@ export const createPublicBooking: CreatePublicBooking<
     throw new HttpError(400, 'É necessário aceitar os termos e condições');
   }
 
-  // Validate service
+  // Validate service (usando deletedAt)
   const service = await context.entities.Service.findUnique({
     where: { id: serviceId },
     select: {
@@ -475,27 +460,27 @@ export const createPublicBooking: CreatePublicBooking<
       duration: true,
       price: true,
       salonId: true,
-      isActive: true,
+      deletedAt: true,
     },
   });
 
-  if (!service || service.salonId !== salon.id || !service.isActive) {
+  if (!service || service.salonId !== salon.id || service.deletedAt) {
     throw new HttpError(404, 'Serviço não encontrado ou inativo');
   }
 
-  // Validate professional
+  // Validate professional (usando deletedAt)
   const professional = await context.entities.Employee.findUnique({
     where: { id: professionalId },
     select: {
       id: true,
       userId: true,
       salonId: true,
-      isActive: true,
       acceptsOnlineBooking: true,
+      deletedAt: true,
     },
   });
 
-  if (!professional || professional.salonId !== salon.id || !professional.isActive || !professional.acceptsOnlineBooking) {
+  if (!professional || professional.salonId !== salon.id || !professional.acceptsOnlineBooking || professional.deletedAt) {
     throw new HttpError(404, 'Profissional não disponível');
   }
 
@@ -529,13 +514,12 @@ export const createPublicBooking: CreatePublicBooking<
 
   // Check for conflicts
   const conflicts = await checkAdvancedConflicts(
-    {
-      salonId: salon.id,
-      employeeId: professionalId,
-      startTime: appointmentStartTime,
-      endTime: appointmentEndTime,
-      excludeAppointmentId: undefined,
-    },
+    salon.id,
+    professionalId,
+    appointmentStartTime,
+    appointmentEndTime,
+    serviceId,
+    undefined,
     context.entities
   );
 
@@ -544,29 +528,16 @@ export const createPublicBooking: CreatePublicBooking<
   }
 
   // Find or create client
-  let client = null;
-
-  if (clientData.phone) {
-    // Try to find existing client by phone
-    client = await context.entities.Client.findFirst({
-      where: {
-        salonId: salon.id,
-        phone: clientData.phone,
-        deletedAt: null,
-      },
-    });
-  }
-
-  if (!client && clientData.email) {
-    // Try to find by email
-    client = await context.entities.Client.findFirst({
-      where: {
-        salonId: salon.id,
-        email: clientData.email,
-        deletedAt: null,
-      },
-    });
-  }
+  let client = await context.entities.Client.findFirst({
+    where: {
+      salonId: salon.id,
+      OR: [
+        ...(clientData.phone ? [{ phone: clientData.phone }] : []),
+        ...(clientData.email ? [{ email: clientData.email }] : []),
+      ],
+      deletedAt: null,
+    },
+  });
 
   // Create new client if not found
   if (!client) {
@@ -576,18 +547,7 @@ export const createPublicBooking: CreatePublicBooking<
         name: clientData.name,
         phone: clientData.phone || null,
         email: clientData.email || null,
-        source: 'ONLINE_BOOKING',
         status: 'ACTIVE',
-      },
-    });
-  } else {
-    // Update client info if needed
-    await context.entities.Client.update({
-      where: { id: client.id },
-      data: {
-        name: clientData.name,
-        phone: clientData.phone || client.phone,
-        email: clientData.email || client.email,
       },
     });
   }
@@ -595,33 +555,33 @@ export const createPublicBooking: CreatePublicBooking<
   // Generate confirmation code
   const confirmationCode = generateConfirmationCode();
 
-  // Create appointment
+  // Create appointment usando startAt/endAt (DateTime)
   const appointment = await context.entities.Appointment.create({
     data: {
       salonId: salon.id,
       clientId: client.id,
-      professionalId: professional.userId,
-      startTime: appointmentStartTime,
-      endTime: appointmentEndTime,
+      professionalId: professional.userId || professional.id,
+      employeeId: professional.id,
+      startAt: appointmentStartTime,
+      endAt: appointmentEndTime,
       status: salon.bookingConfig.autoApproveBookings ? 'CONFIRMED' : 'PENDING',
       confirmationCode,
-      source: 'ONLINE_BOOKING',
+      bookedOnline: true,
+      bookingSource: 'CLIENT_ONLINE',
       notes: clientData.notes || null,
-      services: {
-        create: [
-          {
-            serviceId: service.id,
-            quantity: 1,
-            price: service.price,
-            duration: service.duration,
-          },
-        ],
-      },
+      totalPrice: service.price,
+      finalPrice: service.price,
     },
-    select: {
-      id: true,
-      confirmationCode: true,
-      status: true,
+  });
+
+  // Create appointment service
+  await context.entities.AppointmentService.create({
+    data: {
+      appointmentId: appointment.id,
+      serviceId: service.id,
+      customPrice: service.price,
+      customDuration: service.duration,
+      discount: 0,
     },
   });
 
@@ -636,7 +596,7 @@ export const createPublicBooking: CreatePublicBooking<
 
   return {
     appointmentId: appointment.id,
-    confirmationCode: appointment.confirmationCode,
+    confirmationCode: appointment.confirmationCode!,
     message: salon.bookingConfig.autoApproveBookings
       ? 'Agendamento confirmado com sucesso! Você receberá uma confirmação por email.'
       : 'Agendamento recebido! Aguarde a confirmação do salão.',

@@ -22,55 +22,59 @@ import { Prisma } from '@prisma/client';
 // ============================================================================
 
 /**
- * Converte string "HH:mm" para minutos desde meia-noite
+ * Converte string "HH:mm" para Date em uma data específica
+ * @param dateStr - Data no formato "YYYY-MM-DD"
  * @param timeStr - Horário no formato "HH:mm"
- * @returns Minutos desde 00:00
- * @example parseTime("09:30") → 570
+ * @returns Date object
  */
-export function parseTime(timeStr: string): number {
-  const [hours, minutes] = timeStr.split(':').map(Number);
-  return hours * 60 + minutes;
+export function parseDateTime(dateStr: string, timeStr: string): Date {
+  return new Date(`${dateStr}T${timeStr}:00`);
 }
 
 /**
- * Converte minutos desde meia-noite para string "HH:mm"
- * @param minutes - Minutos desde 00:00
+ * Formata DateTime para string "HH:mm"
+ * @param date - Date object
  * @returns Horário no formato "HH:mm"
- * @example formatTime(570) → "09:30"
  */
-export function formatTime(minutes: number): string {
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+export function formatTime(date: Date): string {
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`;
 }
 
 /**
- * Adiciona minutos a um horário
- * @param timeStr - Horário no formato "HH:mm"
+ * Adiciona minutos a um DateTime
+ * @param date - Date object
  * @param minutes - Minutos a adicionar
- * @returns Novo horário no formato "HH:mm"
- * @example addMinutes("09:00", 30) → "09:30"
+ * @returns Novo Date object
  */
-export function addMinutes(timeStr: string, minutes: number): string {
-  const totalMinutes = parseTime(timeStr) + minutes;
-  return formatTime(totalMinutes);
+export function addMinutes(date: Date, minutes: number): Date {
+  return new Date(date.getTime() + minutes * 60000);
 }
 
 /**
- * Gera array de slots de tempo
+ * Gera array de slots de tempo como DateTime
+ * @param dateStr - Data "YYYY-MM-DD"
  * @param startTime - Horário inicial "HH:mm"
  * @param endTime - Horário final "HH:mm"
  * @param duration - Duração de cada slot em minutos
- * @returns Array de horários "HH:mm"
- * @example generateTimeSlots("09:00", "12:00", 60) → ["09:00", "10:00", "11:00"]
+ * @returns Array de objetos {start: Date, end: Date}
  */
-export function generateTimeSlots(startTime: string, endTime: string, duration: number): string[] {
-  const slots: string[] = [];
-  const startMinutes = parseTime(startTime);
-  const endMinutes = parseTime(endTime);
+export function generateTimeSlots(
+  dateStr: string,
+  startTime: string,
+  endTime: string,
+  duration: number
+): Array<{ start: Date; end: Date }> {
+  const slots: Array<{ start: Date; end: Date }> = [];
+  const startDateTime = parseDateTime(dateStr, startTime);
+  const endDateTime = parseDateTime(dateStr, endTime);
 
-  for (let current = startMinutes; current + duration <= endMinutes; current += duration) {
-    slots.push(formatTime(current));
+  let current = startDateTime;
+  while (current.getTime() + duration * 60000 <= endDateTime.getTime()) {
+    const slotEnd = addMinutes(current, duration);
+    slots.push({ start: new Date(current), end: slotEnd });
+    current = slotEnd;
   }
 
   return slots;
@@ -83,15 +87,10 @@ export function generateTimeSlots(startTime: string, endTime: string, duration: 
  * @returns true se há conflito
  */
 export function hasTimeConflict(
-  slot: { start: string; end: string },
-  appointment: { start: string; end: string }
+  slot: { start: Date; end: Date },
+  appointment: { start: Date; end: Date }
 ): boolean {
-  const slotStart = parseTime(slot.start);
-  const slotEnd = parseTime(slot.end);
-  const apptStart = parseTime(appointment.start);
-  const apptEnd = parseTime(appointment.end);
-
-  return slotStart < apptEnd && slotEnd > apptStart;
+  return slot.start < appointment.end && slot.end > appointment.start;
 }
 
 /**
@@ -175,7 +174,7 @@ type GetBookingConfigOutput = {
  * Obtém configurações de agendamento online do salão
  * Operação pública (sem autenticação)
  */
-export const getBookingConfig: GetBookingConfig<
+export const getPublicBookingPageConfig: GetBookingConfig<
   GetBookingConfigInput,
   GetBookingConfigOutput
 > = async ({ bookingSlug }, context) => {
@@ -199,17 +198,16 @@ export const getBookingConfig: GetBookingConfig<
     },
   });
 
-  // Validações
   if (!bookingConfig) {
     throw new HttpError(404, 'Página de agendamento não encontrada');
   }
 
   if (!bookingConfig.enableOnlineBooking) {
-    throw new HttpError(403, 'Agendamento online não está ativo para este salão');
+    throw new HttpError(403, 'Agendamento online está desativado');
   }
 
   if (bookingConfig.salon.deletedAt) {
-    throw new HttpError(404, 'Salão não está mais disponível');
+    throw new HttpError(404, 'Salão não encontrado');
   }
 
   return {
@@ -220,21 +218,21 @@ export const getBookingConfig: GetBookingConfig<
       bookingPageDescription: bookingConfig.bookingPageDescription,
       bookingPageLogo: bookingConfig.bookingPageLogo,
       bookingPageBanner: bookingConfig.bookingPageBanner,
-      bookingPagePrimaryColor: bookingConfig.bookingPagePrimaryColor,
-      bookingPageTheme: bookingConfig.bookingPageTheme,
-      requireClientRegistration: bookingConfig.requireClientRegistration,
-      collectClientPhone: bookingConfig.collectClientPhone,
-      collectClientEmail: bookingConfig.collectClientEmail,
-      collectClientNotes: bookingConfig.collectClientNotes,
-      showProfessionalPhotos: bookingConfig.showProfessionalPhotos,
-      showServicePrices: bookingConfig.showServicePrices,
-      enableServiceSelection: bookingConfig.enableServiceSelection,
-      enableProfessionalChoice: bookingConfig.enableProfessionalChoice,
-      requireTermsAcceptance: bookingConfig.requireTermsAcceptance,
+      bookingPagePrimaryColor: bookingConfig.bookingPagePrimaryColor || '#00FF94',
+      bookingPageTheme: bookingConfig.bookingPageTheme || 'dark',
+      requireClientRegistration: bookingConfig.requireClientRegistration || false,
+      collectClientPhone: bookingConfig.collectClientPhone ?? true,
+      collectClientEmail: bookingConfig.collectClientEmail ?? true,
+      collectClientNotes: bookingConfig.collectClientNotes ?? true,
+      showProfessionalPhotos: bookingConfig.showProfessionalPhotos ?? true,
+      showServicePrices: bookingConfig.showServicePrices ?? true,
+      enableServiceSelection: bookingConfig.enableServiceSelection ?? true,
+      enableProfessionalChoice: bookingConfig.enableProfessionalChoice ?? true,
+      requireTermsAcceptance: bookingConfig.requireTermsAcceptance || false,
       bookingTermsText: bookingConfig.bookingTermsText,
-      minAdvanceHours: bookingConfig.minAdvanceHours,
-      maxAdvanceDays: bookingConfig.maxAdvanceDays,
-      allowSameDayBooking: bookingConfig.allowSameDayBooking,
+      minAdvanceHours: bookingConfig.minAdvanceHours || 2,
+      maxAdvanceDays: bookingConfig.maxAdvanceDays || 90,
+      allowSameDayBooking: bookingConfig.allowSameDayBooking ?? true,
       salon: {
         id: bookingConfig.salon.id,
         name: bookingConfig.salon.name,
@@ -291,11 +289,10 @@ export const listPublicServices: ListPublicServices<
 
   const salonId = bookingConfig.salonId;
 
-  // Buscar serviços ativos do salão
+  // Buscar serviços ativos do salão (usando deletedAt)
   const services = await context.entities.Service.findMany({
     where: {
       salonId,
-      isActive: true,
       deletedAt: null,
     },
     select: {
@@ -318,7 +315,6 @@ export const listPublicServices: ListPublicServices<
           serviceId: service.id,
           employee: {
             salonId,
-            isActive: true,
             acceptsOnlineBooking: true,
             deletedAt: null,
           },
@@ -384,13 +380,12 @@ export const listPublicEmployees: ListPublicEmployees<
 
   const salonId = bookingConfig.salonId;
 
-  // Validar que o serviço existe e pertence ao salão
+  // Validar que o serviço existe e pertence ao salão (usando deletedAt)
   const service = await context.entities.Service.findUnique({
     where: { id: serviceId },
     select: {
       id: true,
       salonId: true,
-      isActive: true,
       deletedAt: true,
     },
   });
@@ -399,17 +394,16 @@ export const listPublicEmployees: ListPublicEmployees<
     throw new HttpError(404, 'Serviço não encontrado');
   }
 
-  if (!service.isActive || service.deletedAt) {
+  if (service.deletedAt) {
     throw new HttpError(400, 'Serviço não está disponível');
   }
 
-  // Buscar employees que podem fazer este serviço
+  // Buscar employees que podem fazer este serviço (usando deletedAt)
   const employeeServices = await context.entities.EmployeeService.findMany({
     where: {
       serviceId,
       employee: {
         salonId,
-        isActive: true,
         acceptsOnlineBooking: true,
         deletedAt: null,
       },
@@ -462,13 +456,13 @@ type CalculateAvailabilityInput = {
 
 type CalculateAvailabilityOutput = {
   availableSlots: Array<{
-    startTime: string; // HH:mm
-    endTime: string; // HH:mm
+    start: Date;
+    end: Date;
   }>;
 };
 
 /**
- * Calcula slots de horário disponíveis para um employee em uma data
+ * Calcula horários disponíveis para um employee em uma data específica
  * Operação pública (sem autenticação)
  */
 export const calculateAvailability: CalculateAvailability<
@@ -484,6 +478,7 @@ export const calculateAvailability: CalculateAvailability<
       minAdvanceHours: true,
       maxAdvanceDays: true,
       allowSameDayBooking: true,
+      slotInterval: true,
     },
   });
 
@@ -493,13 +488,12 @@ export const calculateAvailability: CalculateAvailability<
 
   const salonId = bookingConfig.salonId;
 
-  // Validar employee
+  // Validar employee (usando deletedAt)
   const employee = await context.entities.Employee.findUnique({
     where: { id: employeeId },
     select: {
       id: true,
       salonId: true,
-      isActive: true,
       acceptsOnlineBooking: true,
       deletedAt: true,
     },
@@ -509,18 +503,17 @@ export const calculateAvailability: CalculateAvailability<
     throw new HttpError(404, 'Profissional não encontrado');
   }
 
-  if (!employee.isActive || !employee.acceptsOnlineBooking || employee.deletedAt) {
-    throw new HttpError(400, 'Profissional não está disponível para agendamento online');
+  if (!employee.acceptsOnlineBooking || employee.deletedAt) {
+    throw new HttpError(400, 'Profissional não está disponível');
   }
 
-  // Validar service
+  // Validar service e obter duração
   const service = await context.entities.Service.findUnique({
     where: { id: serviceId },
     select: {
       id: true,
       salonId: true,
       duration: true,
-      isActive: true,
       deletedAt: true,
     },
   });
@@ -529,11 +522,11 @@ export const calculateAvailability: CalculateAvailability<
     throw new HttpError(404, 'Serviço não encontrado');
   }
 
-  if (!service.isActive || service.deletedAt) {
+  if (service.deletedAt) {
     throw new HttpError(400, 'Serviço não está disponível');
   }
 
-  // Validar que o employee pode fazer este serviço
+  // Obter duração customizada se existir
   const employeeService = await context.entities.EmployeeService.findUnique({
     where: {
       employeeId_serviceId: {
@@ -550,25 +543,23 @@ export const calculateAvailability: CalculateAvailability<
     throw new HttpError(400, 'Este profissional não realiza este serviço');
   }
 
-  // Obter duração efetiva do serviço
   const duration = employeeService.customDuration || service.duration;
 
   // Validar data
   const requestedDate = new Date(date + 'T00:00:00');
   const now = new Date();
-  
-  // Validar limites de data
+
   const minDate = new Date(now);
-  minDate.setHours(now.getHours() + bookingConfig.minAdvanceHours);
-  
+  minDate.setHours(now.getHours() + (bookingConfig.minAdvanceHours || 2));
+
   const maxDate = new Date(now);
-  maxDate.setDate(maxDate.getDate() + bookingConfig.maxAdvanceDays);
+  maxDate.setDate(maxDate.getDate() + (bookingConfig.maxAdvanceDays || 90));
   maxDate.setHours(23, 59, 59, 999);
 
   if (requestedDate > maxDate) {
     throw new HttpError(
       400,
-      `Data muito distante. Agendamentos são permitidos até ${bookingConfig.maxAdvanceDays} dias no futuro.`
+      `Agendamento deve ser feito com no máximo ${bookingConfig.maxAdvanceDays} dias de antecedência`
     );
   }
 
@@ -582,10 +573,8 @@ export const calculateAvailability: CalculateAvailability<
     throw new HttpError(400, 'Agendamentos no mesmo dia não são permitidos');
   }
 
-  // Calcular dia da semana (0 = Domingo, 6 = Sábado)
+  // Buscar horários de trabalho do employee nesta data
   const dayOfWeek = requestedDate.getDay();
-
-  // Buscar schedules do employee para este dia da semana
   const schedules = await context.entities.EmployeeSchedule.findMany({
     where: {
       employeeId,
@@ -603,19 +592,14 @@ export const calculateAvailability: CalculateAvailability<
   }
 
   // Gerar todos os slots possíveis baseados nos schedules
-  let allPossibleSlots: Array<{ startTime: string; endTime: string }> = [];
+  let allPossibleSlots: Array<{ start: Date; end: Date }> = [];
 
   for (const schedule of schedules) {
-    const slots = generateTimeSlots(schedule.startTime, schedule.endTime, duration);
-    allPossibleSlots.push(
-      ...slots.map((start) => ({
-        startTime: start,
-        endTime: addMinutes(start, duration),
-      }))
-    );
+    const slots = generateTimeSlots(date, schedule.startTime, schedule.endTime, duration);
+    allPossibleSlots.push(...slots);
   }
 
-  // Buscar appointments existentes do employee nesta data
+  // Buscar appointments existentes do employee nesta data (usando startAt/endAt)
   const startOfDay = new Date(requestedDate);
   startOfDay.setHours(0, 0, 0, 0);
   const endOfDay = new Date(requestedDate);
@@ -624,9 +608,9 @@ export const calculateAvailability: CalculateAvailability<
   const appointments = await context.entities.Appointment.findMany({
     where: {
       employeeId,
-      date: {
+      startAt: {
         gte: startOfDay,
-        lte: endOfDay,
+        lt: endOfDay,
       },
       status: {
         not: 'CANCELLED',
@@ -634,8 +618,8 @@ export const calculateAvailability: CalculateAvailability<
       deletedAt: null,
     },
     select: {
-      startTime: true,
-      endTime: true,
+      startAt: true,
+      endAt: true,
     },
   });
 
@@ -644,16 +628,15 @@ export const calculateAvailability: CalculateAvailability<
     // Verificar conflito com appointments
     const hasConflict = appointments.some((appt) =>
       hasTimeConflict(
-        { start: slot.startTime, end: slot.endTime },
-        { start: appt.startTime, end: appt.endTime }
+        { start: slot.start, end: slot.end },
+        { start: appt.startAt, end: appt.endAt }
       )
     );
 
     if (hasConflict) return false;
 
     // Validar horário mínimo de antecedência
-    const slotDateTime = new Date(date + 'T' + slot.startTime + ':00');
-    if (slotDateTime < minDate) return false;
+    if (slot.start < minDate) return false;
 
     return true;
   });
@@ -684,9 +667,8 @@ type CreatePublicAppointmentInput = {
 type CreatePublicAppointmentOutput = {
   appointment: {
     id: string;
-    date: Date;
-    startTime: string;
-    endTime: string;
+    startAt: Date;
+    endAt: Date;
     status: string;
     confirmationCode: string;
   };
@@ -749,13 +731,13 @@ export const createPublicAppointment: CreatePublicAppointment<
     }
   }
 
-  // Validar employee
+  // Validar employee (usando deletedAt)
   const employee = await context.entities.Employee.findUnique({
     where: { id: employeeId },
     select: {
       id: true,
       salonId: true,
-      isActive: true,
+      userId: true,
       acceptsOnlineBooking: true,
       deletedAt: true,
     },
@@ -765,11 +747,11 @@ export const createPublicAppointment: CreatePublicAppointment<
     throw new HttpError(404, 'Profissional não encontrado');
   }
 
-  if (!employee.isActive || !employee.acceptsOnlineBooking || employee.deletedAt) {
+  if (!employee.acceptsOnlineBooking || employee.deletedAt) {
     throw new HttpError(400, 'Profissional não está disponível');
   }
 
-  // Validar service
+  // Validar service (usando deletedAt)
   const service = await context.entities.Service.findUnique({
     where: { id: serviceId },
     select: {
@@ -778,7 +760,6 @@ export const createPublicAppointment: CreatePublicAppointment<
       salonId: true,
       duration: true,
       price: true,
-      isActive: true,
       deletedAt: true,
     },
   });
@@ -787,7 +768,7 @@ export const createPublicAppointment: CreatePublicAppointment<
     throw new HttpError(404, 'Serviço não encontrado');
   }
 
-  if (!service.isActive || service.deletedAt) {
+  if (service.deletedAt) {
     throw new HttpError(400, 'Serviço não está disponível');
   }
 
@@ -813,11 +794,11 @@ export const createPublicAppointment: CreatePublicAppointment<
   const duration = employeeService.customDuration || service.duration;
   const price = employeeService.customPrice || service.price;
 
-  // Calcular endTime
-  const endTime = addMinutes(startTime, duration);
+  // Calcular startAt e endAt como DateTime
+  const startAt = parseDateTime(date, startTime);
+  const endAt = addMinutes(startAt, duration);
 
   // Validar data/horário
-  const appointmentDate = new Date(date + 'T00:00:00');
   const now = new Date();
 
   const minDate = new Date(now);
@@ -827,16 +808,14 @@ export const createPublicAppointment: CreatePublicAppointment<
   maxDate.setDate(maxDate.getDate() + bookingConfig.maxAdvanceDays);
   maxDate.setHours(23, 59, 59, 999);
 
-  const appointmentDateTime = new Date(date + 'T' + startTime + ':00');
-
-  if (appointmentDateTime < minDate) {
+  if (startAt < minDate) {
     throw new HttpError(
       400,
       `Agendamento deve ser feito com pelo menos ${bookingConfig.minAdvanceHours} horas de antecedência`
     );
   }
 
-  if (appointmentDate > maxDate) {
+  if (startAt > maxDate) {
     throw new HttpError(
       400,
       `Agendamento deve ser feito com no máximo ${bookingConfig.maxAdvanceDays} dias de antecedência`
@@ -846,25 +825,25 @@ export const createPublicAppointment: CreatePublicAppointment<
   // Validar same-day booking
   const todayStart = new Date(now);
   todayStart.setHours(0, 0, 0, 0);
-  const appointmentStart = new Date(appointmentDate);
-  appointmentStart.setHours(0, 0, 0, 0);
+  const appointmentDayStart = new Date(startAt);
+  appointmentDayStart.setHours(0, 0, 0, 0);
 
-  if (!bookingConfig.allowSameDayBooking && appointmentStart.getTime() === todayStart.getTime()) {
+  if (!bookingConfig.allowSameDayBooking && appointmentDayStart.getTime() === todayStart.getTime()) {
     throw new HttpError(400, 'Agendamentos no mesmo dia não são permitidos');
   }
 
-  // Verificar disponibilidade (sem conflitos)
-  const startOfDay = new Date(appointmentDate);
-  startOfDay.setHours(0, 0, 0, 0);
-  const endOfDay = new Date(appointmentDate);
-  endOfDay.setHours(23, 59, 59, 999);
+  // Verificar disponibilidade (sem conflitos) usando startAt/endAt
+  const dayStart = new Date(startAt);
+  dayStart.setHours(0, 0, 0, 0);
+  const dayEnd = new Date(startAt);
+  dayEnd.setHours(23, 59, 59, 999);
 
   const existingAppointments = await context.entities.Appointment.findMany({
     where: {
       employeeId,
-      date: {
-        gte: startOfDay,
-        lte: endOfDay,
+      startAt: {
+        gte: dayStart,
+        lt: dayEnd,
       },
       status: {
         not: 'CANCELLED',
@@ -872,15 +851,15 @@ export const createPublicAppointment: CreatePublicAppointment<
       deletedAt: null,
     },
     select: {
-      startTime: true,
-      endTime: true,
+      startAt: true,
+      endAt: true,
     },
   });
 
   const hasConflict = existingAppointments.some((appt) =>
     hasTimeConflict(
-      { start: startTime, end: endTime },
-      { start: appt.startTime, end: appt.endTime }
+      { start: startAt, end: endAt },
+      { start: appt.startAt, end: appt.endAt }
     )
   );
 
@@ -889,29 +868,14 @@ export const createPublicAppointment: CreatePublicAppointment<
   }
 
   // Buscar ou criar cliente
-  let client = null;
-
-  // Tentar encontrar cliente existente por email ou telefone
-  if (clientEmail) {
-    client = await context.entities.Client.findFirst({
-      where: {
-        salonId,
-        email: clientEmail,
-        deletedAt: null,
-      },
-    });
-  }
-
-  if (!client && clientPhone) {
-    const normalizedPhone = normalizePhone(clientPhone);
-    client = await context.entities.Client.findFirst({
-      where: {
-        salonId,
-        phone: normalizedPhone,
-        deletedAt: null,
-      },
-    });
-  }
+  let client = await context.entities.Client.findFirst({
+    where: {
+      salonId,
+      ...(clientEmail ? { email: clientEmail } : {}),
+      ...(clientPhone ? { phone: normalizePhone(clientPhone) } : {}),
+      deletedAt: null,
+    },
+  });
 
   // Criar novo cliente se não existir
   if (!client) {
@@ -924,22 +888,11 @@ export const createPublicAppointment: CreatePublicAppointment<
         status: 'ACTIVE',
       },
     });
-  } else {
-    // Atualizar dados do cliente se necessário
-    await context.entities.Client.update({
-      where: { id: client.id },
-      data: {
-        name: clientName.trim(),
-        ...(clientEmail && { email: clientEmail }),
-        ...(clientPhone && { phone: normalizePhone(clientPhone) }),
-      },
-    });
   }
 
   // Gerar código de confirmação único
   let confirmationCode = generateConfirmationCode();
   
-  // Garantir que o código seja único
   let existingCode = await context.entities.Appointment.findFirst({
     where: { confirmationCode },
   });
@@ -951,21 +904,22 @@ export const createPublicAppointment: CreatePublicAppointment<
     });
   }
 
-  // Criar appointment
+  // Criar appointment com startAt e endAt (DateTime)
   const appointment = await context.entities.Appointment.create({
     data: {
       salonId,
       clientId: client.id,
-      professionalId: employee.userId || employeeId,
+      professionalId: employee.userId || employee.id,
       employeeId,
-      date: appointmentDate,
-      startAt: appointmentDateTime,
-      endAt: new Date(date + 'T' + endTime + ':00'),
-      startTime,
-      endTime,
+      startAt,
+      endAt,
       status: bookingConfig.autoApproveBookings ? 'CONFIRMED' : 'PENDING',
       confirmationCode,
       notes: notes || null,
+      bookedOnline: true,
+      bookingSource: 'CLIENT_ONLINE',
+      totalPrice: price,
+      finalPrice: price,
     },
   });
 
@@ -993,9 +947,8 @@ export const createPublicAppointment: CreatePublicAppointment<
         clientId: client.id,
         employeeId,
         serviceId,
-        date,
-        startTime,
-        endTime,
+        startAt: startAt.toISOString(),
+        endAt: endAt.toISOString(),
         clientName,
         clientEmail,
         clientPhone,
@@ -1003,17 +956,13 @@ export const createPublicAppointment: CreatePublicAppointment<
     },
   });
 
-  // TODO: Enviar email de confirmação se clientEmail fornecido
-  // Isso seria integrado com o sistema de notificações
-
   return {
     appointment: {
       id: appointment.id,
-      date: appointment.date,
-      startTime: appointment.startTime,
-      endTime: appointment.endTime,
+      startAt: appointment.startAt,
+      endAt: appointment.endAt,
       status: appointment.status,
-      confirmationCode: appointment.confirmationCode,
+      confirmationCode: appointment.confirmationCode!,
     },
     confirmationCode,
   };

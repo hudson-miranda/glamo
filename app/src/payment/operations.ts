@@ -51,7 +51,7 @@ export const listPayments: ListPayments<ListPaymentsInput, any> = async (args, c
   }
 
   // Check permission
-  await requirePermission(context, 'payment.view', args.salonId);
+  await requirePermission(context.user, args.salonId, 'payment.view', context.entities);
 
   const page = args.page || 1;
   const pageSize = args.pageSize || 20;
@@ -191,7 +191,7 @@ export const getPayment: GetPayment<GetPaymentInput, any> = async (args, context
     throw new HttpError(400, 'Salão não encontrado para este pagamento.');
   }
 
-  await requirePermission(context, 'payment.view', salonId);
+  await requirePermission(context.user, salonId, 'payment.view', context.entities);
 
   return payment;
 };
@@ -209,7 +209,7 @@ export const getPaymentMetrics: GetPaymentMetrics<GetPaymentMetricsInput, any> =
   }
 
   // Check permission
-  await requirePermission(context, 'payment.view', args.salonId);
+  await requirePermission(context.user, args.salonId, 'payment.view', context.entities);
 
   // Build date filter
   const dateFilter: any = {};
@@ -326,7 +326,7 @@ export const getPaymentTransactions: GetPaymentTransactions<
   }
 
   // Check permission
-  await requirePermission(context, 'payment.view', args.salonId);
+  await requirePermission(context.user, args.salonId, 'payment.view', context.entities);
 
   const page = args.page || 1;
   const pageSize = args.pageSize || 50;

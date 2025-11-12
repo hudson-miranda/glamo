@@ -1,5 +1,6 @@
 import type { User } from 'wasp/entities';
 import { HttpError } from 'wasp/server';
+import { prisma } from 'wasp/server';
 import { 
   legacyPermissionToBitflag, 
   hasPermission,
@@ -17,10 +18,10 @@ let roleTemplateCache: Map<string, { primary: bigint; secondary: bigint }> | nul
 /**
  * Load role templates into memory cache (called once at startup)
  */
-async function loadRoleTemplates(entities: any): Promise<void> {
+async function loadRoleTemplates(): Promise<void> {
   if (roleTemplateCache) return; // Already loaded
 
-  const templates = await entities.RoleTemplate.findMany({
+  const templates = await prisma.roleTemplate.findMany({
     select: {
       name: true,
       primaryPermissions: true,
@@ -96,7 +97,7 @@ export async function requirePermission(
   }
 
   // Ensure role templates are loaded
-  await loadRoleTemplates(entities);
+  await loadRoleTemplates();
 
   // Get user's salon membership (SINGLE QUERY - super fast!)
   const userSalon = await entities.UserSalon.findUnique({
@@ -180,7 +181,7 @@ export async function getUserPermissions(
   salonId: string,
   entities: any
 ): Promise<{ primary: bigint; secondary: bigint; roleTemplate: string } | null> {
-  await loadRoleTemplates(entities);
+  await loadRoleTemplates();
 
   const userSalon = await entities.UserSalon.findUnique({
     where: {
@@ -226,7 +227,7 @@ export async function checkMultiplePermissions(
     return Object.fromEntries(permissions.map(p => [p, false]));
   }
 
-  await loadRoleTemplates(entities);
+  await loadRoleTemplates();
 
   const userSalon = await entities.UserSalon.findUnique({
     where: {

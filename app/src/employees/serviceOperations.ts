@@ -334,8 +334,12 @@ export const removeServiceFromEmployee: RemoveServiceFromEmployee<RemoveServiceF
   const futureAppointments = await context.entities.Appointment.count({
     where: {
       employeeId: employeeService.employeeId,
-      serviceId: employeeService.serviceId,
-      date: {
+      services: {
+        some: {
+          serviceId: employeeService.serviceId,
+        },
+      },
+      startAt: {
         gte: new Date(),
       },
       status: {

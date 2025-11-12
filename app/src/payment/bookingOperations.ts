@@ -1,6 +1,6 @@
 import { HttpError } from 'wasp/server';
 import type {
-  GetBookingConfig,
+  GetBookingPaymentConfig,
   UpdateBookingPaymentConfig,
 } from 'wasp/server/operations';
 import { requirePermission } from '../rbac/requirePermission';
@@ -9,7 +9,7 @@ import { requirePermission } from '../rbac/requirePermission';
 // Types
 // ============================================================================
 
-type GetBookingConfigInput = {
+type GetBookingPaymentConfigInput = {
   salonId: string;
 };
 
@@ -31,10 +31,10 @@ type UpdateBookingPaymentConfigInput = {
 };
 
 // ============================================================================
-// Query: Get Booking Config
+// Query: Get Booking Payment Config
 // ============================================================================
 
-export const getBookingConfig: GetBookingConfig<GetBookingConfigInput, any> = async (
+export const getBookingPaymentConfig: GetBookingPaymentConfig<GetBookingPaymentConfigInput, any> = async (
   args,
   context
 ) => {
@@ -43,7 +43,7 @@ export const getBookingConfig: GetBookingConfig<GetBookingConfigInput, any> = as
   }
 
   // Check permission
-  await requirePermission(context, 'salon.settings.view', args.salonId);
+  await requirePermission(context.user, args.salonId, 'salon.settings.view', context.entities);
 
   // Get booking config
   let bookingConfig = await context.entities.BookingConfig.findUnique({
@@ -75,7 +75,7 @@ export const updateBookingPaymentConfig: UpdateBookingPaymentConfig<
   }
 
   // Check permission
-  await requirePermission(context, 'salon.settings.update', args.salonId);
+  await requirePermission(context.user, args.salonId, 'salon.settings.update', context.entities);
 
   const { salonId, ...updateData } = args;
 
@@ -134,7 +134,8 @@ export const updateBookingPaymentConfig: UpdateBookingPaymentConfig<
       action: 'UPDATE_BOOKING_PAYMENT_CONFIG',
       entity: 'BookingConfig',
       entityId: bookingConfig.id,
-      description: `Configurações de pagamento online atualizadas`,
+      before: JSON.stringify({ acceptFullPayment: bookingConfig.acceptFullPayment, acceptOnlineDeposit: bookingConfig.acceptOnlineDeposit }),
+      after: JSON.stringify(args),
     },
   });
 

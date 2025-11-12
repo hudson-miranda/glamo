@@ -115,7 +115,7 @@ export default function OnlineBookingSettingsPage() {
     try {
       await updateBookingConfig({
         salonId: activeSalonId,
-        ...formData,
+        config: formData,
       });
 
       setSaveSuccess(true);

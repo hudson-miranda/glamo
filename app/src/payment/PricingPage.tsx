@@ -2,7 +2,9 @@ import { CheckCircle } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from 'wasp/client/auth';
-import { generateCheckoutSession, getCustomerPortalUrl, useQuery } from 'wasp/client/operations';
+// Commented out - not implemented yet
+// import { generateCheckoutSession, getCustomerPortalUrl } from 'wasp/client/operations';
+import { useQuery } from 'wasp/client/operations';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardFooter, CardTitle } from '../components/ui/card';
@@ -53,15 +55,25 @@ const PricingPage = () => {
   const isUserSubscribed =
     !!user && !!user.subscriptionStatus && user.subscriptionStatus !== SubscriptionStatus.Deleted;
 
+  // Temporarily disabled
+  const customerPortalUrl = null;
+  const isCustomerPortalUrlLoading = false;
+  const customerPortalUrlError = null;
+  /*
   const {
     data: customerPortalUrl,
     isLoading: isCustomerPortalUrlLoading,
     error: customerPortalUrlError,
   } = useQuery(getCustomerPortalUrl, { enabled: isUserSubscribed });
+  */
 
   const navigate = useNavigate();
 
   async function handleBuyNowClick(paymentPlanId: PaymentPlanId) {
+    // Temporarily disabled - subscription checkout not implemented
+    setErrorMessage('Subscription checkout is temporarily unavailable. Please contact support.');
+    return;
+    /*
     if (!user) {
       navigate('/login');
       return;
@@ -85,6 +97,7 @@ const PricingPage = () => {
       }
       setIsPaymentLoading(false); // We only set this to false here and not in the try block because we redirect to the checkout url within the same window
     }
+    */
   }
 
   const handleCustomerPortalClick = () => {

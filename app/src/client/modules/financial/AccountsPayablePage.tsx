@@ -19,7 +19,7 @@ import { toast } from 'react-hot-toast';
 export default function AccountsPayablePage() {
   const { activeSalonId } = useSalonContext();
   const [page, setPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<'PENDING' | 'PAID' | 'OVERDUE' | 'PARTIALLY_PAID' | 'CANCELLED' | ''>('');
 
   const { data, isLoading, error, refetch } = useQuery(listAccountsPayable, {
     salonId: activeSalonId || '',

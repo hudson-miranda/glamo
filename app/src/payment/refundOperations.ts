@@ -4,10 +4,20 @@ import type { CreatePaymentRefund, ListPaymentRefunds } from 'wasp/server/operat
 import { requirePermission } from '../rbac/requirePermission';
 import Stripe from 'stripe';
 
-// Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-12-18.acacia',
-});
+// Lazy initialization of Stripe
+let stripeInstance: Stripe | null = null;
+const getStripe = () => {
+  if (!stripeInstance) {
+    const apiKey = process.env.STRIPE_SECRET_KEY;
+    if (!apiKey) {
+      throw new HttpError(500, 'STRIPE_SECRET_KEY não configurada');
+    }
+    stripeInstance = new Stripe(apiKey, {
+      apiVersion: '2025-04-30.basil',
+    });
+  }
+  return stripeInstance;
+};
 
 // ============================================================================
 // Types
@@ -64,7 +74,7 @@ export const createPaymentRefund: CreatePaymentRefund<CreatePaymentRefundInput, 
   }
 
   // Check permission
-  await requirePermission(context, 'payment.refund', payment.appointment.salonId);
+  await requirePermission(context.user, payment.appointment.salonId, 'payment.refund', context.entities);
 
   // Validate payment status
   if (payment.status !== 'PAID') {
@@ -117,7 +127,7 @@ export const createPaymentRefund: CreatePaymentRefund<CreatePaymentRefundInput, 
   }
 
   try {
-    const refund = await stripe.refunds.create({
+    const refund = await getStripe().refunds.create({
       payment_intent: payment.stripePaymentIntentId,
       amount: Math.round(finalRefundAmount * 100), // Convert to cents
       reason: 'requested_by_customer',
@@ -163,7 +173,8 @@ export const createPaymentRefund: CreatePaymentRefund<CreatePaymentRefundInput, 
         action: 'CREATE_PAYMENT_REFUND',
         entity: 'Payment',
         entityId: payment.id,
-        description: `Reembolso de R$ ${finalRefundAmount.toFixed(2)} processado para agendamento ${payment.appointmentId}${cancellationFee > 0 ? ` (Taxa de cancelamento: R$ ${cancellationFee.toFixed(2)})` : ''}`,
+        before: JSON.stringify({ status: payment.status, isRefunded: false }),
+        after: JSON.stringify({ refundAmount: finalRefundAmount, cancellationFee, isRefunded: true }),
       },
     });
 
@@ -199,7 +210,7 @@ export const listPaymentRefunds: ListPaymentRefunds<ListPaymentRefundsInput, any
   }
 
   // Check permission
-  await requirePermission(context, 'payment.view', args.salonId);
+  await requirePermission(context.user, args.salonId, 'payment.view', context.entities);
 
   const page = args.page || 1;
   const pageSize = args.pageSize || 20;

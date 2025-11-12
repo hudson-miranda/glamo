@@ -203,15 +203,16 @@ page CheckoutPage {
   component: import Checkout from "@src/payment/CheckoutPage"
 }
 
-query getCustomerPortalUrl {
-  fn: import { getCustomerPortalUrl } from  "@src/payment/operations",
-  entities: [User]
-}
+// Commented out - not implemented yet
+// query getCustomerPortalUrl {
+//   fn: import { getCustomerPortalUrl } from  "@src/payment/operations",
+//   entities: [User]
+// }
 
-action generateCheckoutSession {
-  fn: import { generateCheckoutSession } from "@src/payment/operations",
-  entities: [User]
-}
+// action generateCheckoutSession {
+//   fn: import { generateCheckoutSession } from "@src/payment/operations",
+//   entities: [User]
+// }
 
 api paymentsWebhook {
   fn: import { paymentsWebhook } from "@src/payment/webhook",
@@ -722,8 +723,8 @@ action createPublicBooking {
 //#region Glamo - Public Booking Module (New Simplified API)
 
 query getPublicBookingPageConfig {
-  fn: import { getBookingConfig } from "@src/booking/publicOperations",
-  entities: [Salon, BookingConfig]
+  fn: import { getPublicBookingPageConfig } from "@src/booking/publicOperations",
+  entities: [Salon, BookingConfig, User, UserSalon]
 }
 
 query listPublicServices {
@@ -752,7 +753,7 @@ action createPublicAppointment {
 // Booking Configuration Operations (Admin)
 query getBookingConfig {
   fn: import { getBookingConfig } from "@src/scheduling/bookingConfigOperations",
-  entities: [BookingConfig, User, UserSalon]
+  entities: [BookingConfig, User, UserSalon, Salon]
 }
 
 action updateBookingConfig {
@@ -1812,9 +1813,9 @@ query getProfitAndLoss {
 // ============================================================================
 
 // Booking Config - Payment Settings
-query getBookingConfig {
-  fn: import { getBookingConfig } from "@src/payment/bookingOperations",
-  entities: [BookingConfig, UserSalon, Log]
+query getBookingPaymentConfig {
+  fn: import { getBookingPaymentConfig } from "@src/payment/bookingOperations",
+  entities: [BookingConfig, UserSalon, Log, User]
 }
 
 action updateBookingPaymentConfig {
@@ -1825,7 +1826,7 @@ action updateBookingPaymentConfig {
 // Payment Checkout
 action createBookingCheckout {
   fn: import { createBookingCheckout } from "@src/payment/bookingCheckout",
-  entities: [Appointment, Payment, Salon, BookingConfig, Client, AppointmentService, Service, User, UserSalon, Log]
+  entities: [Appointment, Payment, Salon, BookingConfig, Client, AppointmentService, Service, User, UserSalon, Log, PaymentMethod]
 }
 
 action confirmBookingPayment {
@@ -1864,4 +1865,13 @@ query getPaymentMetrics {
 query getPaymentTransactions {
   fn: import { getPaymentTransactions } from "@src/payment/operations",
   entities: [Payment, Appointment, Sale, Client, UserSalon, Log]
+}
+
+// ============================================================================
+// RBAC Seed Action
+// ============================================================================
+
+action seedRoleTemplates {
+  fn: import { seedRoleTemplatesAction } from "@src/rbac/seedAction",
+  entities: [RoleTemplate]
 }

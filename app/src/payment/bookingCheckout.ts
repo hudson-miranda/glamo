@@ -5,11 +5,22 @@ import type {
 } from 'wasp/server/operations';
 import { requirePermission } from '../rbac/requirePermission';
 import Stripe from 'stripe';
+import { prisma } from 'wasp/server';
 
-// Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-12-18.acacia',
-});
+// Lazy initialization of Stripe
+let stripeInstance: Stripe | null = null;
+const getStripe = () => {
+  if (!stripeInstance) {
+    const apiKey = process.env.STRIPE_SECRET_KEY;
+    if (!apiKey) {
+      throw new HttpError(500, 'STRIPE_SECRET_KEY não configurada');
+    }
+    stripeInstance = new Stripe(apiKey, {
+      apiVersion: '2025-04-30.basil',
+    });
+  }
+  return stripeInstance;
+};
 
 // ============================================================================
 // Types
@@ -62,7 +73,7 @@ export const createBookingCheckout: CreateBookingCheckout<
   }
 
   // Check permission
-  await requirePermission(context, 'appointment.pay', appointment.salonId);
+  await requirePermission(context.user, appointment.salonId, 'appointment.pay', context.entities);
 
   // Check if appointment already has payment
   if (appointment.paymentStatus === 'PAID') {
@@ -112,7 +123,7 @@ export const createBookingCheckout: CreateBookingCheckout<
   const amountInCents = Math.round(paymentAmount * 100);
 
   // Create Stripe Checkout Session
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     mode: 'payment',
     payment_method_types: ['card'],
     line_items: [
@@ -149,7 +160,7 @@ export const createBookingCheckout: CreateBookingCheckout<
   });
 
   // Create payment record in pending state
-  const paymentMethod = await context.entities.PaymentMethod.findFirst({
+  const paymentMethod = await prisma.paymentMethod.findFirst({
     where: { type: 'ONLINE', isOnline: true },
   });
 
@@ -188,7 +199,8 @@ export const createBookingCheckout: CreateBookingCheckout<
       action: 'CREATE_BOOKING_CHECKOUT',
       entity: 'Payment',
       entityId: payment.id,
-      description: `Checkout criado para agendamento ${appointment.id} - ${paymentType}`,
+      before: JSON.stringify({ appointmentId: appointment.id }),
+      after: JSON.stringify({ paymentId: payment.id, type: paymentType, amount: paymentAmount }),
     },
   });
 
@@ -230,10 +242,10 @@ export const confirmBookingPayment: ConfirmBookingPayment<
   }
 
   // Check permission
-  await requirePermission(context, 'appointment.view', payment.appointment.salonId);
+  await requirePermission(context.user, payment.appointment.salonId, 'appointment.view', context.entities);
 
   // Retrieve Stripe session
-  const session = await stripe.checkout.sessions.retrieve(args.stripeSessionId);
+  const session = await getStripe().checkout.sessions.retrieve(args.stripeSessionId);
 
   if (session.payment_status !== 'paid') {
     throw new HttpError(400, 'Pagamento ainda não foi confirmado pelo Stripe.');
@@ -270,7 +282,8 @@ export const confirmBookingPayment: ConfirmBookingPayment<
       action: 'CONFIRM_BOOKING_PAYMENT',
       entity: 'Payment',
       entityId: payment.id,
-      description: `Pagamento confirmado para agendamento ${payment.appointmentId}`,
+      before: JSON.stringify({ status: 'PENDING', stripeSessionId: args.stripeSessionId }),
+      after: JSON.stringify({ status: 'PAID', paymentIntentId: session.payment_intent }),
     },
   });
 

@@ -1,4 +1,5 @@
-import { getCustomerPortalUrl, useQuery } from 'wasp/client/operations';
+import { useQuery } from 'wasp/client/operations';
+// import { getCustomerPortalUrl } from 'wasp/client/operations'; // Commented out - not implemented
 import { Link as WaspRouterLink, routes } from 'wasp/client/router';
 import type { User } from 'wasp/entities';
 import { Button } from '../components/ui/button';
@@ -146,6 +147,9 @@ function BuyMoreButton() {
 }
 
 function CustomerPortalButton() {
+  // Customer portal temporarily disabled
+  return null;
+  /*
   const {
     data: customerPortalUrl,
     isLoading: isCustomerPortalUrlLoading,
@@ -177,4 +181,5 @@ function CustomerPortalButton() {
       </Button>
     </div>
   );
+  */
 }

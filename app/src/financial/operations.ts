@@ -1803,7 +1803,7 @@ export const getCashFlowReport: GetCashFlowReport<GetCashFlowReportInput, any> =
           gte: startDate,
           lte: endDate,
         },
-        status: 'CLOSED',
+        status: 'PAID',
         deletedAt: null,
       },
       select: {
@@ -2058,7 +2058,7 @@ export const getProfitAndLoss: GetProfitAndLoss<GetProfitAndLossInput, any> = as
         gte: startDate,
         lte: endDate,
       },
-      status: 'CLOSED',
+      status: 'PAID',
       deletedAt: null,
     },
     include: {
@@ -2087,7 +2087,7 @@ export const getProfitAndLoss: GetProfitAndLoss<GetProfitAndLossInput, any> = as
   });
 
   let totalRevenue = 0;
-  let servicebRevenue = 0;
+  let serviceRevenue = 0;
   let productRevenue = 0;
   let productCost = 0;
 

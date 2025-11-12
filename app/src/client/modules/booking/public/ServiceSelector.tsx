@@ -10,11 +10,6 @@ interface Service {
   description: string | null;
   duration: number;
   price: number;
-  categoryId: string | null;
-  category?: {
-    id: string;
-    name: string;
-  } | null;
 }
 
 interface ServiceSelectorProps {
@@ -30,9 +25,9 @@ export function ServiceSelector({
   onSelectService,
   showPrices,
 }: ServiceSelectorProps) {
-  // Group services by category
+  // Group all services under one category since Service model doesn't have direct category relation
   const groupedServices = services.reduce((acc, service) => {
-    const categoryName = service.category?.name || 'Outros Serviços';
+    const categoryName = 'Todos os Serviços';
     if (!acc[categoryName]) {
       acc[categoryName] = [];
     }
