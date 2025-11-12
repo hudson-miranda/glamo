@@ -6,7 +6,10 @@ import type {
   UpdateEmployee,
   DeleteEmployee,
   UpdateEmployeeSchedules,
-  UpdateEmployeeServices
+  UpdateEmployeeServices,
+  UploadEmployeePhoto,
+  LinkEmployeeToUser,
+  UnlinkEmployeeFromUser
 } from 'wasp/server/operations';
 import { HttpError } from 'wasp/server';
 import { requirePermission } from '../rbac/requirePermission';
@@ -617,6 +620,194 @@ export const updateEmployeeServices: UpdateEmployeeServices<UpdateEmployeeServic
 };
 
 // ============================================================================
+// Action: uploadEmployeePhoto
+// ============================================================================
+type UploadEmployeePhotoInput = {
+  id: string;
+  photoUrl: string;
+};
+
+export const uploadEmployeePhoto: UploadEmployeePhoto<UploadEmployeePhotoInput, Employee> = async (args, context) => {
+  if (!context.user) {
+    throw new HttpError(401, 'Você precisa estar autenticado');
+  }
+
+  const employee = await context.entities.Employee.findUnique({
+    where: { id: args.id },
+  });
+
+  if (!employee) {
+    throw new HttpError(404, 'Colaborador não encontrado');
+  }
+
+  // Verificar permissão
+  await requirePermission(context.user, employee.salonId, 'employees:update', context.entities);
+
+  // Validar URL
+  if (!args.photoUrl || !isValidUrl(args.photoUrl)) {
+    throw new HttpError(400, 'URL da foto inválida');
+  }
+
+  // Atualizar foto
+  const updated = await context.entities.Employee.update({
+    where: { id: args.id },
+    data: {
+      profilePhoto: args.photoUrl,
+    },
+  });
+
+  // Log da ação
+  await context.entities.Log.create({
+    data: {
+      userId: context.user.id,
+      entity: 'Employee',
+      entityId: employee.id,
+      action: 'UPDATE',
+      after: {
+        profilePhoto: args.photoUrl,
+      },
+    },
+  });
+
+  return updated;
+};
+
+// ============================================================================
+// Action: linkEmployeeToUser
+// ============================================================================
+type LinkEmployeeToUserInput = {
+  employeeId: string;
+  userId: string;
+};
+
+export const linkEmployeeToUser: LinkEmployeeToUser<LinkEmployeeToUserInput, Employee> = async (args, context) => {
+  if (!context.user) {
+    throw new HttpError(401, 'Você precisa estar autenticado');
+  }
+
+  const employee = await context.entities.Employee.findUnique({
+    where: { id: args.employeeId },
+  });
+
+  if (!employee) {
+    throw new HttpError(404, 'Colaborador não encontrado');
+  }
+
+  // Verificar permissão
+  await requirePermission(context.user, employee.salonId, 'employees:update', context.entities);
+
+  // Verificar se o usuário existe
+  const user = await context.entities.User.findUnique({
+    where: { id: args.userId },
+  });
+
+  if (!user) {
+    throw new HttpError(404, 'Usuário não encontrado');
+  }
+
+  // Verificar se o usuário pertence ao mesmo salão
+  const userSalon = await context.entities.UserSalon.findFirst({
+    where: {
+      userId: args.userId,
+      salonId: employee.salonId,
+    },
+  });
+
+  if (!userSalon) {
+    throw new HttpError(400, 'Usuário não pertence ao mesmo salão');
+  }
+
+  // Atualizar employee
+  const updated = await context.entities.Employee.update({
+    where: { id: args.employeeId },
+    data: {
+      userId: args.userId,
+    },
+  });
+
+  // Log da ação
+  await context.entities.Log.create({
+    data: {
+      userId: context.user.id,
+      entity: 'Employee',
+      entityId: employee.id,
+      action: 'LINK_USER',
+      after: {
+        userId: args.userId,
+        userName: user.name,
+        userEmail: user.email,
+      },
+    },
+  });
+
+  return updated;
+};
+
+// ============================================================================
+// Action: unlinkEmployeeFromUser
+// ============================================================================
+type UnlinkEmployeeFromUserInput = {
+  employeeId: string;
+};
+
+export const unlinkEmployeeFromUser: UnlinkEmployeeFromUser<UnlinkEmployeeFromUserInput, Employee> = async (args, context) => {
+  if (!context.user) {
+    throw new HttpError(401, 'Você precisa estar autenticado');
+  }
+
+  const employee = await context.entities.Employee.findUnique({
+    where: { id: args.employeeId },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+
+  if (!employee) {
+    throw new HttpError(404, 'Colaborador não encontrado');
+  }
+
+  // Verificar permissão
+  await requirePermission(context.user, employee.salonId, 'employees:update', context.entities);
+
+  if (!employee.userId) {
+    throw new HttpError(400, 'Colaborador não está vinculado a nenhum usuário');
+  }
+
+  const oldUser = employee.user;
+
+  // Atualizar employee
+  const updated = await context.entities.Employee.update({
+    where: { id: args.employeeId },
+    data: {
+      userId: null,
+    },
+  });
+
+  // Log da ação
+  await context.entities.Log.create({
+    data: {
+      userId: context.user.id,
+      entity: 'Employee',
+      entityId: employee.id,
+      action: 'UNLINK_USER',
+      before: {
+        userId: oldUser?.id,
+        userName: oldUser?.name,
+        userEmail: oldUser?.email,
+      },
+    },
+  });
+
+  return updated;
+};
+
+// ============================================================================
 // Utility Functions
 // ============================================================================
 function generateRandomColor(): string {
@@ -626,4 +817,13 @@ function generateRandomColor(): string {
     '#FFD93D', '#6BCF7F', '#FF8B94', '#C7CEEA', '#FFDAC1'
   ];
   return colors[Math.floor(Math.random() * colors.length)];
+}
+
+function isValidUrl(url: string): boolean {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
 }
