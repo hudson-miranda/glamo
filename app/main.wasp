@@ -587,6 +587,63 @@ action updateEmployeeServices {
   fn: import { updateEmployeeServices } from "@src/employees/operations",
   entities: [User, Employee, EmployeeService, Service, Log, UserSalon]
 }
+
+action uploadEmployeePhoto {
+  fn: import { uploadEmployeePhoto } from "@src/employees/operations",
+  entities: [User, Employee, Log, UserSalon]
+}
+
+action linkEmployeeToUser {
+  fn: import { linkEmployeeToUser } from "@src/employees/operations",
+  entities: [User, Employee, UserSalon, Log]
+}
+
+action unlinkEmployeeFromUser {
+  fn: import { unlinkEmployeeFromUser } from "@src/employees/operations",
+  entities: [User, Employee, Log, UserSalon]
+}
+
+// Employee Schedule Operations
+query listEmployeeSchedules {
+  fn: import { listEmployeeSchedules } from "@src/employees/scheduleOperations",
+  entities: [User, Employee, EmployeeSchedule, UserSalon]
+}
+
+action createEmployeeSchedule {
+  fn: import { createEmployeeSchedule } from "@src/employees/scheduleOperations",
+  entities: [User, Employee, EmployeeSchedule, Log, UserSalon]
+}
+
+action updateEmployeeSchedule {
+  fn: import { updateEmployeeSchedule } from "@src/employees/scheduleOperations",
+  entities: [User, Employee, EmployeeSchedule, Log, UserSalon]
+}
+
+action deleteEmployeeSchedule {
+  fn: import { deleteEmployeeSchedule } from "@src/employees/scheduleOperations",
+  entities: [User, Employee, EmployeeSchedule, Log, UserSalon]
+}
+
+// Employee Service Operations
+query listEmployeeServices {
+  fn: import { listEmployeeServices } from "@src/employees/serviceOperations",
+  entities: [User, Employee, EmployeeService, Service, UserSalon]
+}
+
+action assignServiceToEmployee {
+  fn: import { assignServiceToEmployee } from "@src/employees/serviceOperations",
+  entities: [User, Employee, Service, EmployeeService, Log, UserSalon]
+}
+
+action updateEmployeeServiceDetails {
+  fn: import { updateEmployeeServiceDetails } from "@src/employees/serviceOperations",
+  entities: [User, Employee, Service, EmployeeService, Log, UserSalon]
+}
+
+action removeServiceFromEmployee {
+  fn: import { removeServiceFromEmployee } from "@src/employees/serviceOperations",
+  entities: [User, Employee, Service, EmployeeService, Appointment, Log, UserSalon]
+}
 //#endregion
 
 //#region Glamo - Appointments Module
