@@ -282,6 +282,12 @@ page AdminSettingsPage {
   component: import AdminSettings from "@src/admin/elements/settings/SettingsPage"
 }
 
+route OnlineBookingSettingsRoute { path: "/settings/online-booking", to: OnlineBookingSettingsPage }
+page OnlineBookingSettingsPage {
+  authRequired: true,
+  component: import OnlineBookingSettingsPage from "@src/client/modules/settings/OnlineBookingSettingsPage"
+}
+
 route AdminCalendarRoute { path: "/admin/calendar", to: AdminCalendarPage }
 page AdminCalendarPage {
   authRequired: true,
@@ -639,6 +645,33 @@ action addToWaitingList {
   fn: import { addToWaitingList } from "@src/scheduling/waitingListOperations",
   entities: [WaitingList, Client, Service, User, UserSalon, Log]
 }
+
+// Public Booking Operations (No auth required)
+query getPublicBookingConfig {
+  fn: import { getPublicBookingConfig } from "@src/scheduling/publicOperations",
+  entities: [Salon, BookingConfig, Service, ServiceCategory, Employee, User]
+}
+
+query getPublicAvailability {
+  fn: import { getPublicAvailability } from "@src/scheduling/publicOperations",
+  entities: [Salon, BookingConfig, Service, Employee, Appointment, AvailableTimeslot, TimeBlock]
+}
+
+action createPublicBooking {
+  fn: import { createPublicBooking } from "@src/scheduling/publicOperations",
+  entities: [Salon, BookingConfig, Service, Employee, Client, Appointment, AppointmentService, User]
+}
+
+// Booking Configuration Operations (Admin)
+query getBookingConfig {
+  fn: import { getBookingConfig } from "@src/scheduling/bookingConfigOperations",
+  entities: [BookingConfig, User, UserSalon]
+}
+
+action updateBookingConfig {
+  fn: import { updateBookingConfig } from "@src/scheduling/bookingConfigOperations",
+  entities: [BookingConfig, User, UserSalon, Log]
+}
 //#endregion
 
 //#region Glamo - Sales Module
@@ -942,6 +975,16 @@ route ReportsRoute { path: "/reports", to: ReportsPage }
 page ReportsPage {
   authRequired: true,
   component: import ReportsPage from "@src/client/modules/reports/ReportsPage"
+}
+
+// ============================================================================
+// PUBLIC BOOKING PAGE (No auth required)
+// ============================================================================
+
+route PublicBookingRoute { path: "/book/:bookingSlug", to: PublicBookingPage }
+page PublicBookingPage {
+  authRequired: false,
+  component: import PublicBookingPage from "@src/client/modules/booking/public/PublicBookingPage"
 }
 
 // ============================================================================
@@ -1675,4 +1718,63 @@ query getFinancialSummary {
 query getProfitAndLoss {
   fn: import { getProfitAndLoss } from "@src/financial/operations",
   entities: [Sale, Expense, AccountPayable, FinancialCategory, Service, Product, UserSalon, Log]
+}
+
+// ============================================================================
+// Online Payment Queries & Actions
+// ============================================================================
+
+// Booking Config - Payment Settings
+query getBookingConfig {
+  fn: import { getBookingConfig } from "@src/payment/bookingOperations",
+  entities: [BookingConfig, UserSalon, Log]
+}
+
+action updateBookingPaymentConfig {
+  fn: import { updateBookingPaymentConfig } from "@src/payment/bookingOperations",
+  entities: [BookingConfig, UserSalon, Log]
+}
+
+// Payment Checkout
+action createBookingCheckout {
+  fn: import { createBookingCheckout } from "@src/payment/bookingCheckout",
+  entities: [Appointment, Payment, Salon, BookingConfig, Client, AppointmentService, Service, User, UserSalon, Log]
+}
+
+action confirmBookingPayment {
+  fn: import { confirmBookingPayment } from "@src/payment/bookingCheckout",
+  entities: [Appointment, Payment, UserSalon, Log]
+}
+
+// Payment Management
+query listPayments {
+  fn: import { listPayments } from "@src/payment/operations",
+  entities: [Payment, Appointment, Sale, Client, User, PaymentMethod, UserSalon, Log]
+}
+
+query getPayment {
+  fn: import { getPayment } from "@src/payment/operations",
+  entities: [Payment, Appointment, Sale, Client, User, PaymentMethod, UserSalon, Log]
+}
+
+// Refund Management
+action createPaymentRefund {
+  fn: import { createPaymentRefund } from "@src/payment/refundOperations",
+  entities: [Payment, Appointment, UserSalon, Log]
+}
+
+query listPaymentRefunds {
+  fn: import { listPaymentRefunds } from "@src/payment/refundOperations",
+  entities: [Payment, Appointment, UserSalon, Log]
+}
+
+// Payment Metrics & Reports
+query getPaymentMetrics {
+  fn: import { getPaymentMetrics } from "@src/payment/operations",
+  entities: [Payment, Appointment, Salon, UserSalon, Log]
+}
+
+query getPaymentTransactions {
+  fn: import { getPaymentTransactions } from "@src/payment/operations",
+  entities: [Payment, Appointment, Sale, Client, UserSalon, Log]
 }

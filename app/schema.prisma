@@ -864,6 +864,23 @@ enum PaymentStatus {
   PARTIAL
   PAID
   REFUNDED
+  CANCELLED
+}
+
+enum DepositType {
+  FIXED
+  PERCENTAGE
+}
+
+enum FeeType {
+  FIXED
+  PERCENTAGE
+}
+
+enum PaymentType {
+  FULL
+  DEPOSIT
+  REMAINING
 }
 
 model Appointment {
@@ -909,6 +926,11 @@ model Appointment {
   discountAmount Float? @default(0)
   finalPrice     Float?
 
+  // Online Payment
+  totalPaid       Float   @default(0)
+  remainingAmount Float   @default(0)
+  requiresPayment Boolean @default(false)
+
   deletedAt DateTime?
 
   salon        Salon                  @relation(fields: [salonId], references: [id], onDelete: Restrict)
@@ -926,6 +948,9 @@ model Appointment {
   // Phase 3: Loyalty & Advanced Features relations
   photos    ClientPhoto[]
   anamnesis ClientAnamnesis[]
+
+  // Payment relations
+  payments Payment[]
 
   @@index([salonId, startAt])
   @@index([employeeId, startAt])
@@ -1281,13 +1306,28 @@ model Payment {
   createdAt DateTime @default(now())
 
   userId   String
-  saleId   String
+  saleId   String?
   methodId String
   amount   Float
   status   PaymentStatus @default(PENDING)
 
+  // Online payment fields for appointments
+  appointmentId         String?
+  stripePaymentIntentId String?     @unique
+  stripeCheckoutId      String?     @unique
+  type                  PaymentType @default(FULL)
+  depositAmount         Float?
+  remainingAmount       Float?
+
+  // Refund tracking
+  isRefunded   Boolean   @default(false)
+  refundedAt   DateTime?
+  refundAmount Float?
+  refundReason String?
+
   user           User            @relation(fields: [userId], references: [id], onDelete: Restrict)
-  sale           Sale            @relation(fields: [saleId], references: [id], onDelete: Restrict)
+  sale           Sale?           @relation(fields: [saleId], references: [id], onDelete: Restrict)
+  appointment    Appointment?    @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
   method         PaymentMethod   @relation(fields: [methodId], references: [id], onDelete: Restrict)
   creditPayments CreditPayment[]
 }
@@ -1516,6 +1556,29 @@ model BookingConfig {
 
   salonId String @unique
 
+  // Public Online Booking Settings
+  enableOnlineBooking       Boolean @default(false)
+  bookingSlug               String? @unique // URL-friendly slug for public booking (e.g., "salon-glamour")
+  bookingPageTitle          String? // Custom title for booking page
+  bookingPageDescription    String? // Description for SEO and booking page
+  bookingPageLogo           String? // URL to logo
+  bookingPageBanner         String? // URL to banner image
+  bookingPagePrimaryColor   String  @default("#00FF94") // Neon green default
+  bookingPageTheme          String  @default("dark") // "dark" or "light"
+  requireClientRegistration Boolean @default(false) // Require clients to register or allow guest booking
+  collectClientPhone        Boolean @default(true)
+  collectClientEmail        Boolean @default(true)
+  collectClientNotes        Boolean @default(true)
+  showProfessionalPhotos    Boolean @default(true)
+  showServicePrices         Boolean @default(true)
+  enableServiceSelection    Boolean @default(true)
+  enableProfessionalChoice  Boolean @default(true) // Allow choosing "Any Available"
+  sendConfirmationEmail     Boolean @default(true)
+  sendConfirmationSMS       Boolean @default(false)
+  autoApproveBookings       Boolean @default(true) // Auto-approve or require manual approval
+  bookingTermsText          String? // Terms and conditions text
+  requireTermsAcceptance    Boolean @default(false)
+
   // Booking window
   minAdvanceHours Int @default(2) // Minimum advance booking
   maxAdvanceDays  Int @default(90) // Maximum advance booking
@@ -1544,6 +1607,21 @@ model BookingConfig {
   reminder24h      Boolean  @default(true)
   reminder2h       Boolean  @default(true)
   reminderChannels String[] // SMS, EMAIL, WHATSAPP
+
+  // Online Payment Configuration
+  requireOnlinePayment Boolean     @default(false) // Obrigatório pagar ao agendar
+  acceptOnlineDeposit  Boolean     @default(true) // Aceitar depósito
+  depositType          DepositType @default(PERCENTAGE) // FIXED ou PERCENTAGE
+  depositAmount        Float       @default(0) // Valor fixo ou porcentagem
+  minDepositAmount     Float       @default(10) // Depósito mínimo em R$
+  acceptFullPayment    Boolean     @default(true) // Aceitar pagamento total
+
+  // Cancellation Payment Policies
+  allowCancellation         Boolean  @default(true)
+  cancellationDeadlineHours Int      @default(24) // Prazo para cancelar (horas antes)
+  cancellationFeeType       FeeType? @default(PERCENTAGE)
+  cancellationFeeAmount     Float    @default(0) // Taxa de cancelamento
+  refundDeposit             Boolean  @default(true) // Reembolsar depósito se cancelar a tempo
 
   salon Salon @relation(fields: [salonId], references: [id], onDelete: Cascade)
 }
@@ -1605,6 +1683,13 @@ model Employee {
   tipRule                  String? // Regra de gorjeta
   canReceiveTips           Boolean @default(true)
   tipsOnlyFromAppointments Boolean @default(true)
+
+  // Agendamento online
+  role                 String? // Role/specialty for display on booking page
+  profilePhoto         String? // URL to profile photo
+  bio                  String? // Short bio for booking page
+  specialties          String[] @default([]) // Array of specialties
+  acceptsOnlineBooking Boolean  @default(true) // Accept bookings from public booking page
 
   // Controle
   isActive  Boolean   @default(true)
