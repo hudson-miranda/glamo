@@ -7,7 +7,7 @@ import {
   listCampaignTemplates,
   sendManualMessage,
 } from 'wasp/client/operations';
-import { useSalonContext } from '../../contexts/SalonContext';
+import { useSalonContext } from '../../hooks/useSalonContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';

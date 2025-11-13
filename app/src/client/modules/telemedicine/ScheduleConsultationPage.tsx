@@ -27,7 +27,7 @@ import {
   Plus,
   Info
 } from 'lucide-react';
-import { useSalonContext } from '../../contexts/SalonContext';
+import { useSalonContext } from '../../hooks/useSalonContext';
 import { formatDate } from '../../lib/formatters';
 
 interface TimeSlot {

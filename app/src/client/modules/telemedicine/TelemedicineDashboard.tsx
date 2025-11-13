@@ -17,7 +17,7 @@ import {
   Filter,
   ChevronRight
 } from 'lucide-react';
-import { useSalonContext } from '../../contexts/SalonContext';
+import { useSalonContext } from '../../hooks/useSalonContext';
 import { formatDate, formatDateTime } from '../../lib/formatters';
 
 interface ConsultationMetrics {

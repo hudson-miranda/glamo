@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useQuery, getClientDocuments } from 'wasp/client/operations';
-import { uploadClientDocument, deleteClientDocument } from 'wasp/client/operations';
+import { useQuery, getClientDocuments, uploadClientDocument, deleteClientDocument } from 'wasp/client/operations';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/card';
 import { Button } from '../../../../components/ui/button';
 import { Badge } from '../../../../components/ui/badge';

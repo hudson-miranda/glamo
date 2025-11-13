@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from 'wasp/client/operations';
-import { getClient, getClientDocuments } from 'wasp/client/operations';
-import { useSalonContext } from '../../contexts/SalonContext';
+import { useQuery, getClient, getClientDocuments } from 'wasp/client/operations';
+import { useSalonContext } from '../../hooks/useSalonContext';
 import { formatDate, formatDateTime } from '../../lib/formatters';
 import { 
   Card, 
@@ -10,11 +9,18 @@ import {
   CardDescription, 
   CardHeader, 
   CardTitle 
-} from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import { Textarea } from '../../components/ui/textarea';
+} from '../../../components/ui/card';
+import { Button } from '../../../components/ui/button';
+import { Input } from '../../../components/ui/input';
+import { Label } from '../../../components/ui/label';
+import { Textarea } from '../../../components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../components/ui/select';
 import {
   Dialog,
   DialogContent,
@@ -22,8 +28,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '../../components/ui/dialog';
-import { Badge } from '../../components/ui/badge';
+} from '../../../components/ui/dialog';
+import { Badge } from '../../../components/ui/badge';
 import {
   Download,
   Share2,

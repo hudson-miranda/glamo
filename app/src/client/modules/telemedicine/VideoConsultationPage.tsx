@@ -29,7 +29,7 @@ import {
   Camera,
   CameraOff
 } from 'lucide-react';
-import { useSalonContext } from '../../contexts/SalonContext';
+import { useSalonContext } from '../../hooks/useSalonContext';
 import { formatDateTime } from '../../lib/formatters';
 import { useParams } from 'react-router-dom';
 

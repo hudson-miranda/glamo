@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'wasp/client/router';
 import { useQuery, listCommunicationLogs } from 'wasp/client/operations';
-import { useSalonContext } from '../../contexts/SalonContext';
+import { useSalonContext } from '../../hooks/useSalonContext';
 import { formatDate, formatDateTime } from '../../lib/formatters';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';

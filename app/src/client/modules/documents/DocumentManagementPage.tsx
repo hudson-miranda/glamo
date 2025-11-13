@@ -1,11 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { useQuery } from 'wasp/client/operations';
-import { listClients, getClientDocuments } from 'wasp/client/operations';
-import { uploadClientDocument, deleteClientDocument } from 'wasp/client/operations';
-import { useSalonContext } from '../../contexts/SalonContext';
+import { useQuery, listClients, getClientDocuments, uploadClientDocument, deleteClientDocument } from 'wasp/client/operations';
+import { useSalonContext } from '../../hooks/useSalonContext';
 import { formatDate, formatDateTime } from '../../lib/formatters';
-import { Card } from '../../../components/ui/Card';
-import { Button } from '../../../components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../../components/ui/card';
+import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
 import { Textarea } from '../../../components/ui/textarea';
@@ -24,7 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../../components/ui/dialog';
-import { Badge } from '../../../components/ui/Badge';
+import { Badge } from '../../../components/ui/badge';
 import {
   Upload,
   FileText,
@@ -494,7 +492,7 @@ export default function DocumentManagementPage() {
               
               return (
               <Card key={doc.id} className="hover:shadow-lg transition-shadow">
-                <div className="p-6">
+                  <CardHeader>
                   <div className="flex items-start justify-between gap-4 mb-4">
                       <div className="flex items-center gap-2 flex-1">
                         <TypeIcon className="h-5 w-5 text-primary flex-shrink-0" />
