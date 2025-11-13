@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useQuery, listClients } from 'wasp/client/operations';
+import { useQuery, listClients, createClient, updateClient } from 'wasp/client/operations';
 import { Button } from '../../../components/ui/button';
 import {
   Table,
@@ -15,6 +15,7 @@ import { useSalonContext } from '../../hooks/useSalonContext';
 import { ClientFilters } from './components/ClientFilters';
 import { ClientStatsCards } from './components/ClientStatsCards';
 import { ClientTableRow } from './components/ClientTableRow';
+import { ClientFormModal } from './components/ClientFormModal';
 
 type FilterState = {
   search: string;
@@ -34,6 +35,9 @@ export default function ClientsListPage() {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [page, setPage] = useState(1);
   const perPage = 20;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingClient, setEditingClient] = useState<any>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data, isLoading, error } = useQuery(
     listClients,
@@ -70,6 +74,63 @@ export default function ClientsListPage() {
     console.log('Export clients to CSV');
   };
 
+  const handleOpenModal = (client?: any) => {
+    setEditingClient(client || null);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingClient(null);
+  };
+
+  const handleSubmitClient = async (formData: any) => {
+    setIsSubmitting(true);
+    try {
+      if (editingClient) {
+        // Update existing client
+        await updateClient({
+          clientId: editingClient.id,
+          salonId: activeSalonId!,
+          name: formData.name,
+          email: formData.email || undefined,
+          phone: formData.phone,
+          birthDate: formData.birthDate || undefined,
+          gender: formData.gender,
+          status: formData.status,
+          clientType: formData.clientType,
+          address: formData.address || undefined,
+          city: formData.city || undefined,
+          state: formData.state || undefined,
+          zipCode: formData.zipCode || undefined,
+          observations: formData.notes || undefined,
+          // Tags will be handled separately if needed
+        });
+      } else {
+        // Create new client
+        await createClient({
+          salonId: activeSalonId!,
+          name: formData.name,
+          email: formData.email || undefined,
+          phone: formData.phone,
+          birthDate: formData.birthDate || undefined,
+          gender: formData.gender,
+          status: formData.status || 'ACTIVE',
+          clientType: formData.clientType || 'REGULAR',
+          address: formData.address || undefined,
+          city: formData.city || undefined,
+          state: formData.state || undefined,
+          zipCode: formData.zipCode || undefined,
+          observations: formData.notes || undefined,
+        });
+      }
+      // Refresh the client list
+      // The useQuery hook will automatically refetch
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const hasClients = data && data.clients && data.clients.length > 0;
   const hasFilters = filters.search || filters.status || filters.clientType || filters.tags.length > 0;
 
@@ -88,7 +149,7 @@ export default function ClientsListPage() {
             <Download className='mr-2 h-4 w-4' />
             Export
           </Button>
-          <Button>
+          <Button onClick={() => handleOpenModal()}>
             <Plus className='mr-2 h-4 w-4' />
             New Client
           </Button>
@@ -133,7 +194,7 @@ export default function ClientsListPage() {
               }
               action={
                 !hasFilters && (
-                  <Button>
+                  <Button onClick={() => handleOpenModal()}>
                     <Plus className='mr-2 h-4 w-4' />
                     New Client
                   </Button>
@@ -161,7 +222,7 @@ export default function ClientsListPage() {
                       <ClientTableRow
                         key={client.id}
                         client={client}
-                        onEdit={(client) => console.log('Edit client:', client)}
+                        onEdit={(client) => handleOpenModal(client)}
                         onDelete={(client) => console.log('Delete client:', client)}
                       />
                     ))}
@@ -203,6 +264,15 @@ export default function ClientsListPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Client Form Modal */}
+      <ClientFormModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSubmit={handleSubmitClient}
+        client={editingClient}
+        isLoading={isSubmitting}
+      />
     </div>
   );
 }
