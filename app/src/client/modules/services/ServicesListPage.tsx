@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery, listServices } from 'wasp/client/operations';
+import { useQuery, listServices, createService, updateService, deleteService, createServiceVariant, updateServiceVariant, deleteServiceVariant } from 'wasp/client/operations';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import {
@@ -15,13 +15,18 @@ import { EmptyState } from '../../../components/ui/empty-state';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Plus, Search, Scissors, Edit, Trash2 } from 'lucide-react';
 import { useSalonContext } from '../../hooks/useSalonContext';
+import { ServiceFormModal } from './components/ServiceFormModal';
+import { useToast } from '../../../components/ui/use-toast';
 
 export default function ServicesListPage() {
   const { activeSalonId } = useSalonContext();
+  const { toast } = useToast();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState<any>(null);
 
-  const { data, isLoading, error } = useQuery(listServices, {
+  const { data, isLoading, error, refetch } = useQuery(listServices, {
     salonId: activeSalonId || '',
     search,
     page,
@@ -29,6 +34,149 @@ export default function ServicesListPage() {
   }, {
     enabled: !!activeSalonId,
   });
+
+  const handleOpenModal = (service: any = null) => {
+    setSelectedService(service);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedService(null);
+  };
+
+  const handleSubmitService = async (formData: any, variants: any[]) => {
+    if (!activeSalonId) {
+      throw new Error('No active salon');
+    }
+
+    if (selectedService) {
+      // Update existing service
+      await updateService({
+        id: selectedService.id,
+        salonId: activeSalonId,
+        ...formData,
+      });
+
+      // Handle variants
+      for (const variant of variants) {
+        if (!variant.id || variant.id.startsWith('temp-')) {
+          // Create new variant
+          await createServiceVariant({
+            serviceId: selectedService.id,
+            salonId: activeSalonId,
+            name: variant.name,
+            description: variant.description,
+            price: variant.price,
+            duration: variant.duration,
+            active: variant.active,
+          });
+        }
+      }
+    } else {
+      // Create new service
+      const newService = await createService({
+        salonId: activeSalonId,
+        ...formData,
+      });
+
+      // Create variants
+      for (const variant of variants) {
+        await createServiceVariant({
+          serviceId: newService.id,
+          salonId: activeSalonId,
+          name: variant.name,
+          description: variant.description,
+          price: variant.price,
+          duration: variant.duration,
+          active: variant.active,
+        });
+      }
+    }
+
+    await refetch();
+  };
+
+  const handleSubmitVariant = async (serviceId: string, variant: any) => {
+    if (!activeSalonId) {
+      throw new Error('No active salon');
+    }
+
+    if (variant.id && !variant.id.startsWith('temp-')) {
+      // Update existing variant
+      await updateServiceVariant({
+        id: variant.id,
+        serviceId,
+        salonId: activeSalonId,
+        name: variant.name,
+        description: variant.description,
+        price: variant.price,
+        duration: variant.duration,
+        active: variant.active,
+      });
+    } else {
+      // Create new variant
+      await createServiceVariant({
+        serviceId,
+        salonId: activeSalonId,
+        name: variant.name,
+        description: variant.description,
+        price: variant.price,
+        duration: variant.duration,
+        active: variant.active,
+      });
+    }
+
+    await refetch();
+  };
+
+  const handleDeleteVariant = async (serviceId: string, variantId: string) => {
+    if (!activeSalonId) {
+      throw new Error('No active salon');
+    }
+
+    await deleteServiceVariant({
+      id: variantId,
+      salonId: activeSalonId,
+    });
+
+    await refetch();
+  };
+
+  const handleDeleteService = async (service: any) => {
+    if (!activeSalonId) {
+      toast({
+        title: 'Erro',
+        description: 'Nenhum salão ativo',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!confirm('Tem certeza que deseja excluir este serviço? Esta ação não pode ser desfeita.')) {
+      return;
+    }
+
+    try {
+      await deleteService({
+        id: service.id,
+        salonId: activeSalonId,
+      });
+
+      toast({
+        title: 'Serviço excluído',
+        description: 'Serviço removido com sucesso',
+      });
+
+      await refetch();
+    } catch (error: any) {
+      toast({
+        title: 'Erro',
+        description: error.message || 'Erro ao excluir serviço',
+        variant: 'destructive',
+      });
+    }
+  };
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -39,6 +187,16 @@ export default function ServicesListPage() {
 
   return (
       <div className='space-y-6'>
+        <ServiceFormModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onSubmit={handleSubmitService}
+          onSubmitVariant={handleSubmitVariant}
+          onDeleteVariant={handleDeleteVariant}
+          service={selectedService}
+          categories={data?.categories || []}
+        />
+
         {/* Header */}
         <div className='flex items-center justify-between'>
           <div>
@@ -47,7 +205,7 @@ export default function ServicesListPage() {
               Manage your salon services and pricing
             </p>
           </div>
-          <Button>
+          <Button onClick={() => handleOpenModal()}>
             <Plus className='mr-2 h-4 w-4' />
             New Service
           </Button>
@@ -95,7 +253,7 @@ export default function ServicesListPage() {
                 }
                 action={
                   !search && (
-                    <Button>
+                    <Button onClick={() => handleOpenModal()}>
                       <Plus className='mr-2 h-4 w-4' />
                       New Service
                     </Button>
@@ -145,11 +303,19 @@ export default function ServicesListPage() {
                         </TableCell>
                         <TableCell className='text-right'>
                           <div className='flex items-center justify-end space-x-2'>
-                            <Button variant='ghost' size='sm'>
+                            <Button 
+                              variant='ghost' 
+                              size='sm'
+                              onClick={() => handleOpenModal(service)}
+                            >
                               <Edit className='h-4 w-4' />
                             </Button>
-                            <Button variant='ghost' size='sm'>
-                              <Trash2 className='h-4 w-4' />
+                            <Button 
+                              variant='ghost' 
+                              size='sm'
+                              onClick={() => handleDeleteService(service)}
+                            >
+                              <Trash2 className='h-4 w-4 text-destructive' />
                             </Button>
                           </div>
                         </TableCell>
