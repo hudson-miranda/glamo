@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery, listProducts } from 'wasp/client/operations';
+import { useQuery, listProducts, createProduct, updateProduct, deleteProduct } from 'wasp/client/operations';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import {
@@ -15,12 +15,16 @@ import { EmptyState } from '../../../components/ui/empty-state';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Plus, Search, Package, AlertTriangle } from 'lucide-react';
 import { useSalonContext } from '../../hooks/useSalonContext';
+import { ProductFormModal } from './components/ProductFormModal';
 
 export default function InventoryListPage() {
   const { activeSalonId } = useSalonContext();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [lowStockOnly, setLowStockOnly] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data, isLoading, error } = useQuery(listProducts, {
     salonId: activeSalonId || '',
@@ -39,6 +43,38 @@ export default function InventoryListPage() {
     }).format(value);
   };
 
+  const handleOpenModal = (product?: any) => {
+    setEditingProduct(product || null);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingProduct(null);
+  };
+
+  const handleSubmitProduct = async (formData: any) => {
+    setIsSubmitting(true);
+    try {
+      if (editingProduct) {
+        await updateProduct({
+          productId: editingProduct.id,
+          salonId: activeSalonId!,
+          ...formData,
+          expirationDate: formData.expirationDate ? new Date(formData.expirationDate) : undefined,
+        });
+      } else {
+        await createProduct({
+          salonId: activeSalonId!,
+          ...formData,
+          expirationDate: formData.expirationDate ? new Date(formData.expirationDate) : undefined,
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
       <div className='space-y-6'>
         {/* Header */}
@@ -49,7 +85,7 @@ export default function InventoryListPage() {
               Manage products, stock, and suppliers
             </p>
           </div>
-          <Button>
+          <Button onClick={() => handleOpenModal()}>
             <Plus className='mr-2 h-4 w-4' />
             New Product
           </Button>
@@ -107,7 +143,7 @@ export default function InventoryListPage() {
                 }
                 action={
                   !search && !lowStockOnly && (
-                    <Button>
+                    <Button onClick={() => handleOpenModal()}>
                       <Plus className='mr-2 h-4 w-4' />
                       New Product
                     </Button>
@@ -163,8 +199,12 @@ export default function InventoryListPage() {
                             </Badge>
                           </TableCell>
                           <TableCell className='text-right'>
-                            <Button variant='ghost' size='sm'>
-                              View
+                            <Button 
+                              variant='ghost' 
+                              size='sm'
+                              onClick={() => handleOpenModal(product)}
+                            >
+                              Edit
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -203,6 +243,18 @@ export default function InventoryListPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Product Form Modal */}
+        <ProductFormModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onSubmit={handleSubmitProduct}
+          product={editingProduct}
+          isLoading={isSubmitting}
+          categories={[]}
+          brands={[]}
+          suppliers={[]}
+        />
       </div>
   );
 }
