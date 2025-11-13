@@ -1,16 +1,25 @@
 import { defineConfig } from 'vite'
 
+// Detecta automaticamente o ambiente
+const isProduction = process.env.NODE_ENV === 'production'
+const publicIp = process.env.VITE_PUBLIC_IP || '191.252.217.98'
+const isLocalDev = process.env.VITE_LOCAL_DEV === 'true' || !process.env.VITE_PUBLIC_IP
+
 export default defineConfig({
   server: {
     host: '0.0.0.0', // Aceita conexões de qualquer IP
     port: 3000,
     open: false, // Não tenta abrir o browser automaticamente
     strictPort: true, // Falha se a porta já estiver em uso
-    // Hot Module Replacement otimizado para servidor remoto
-    hmr: {
-      overlay: true, // Mostra erros na tela
-      protocol: 'ws', // Usa WebSocket para HMR
-      host: '191.252.217.98', // IP público do servidor para HMR
+    // Hot Module Replacement configurado dinamicamente
+    hmr: isLocalDev ? {
+      overlay: true,
+      protocol: 'ws',
+      // Em localhost, usa a configuração padrão (auto-detecta)
+    } : {
+      overlay: true,
+      protocol: 'ws',
+      host: publicIp, // IP público do servidor para desenvolvimento remoto
       clientPort: 3000,
     },
     // DESABILITA polling para melhorar performance em servidor
