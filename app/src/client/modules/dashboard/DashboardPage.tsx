@@ -3,7 +3,7 @@ import { Button } from '../../../components/ui/button';
 import { EmptyState } from '../../../components/ui/empty-state';
 import { Users, Calendar, DollarSign, TrendingUp, Plus, Loader2, Building2 } from 'lucide-react';
 import { useSalonContext } from '../../hooks/useSalonContext';
-import { useQuery, listClients, listAppointments } from 'wasp/client/operations';
+import { useQuery, listClients, listAppointments, listSales } from 'wasp/client/operations';
 import { Link } from 'wasp/client/router';
 
 export default function DashboardPage() {
@@ -34,6 +34,43 @@ export default function DashboardPage() {
     }
   );
 
+  // Get sales data for current month
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  
+  // Previous month for comparison
+  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+
+  const { data: currentMonthSales, isLoading: isLoadingSales } = useQuery(
+    listSales,
+    {
+      salonId: activeSalonId || '',
+      startDate: startOfMonth.toISOString(),
+      endDate: endOfMonth.toISOString(),
+      page: 1,
+      perPage: 1000,
+    },
+    {
+      enabled: !!activeSalonId,
+    }
+  );
+
+  const { data: lastMonthSales, isLoading: isLoadingLastMonth } = useQuery(
+    listSales,
+    {
+      salonId: activeSalonId || '',
+      startDate: startOfLastMonth.toISOString(),
+      endDate: endOfLastMonth.toISOString(),
+      page: 1,
+      perPage: 1000,
+    },
+    {
+      enabled: !!activeSalonId,
+    }
+  );
+
   // Calculate stats
   const totalClients = clientsData?.total || 0;
   
@@ -54,6 +91,22 @@ export default function DashboardPage() {
     apt.status === 'PENDING' || apt.status === 'CONFIRMED' || apt.status === 'IN_SERVICE'
   ).length;
 
+  // Calculate revenue
+  const currentMonthRevenue = currentMonthSales?.sales?.reduce((sum: number, sale: any) => {
+    return sum + (sale.finalAmount || 0);
+  }, 0) || 0;
+
+  const lastMonthRevenue = lastMonthSales?.sales?.reduce((sum: number, sale: any) => {
+    return sum + (sale.finalAmount || 0);
+  }, 0) || 0;
+
+  // Calculate growth rate
+  const growthRate = lastMonthRevenue > 0
+    ? ((currentMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100
+    : 0;
+
+  const isGrowthPositive = growthRate > 0;
+
   // Show empty state if no salon selected
   if (!activeSalonId) {
     return (
@@ -73,7 +126,14 @@ export default function DashboardPage() {
     );
   }
 
-  const isLoading = isLoadingClients || isLoadingAppointments;
+  const isLoading = isLoadingClients || isLoadingAppointments || isLoadingSales || isLoadingLastMonth;
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(value);
+  };
 
   return (
     <div className='space-y-6'>
@@ -136,10 +196,16 @@ export default function DashboardPage() {
               <DollarSign className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold'>R$ --</div>
-              <p className='text-xs text-muted-foreground'>
-                Coming soon
-              </p>
+              {isLoading ? (
+                <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
+              ) : (
+                <>
+                  <div className='text-2xl font-bold'>{formatCurrency(currentMonthRevenue)}</div>
+                  <p className='text-xs text-muted-foreground'>
+                    From {currentMonthSales?.total || 0} sales
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -151,10 +217,18 @@ export default function DashboardPage() {
               <TrendingUp className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold'>--</div>
-              <p className='text-xs text-muted-foreground'>
-                Coming soon
-              </p>
+              {isLoading ? (
+                <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
+              ) : (
+                <>
+                  <div className={`text-2xl font-bold ${isGrowthPositive ? 'text-green-600' : 'text-red-600'}`}>
+                    {isGrowthPositive ? '+' : ''}{growthRate.toFixed(1)}%
+                  </div>
+                  <p className='text-xs text-muted-foreground'>
+                    vs. last month
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
