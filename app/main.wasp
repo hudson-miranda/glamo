@@ -1046,6 +1046,12 @@ page SalesListPage {
   component: import SalesListPage from "@src/client/modules/sales/SalesListPage"
 }
 
+route PDVRoute { path: "/pdv", to: PDVPage }
+page PDVPage {
+  authRequired: true,
+  component: import PDVPage from "@src/client/modules/sales/PDVPage"
+}
+
 route InventoryListRoute { path: "/inventory", to: InventoryListPage }
 page InventoryListPage {
   authRequired: true,

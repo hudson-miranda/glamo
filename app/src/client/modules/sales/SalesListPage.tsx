@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery, listSales } from 'wasp/client/operations';
+import { Link } from 'wasp/client/router';
 import { Button } from '../../../components/ui/button';
 import {
   Table,
@@ -52,21 +53,21 @@ export default function SalesListPage() {
 
   return (
       <div className='space-y-6'>
-        {/* Header */}
-        <div className='flex items-center justify-between'>
-          <div>
-            <h1 className='text-3xl font-bold tracking-tight'>Sales</h1>
-            <p className='text-muted-foreground'>
-              Manage sales transactions and payments
-            </p>
-          </div>
+      {/* Header */}
+      <div className='flex items-center justify-between'>
+        <div>
+          <h1 className='text-3xl font-bold tracking-tight'>Sales</h1>
+          <p className='text-muted-foreground'>
+            Manage sales transactions and payments
+          </p>
+        </div>
+        <Link to="/pdv">
           <Button>
             <Plus className='mr-2 h-4 w-4' />
             New Sale
           </Button>
-        </div>
-
-        {/* Sales Table */}
+        </Link>
+      </div>        {/* Sales Table */}
         <Card>
           <CardContent className='p-0'>
             {isLoading ? (
@@ -85,10 +86,12 @@ export default function SalesListPage() {
                 title='No sales found'
                 description='Get started by creating your first sale'
                 action={
-                  <Button>
-                    <Plus className='mr-2 h-4 w-4' />
-                    New Sale
-                  </Button>
+                  <Link to="/pdv">
+                    <Button>
+                      <Plus className='mr-2 h-4 w-4' />
+                      New Sale
+                    </Button>
+                  </Link>
                 }
               />
             ) : (
