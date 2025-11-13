@@ -992,12 +992,11 @@ page ClientsListPage {
   component: import ClientsListPage from "@src/client/modules/clients/ClientsListPage"
 }
 
-// TODO: Temporarily disabled - missing ui/tabs component and useParams hook
-// route ClientDetailRoute { path: "/clients/:id", to: ClientDetailPage }
-// page ClientDetailPage {
-//   authRequired: true,
-//   component: import ClientDetailPage from "@src/client/modules/clients/ClientDetailPage"
-// }
+route ClientDetailRoute { path: "/clients/:id", to: ClientDetailPage }
+page ClientDetailPage {
+  authRequired: true,
+  component: import ClientDetailPage from "@src/client/modules/clients/ClientDetailPage"
+}
 
 route EmployeesRoute { path: "/employees", to: EmployeesPage }
 page EmployeesPage {
@@ -1066,6 +1065,46 @@ page ReportsPage {
 }
 
 // ============================================================================
+// FINANCIAL MODULE ROUTES
+// ============================================================================
+
+route FinancialDashboardRoute { path: "/financial/dashboard", to: FinancialDashboardPage }
+page FinancialDashboardPage {
+  authRequired: true,
+  component: import FinancialDashboardPage from "@src/client/modules/financial/FinancialDashboard"
+}
+
+route AccountsReceivableRoute { path: "/financial/receivables", to: AccountsReceivablePage }
+page AccountsReceivablePage {
+  authRequired: true,
+  component: import AccountsReceivablePage from "@src/client/modules/financial/AccountsReceivablePage"
+}
+
+route AccountsPayableRoute { path: "/financial/payables", to: AccountsPayablePage }
+page AccountsPayablePage {
+  authRequired: true,
+  component: import AccountsPayablePage from "@src/client/modules/financial/AccountsPayablePage"
+}
+
+route ExpensesRoute { path: "/financial/expenses", to: ExpensesPage }
+page ExpensesPage {
+  authRequired: true,
+  component: import ExpensesPage from "@src/client/modules/financial/ExpensesPage"
+}
+
+route BudgetsRoute { path: "/financial/budgets", to: BudgetsPage }
+page BudgetsPage {
+  authRequired: true,
+  component: import BudgetsPage from "@src/client/modules/financial/BudgetsPage"
+}
+
+route CategoriesRoute { path: "/financial/categories", to: CategoriesPage }
+page CategoriesPage {
+  authRequired: true,
+  component: import CategoriesPage from "@src/client/modules/financial/CategoriesPage"
+}
+
+// ============================================================================
 // PUBLIC BOOKING PAGE (No auth required)
 // ============================================================================
 
@@ -1091,6 +1130,31 @@ route LoyaltyProgramRoute { path: "/programs/loyalty", to: LoyaltyProgramPage }
 page LoyaltyProgramPage {
   authRequired: true,
   component: import LoyaltyProgramPage from "@src/client/modules/loyalty/LoyaltyProgramPage"
+}
+
+// Gamification Module
+route GamificationDashboardRoute { path: "/gamification", to: GamificationDashboard }
+page GamificationDashboard {
+  authRequired: true,
+  component: import GamificationDashboard from "@src/client/modules/gamification/GamificationDashboard"
+}
+
+route BadgesAchievementsRoute { path: "/gamification/badges", to: BadgesAchievementsPage }
+page BadgesAchievementsPage {
+  authRequired: true,
+  component: import BadgesAchievementsPage from "@src/client/modules/gamification/BadgesAchievementsPage"
+}
+
+route LeaderboardRoute { path: "/gamification/leaderboard", to: LeaderboardPage }
+page LeaderboardPage {
+  authRequired: true,
+  component: import LeaderboardPage from "@src/client/modules/gamification/LeaderboardPage"
+}
+
+route PointsRewardsRoute { path: "/gamification/rewards", to: PointsRewardsPage }
+page PointsRewardsPage {
+  authRequired: true,
+  component: import PointsRewardsPage from "@src/client/modules/gamification/PointsRewardsPage"
 }
 
 // Referral Program Module
@@ -1265,35 +1329,124 @@ job sendFollowUpMessages {
 // Phase 2: Campaign Management Routes
 // ============================================================================
 
-// TODO: Temporarily disabled - missing @/components/ui/* components
-// route CampaignsListRoute { path: "/campaigns", to: CampaignsListPage }
-// page CampaignsListPage {
-//   authRequired: true,
-//   component: import CampaignsListPage from "@src/client/modules/campaigns/CampaignsListPage"
-// }
+route CampaignsListRoute { path: "/campaigns", to: CampaignsListPage }
+page CampaignsListPage {
+  authRequired: true,
+  component: import CampaignsListPage from "@src/client/modules/communication/CampaignsListPage"
+}
 
-// route CreateCampaignRoute { path: "/campaigns/new", to: CreateCampaignPage }
-// page CreateCampaignPage {
-//   authRequired: true,
-//   component: import CreateCampaignPage from "@src/client/modules/campaigns/CreateCampaignPage"
-// }
+route CreateCampaignRoute { path: "/campaigns/new", to: CreateCampaignPage }
+page CreateCampaignPage {
+  authRequired: true,
+  component: import CreateCampaignPage from "@src/client/modules/communication/CreateCampaignPage"
+}
 
-// route CampaignDetailRoute { path: "/campaigns/:id", to: CampaignDetailPage }
-// page CampaignDetailPage {
-//   authRequired: true,
-//   component: import CampaignDetailPage from "@src/client/modules/campaigns/CampaignDetailPage"
-// }
+route CampaignDetailRoute { path: "/campaigns/:id", to: CampaignDetailPage }
+page CampaignDetailPage {
+  authRequired: true,
+  component: import CampaignDetailPage from "@src/client/modules/communication/CampaignDetailPage"
+}
 
-// route ClientSegmentsRoute { path: "/segments", to: ClientSegmentsPage }
-// page ClientSegmentsPage {
-//   authRequired: true,
-//   component: import ClientSegmentsPage from "@src/client/modules/campaigns/ClientSegmentsPage"
-// }
-//#endregion
+route CampaignSegmentationRoute { path: "/campaigns/segments", to: CampaignSegmentationPage }
+page CampaignSegmentationPage {
+  authRequired: true,
+  component: import CampaignSegmentationPage from "@src/client/modules/communication/CampaignSegmentationPage"
+}
+
+// ============================================================================
+// Phase 3: Communication Multicanal Routes
+// ============================================================================
+
+route CommunicationLogRoute { path: "/communication/log", to: CommunicationLogPage }
+page CommunicationLogPage {
+  authRequired: true,
+  component: import CommunicationLogPage from "@src/client/modules/communication/CommunicationLogPage"
+}
+
+route TemplatesRoute { path: "/communication/templates", to: TemplatesPage }
+page TemplatesPage {
+  authRequired: true,
+  component: import TemplatesPage from "@src/client/modules/communication/TemplatesPage"
+}
+
+route BulkMessagingRoute { path: "/communication/bulk", to: BulkMessagingPage }
+page BulkMessagingPage {
+  authRequired: true,
+  component: import BulkMessagingPage from "@src/client/modules/communication/BulkMessagingPage"
+}
+
+// ============================================================================
+// Phase 4: Telemedicine (Video Consultations)
+// ============================================================================
+
+route TelemedicineDashboardRoute { 
+  path: "/telemedicine", 
+  to: TelemedicineDashboardPage 
+}
+page TelemedicineDashboardPage {
+  authRequired: true,
+  component: import TelemedicineDashboard from "@src/client/modules/telemedicine/TelemedicineDashboard"
+}
+
+route VideoConsultationRoute { 
+  path: "/telemedicine/consultation/:appointmentId", 
+  to: VideoConsultationPage 
+}
+page VideoConsultationPage {
+  authRequired: true,
+  component: import VideoConsultationPage from "@src/client/modules/telemedicine/VideoConsultationPage"
+}
+
+route ConsultationHistoryRoute { 
+  path: "/telemedicine/history", 
+  to: ConsultationHistoryPage 
+}
+page ConsultationHistoryPage {
+  authRequired: true,
+  component: import ConsultationHistoryPage from "@src/client/modules/telemedicine/ConsultationHistoryPage"
+}
+
+route ScheduleConsultationRoute { 
+  path: "/telemedicine/schedule", 
+  to: ScheduleConsultationPage 
+}
+page ScheduleConsultationPage {
+  authRequired: true,
+  component: import ScheduleConsultationPage from "@src/client/modules/telemedicine/ScheduleConsultationPage"
+}
 
 
 // ============================================================================
-// Phase 3: Loyalty & Advanced Features
+// Phase 5: Documents & Signatures
+// ============================================================================
+
+// Document Management Routes
+route DocumentManagementRoute { path: "/documents", to: DocumentManagementPage }
+page DocumentManagementPage {
+  authRequired: true,
+  component: import DocumentManagementPage from "@src/client/modules/documents/DocumentManagementPage"
+}
+
+route DocumentViewerRoute { path: "/documents/:clientId/:documentId", to: DocumentViewerPage }
+page DocumentViewerPage {
+  authRequired: true,
+  component: import DocumentViewerPage from "@src/client/modules/documents/DocumentViewerPage"
+}
+
+route TemplateEditorRoute { path: "/documents/templates", to: TemplateEditorPage }
+page TemplateEditorPage {
+  authRequired: true,
+  component: import TemplateEditorPage from "@src/client/modules/documents/TemplateEditorPage"
+}
+
+route SignatureRequestRoute { path: "/documents/signatures", to: SignatureRequestPage }
+page SignatureRequestPage {
+  authRequired: true,
+  component: import SignatureRequestPage from "@src/client/modules/documents/SignatureRequestPage"
+}
+
+// ============================================================================
+// Phase 6: Loyalty & Advanced Features
 // ============================================================================
 
 // ============================================================================
