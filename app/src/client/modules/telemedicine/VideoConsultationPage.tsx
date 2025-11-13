@@ -80,11 +80,11 @@ export default function VideoConsultationPage() {
   // Fetch appointment data
   const { data: appointment, isLoading } = useQuery(
     getAppointment,
-    { appointmentId: appointmentId || '' },
+      { appointmentId: appointmentId || '', salonId: activeSalonId || '' },
     { enabled: !!appointmentId }
   );
 
-  const updateStatusFn = updateAppointmentStatus();
+    const updateStatusFn = updateAppointmentStatus;
 
   useEffect(() => {
     // Simulate WebRTC connection

@@ -105,23 +105,23 @@ export default function DocumentManagementPage() {
   
   // Queries
   const { data: clients, isLoading: loadingClients } = useQuery(listClients, {
-    salonId: activeSalonId,
+      salonId: activeSalonId || '',
   });
   
   const { data: documentsData, isLoading: loadingDocuments, refetch: refetchDocuments } = useQuery(
     getClientDocuments,
     selectedClient ? {
       clientId: selectedClient.id,
-      salonId: activeSalonId,
-    } : null,
+        salonId: activeSalonId || '',
+      } : undefined,
     { enabled: !!selectedClient }
   );
   
   const documents = documentsData || [];
   
   // Mutations
-  const uploadDocumentFn = uploadClientDocument();
-  const deleteDocumentFn = deleteClientDocument();
+    const uploadDocumentFn = uploadClientDocument;
+    const deleteDocumentFn = deleteClientDocument;
   
   // Filter documents
   const filteredDocuments = documents.filter((doc: any) => {
@@ -161,7 +161,7 @@ export default function DocumentManagementPage() {
   });
   
   // Client search results
-  const searchedClients = clients?.filter((client: any) => {
+  const searchedClients = (clients?.clients || []).filter((client: any) => {
     if (!clientSearch) return true;
     const query = clientSearch.toLowerCase();
     return (
@@ -227,7 +227,7 @@ export default function DocumentManagementPage() {
       
       await uploadDocumentFn({
         clientId: uploadClientId,
-        salonId: activeSalonId,
+        salonId: activeSalonId || '',
         title: uploadTitle,
         description: uploadDescription,
         documentType: uploadDocType,
@@ -267,7 +267,7 @@ export default function DocumentManagementPage() {
       await deleteDocumentFn({
         documentId: documentToDelete.id,
         clientId: selectedClient.id,
-        salonId: activeSalonId,
+        salonId: activeSalonId || '',
       });
       
       setDeleteDialogOpen(false);
@@ -653,7 +653,7 @@ export default function DocumentManagementPage() {
                     <SelectValue placeholder="Selecione o cliente" />
                   </SelectTrigger>
                   <SelectContent>
-                    {clients?.map((client: any) => (
+                      {(clients?.clients || []).map((client: any) => (
                       <SelectItem key={client.id} value={client.id}>
                         {client.name}
                       </SelectItem>

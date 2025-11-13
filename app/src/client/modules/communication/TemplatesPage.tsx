@@ -4,7 +4,6 @@ import {
   useQuery,
   listCampaignTemplates,
   createCampaignTemplate,
-  type CampaignTemplate,
 } from 'wasp/client/operations';
 import { useSalonContext } from '../../hooks/useSalonContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
@@ -97,13 +96,13 @@ export default function TemplatesPage() {
 
   // Fetch templates
   const { data, isLoading, error, refetch } = useQuery(listCampaignTemplates, {
-    salonId: activeSalonId,
+     salonId: activeSalonId || undefined,
   });
 
-  const createTemplateFn = createCampaignTemplate();
+    const createTemplateFn = createCampaignTemplate;
 
   // Filter templates
-  const filteredTemplates = data?.templates?.filter((template: any) => {
+  const filteredTemplates = (Array.isArray(data) ? data : []).filter((template: any) => {
     if (!showSystemTemplates && template.isSystem) return false;
     if (typeFilter && template.type !== typeFilter) return false;
     if (channelFilter && template.channel !== channelFilter) return false;
@@ -116,12 +115,12 @@ export default function TemplatesPage() {
       );
     }
     return true;
-  }) || [];
+  });
 
   // Stats
-  const totalTemplates = data?.templates?.length || 0;
-  const customTemplates = data?.templates?.filter((t: any) => !t.isSystem).length || 0;
-  const systemTemplates = data?.templates?.filter((t: any) => t.isSystem).length || 0;
+  const totalTemplates = Array.isArray(data) ? data.length : 0;
+  const customTemplates = Array.isArray(data) ? data.filter((t: any) => !t.isSystem).length : 0;
+  const systemTemplates = Array.isArray(data) ? data.filter((t: any) => t.isSystem).length : 0;
 
   const handleOpenDialog = (template?: any) => {
     if (template) {

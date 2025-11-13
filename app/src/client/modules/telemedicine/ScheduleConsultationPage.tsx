@@ -79,7 +79,7 @@ export default function ScheduleConsultationPage() {
     { enabled: !!activeSalonId }
   );
 
-  const createAppointmentFn = createAppointment();
+    const createAppointmentFn = createAppointment;
 
   // Filter clients by search
   const filteredClients = clientsData?.clients?.filter((client: any) => {

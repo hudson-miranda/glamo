@@ -108,12 +108,12 @@ export default function DocumentViewerPage() {
   // Queries
   const { data: client, isLoading: loadingClient } = useQuery(getClient, {
     clientId: clientId!,
-    salonId: activeSalonId,
+     salonId: activeSalonId || '',
   });
   
   const { data: documentsData, isLoading: loadingDocuments } = useQuery(getClientDocuments, {
     clientId: clientId!,
-    salonId: activeSalonId,
+     salonId: activeSalonId || '',
   });
   
   const documents = documentsData || [];

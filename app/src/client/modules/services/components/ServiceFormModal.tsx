@@ -79,7 +79,6 @@ interface ServiceFormModalProps {
   onDeleteVariant?: (serviceId: string, variantId: string) => Promise<void>;
   service?: Service | null;
   isLoading?: boolean;
-  categories?: any[];
 }
 
 export function ServiceFormModal({
@@ -90,7 +89,6 @@ export function ServiceFormModal({
   onDeleteVariant,
   service,
   isLoading = false,
-  categories = [],
 }: ServiceFormModalProps) {
   const { toast } = useToast();
   const [variants, setVariants] = useState<ServiceVariant[]>([]);
@@ -302,21 +300,11 @@ export function ServiceFormModal({
 
                   <div>
                     <Label htmlFor="categoryId">Categoria</Label>
-                    <Select
-                      value={watch('categoryId')}
-                      onValueChange={(value) => setValue('categoryId', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione uma categoria" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((cat: any) => (
-                          <SelectItem key={cat.id} value={cat.id}>
-                            {cat.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      <Input
+                        id="categoryId"
+                        {...register('categoryId')}
+                        placeholder="Ex: Cabelo, Unha, Estética"
+                      />
                   </div>
 
                   <div>

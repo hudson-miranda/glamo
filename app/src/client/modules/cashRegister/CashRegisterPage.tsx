@@ -51,7 +51,6 @@ export default function CashRegisterPage() {
     await openCashSession({
       salonId: activeSalonId,
       openingBalance: formData.openingBalance,
-      notes: formData.notes,
     });
 
     toast({
@@ -71,8 +70,7 @@ export default function CashRegisterPage() {
     await closeCashSession({
       sessionId: activeSession.id,
       salonId: activeSalonId,
-      actualBalance: formData.actualBalance,
-      notes: formData.notes,
+        closingBalance: formData.actualBalance,
     });
 
     const difference = formData.actualBalance - activeSession.expectedBalance;
@@ -97,11 +95,9 @@ export default function CashRegisterPage() {
     await addCashMovement({
       sessionId: activeSession.id,
       salonId: activeSalonId,
-      type: formData.type,
+        type: formData.type === 'DEPOSIT' ? 'SUPRIMENTO' : 'SANGRIA',
       amount: formData.amount,
-      description: formData.description,
-      category: formData.category,
-      referenceNumber: formData.referenceNumber,
+        notes: formData.description,
     });
 
     toast({

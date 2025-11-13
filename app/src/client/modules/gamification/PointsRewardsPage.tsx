@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useQuery, useMutation } from 'wasp/client/operations';
+import { useQuery } from 'wasp/client/operations';
 import { 
   listLoyaltyPrograms,
   getClientLoyaltyBalance,
@@ -201,7 +201,7 @@ export default function PointsRewardsPage() {
     { enabled: !!activeSalonId }
   );
 
-  const redeemMutation = useMutation(redeemLoyalty);
+  const [redeeming, setRedeeming] = useState(false);
 
   // Mock client balance (in real app, would use getClientLoyaltyBalance with clientId)
   const mockBalance = {
@@ -260,6 +260,7 @@ export default function PointsRewardsPage() {
       //   amount: selectedReward.pointsCost,
       //   saleId: undefined
       // });
+      setRedeeming(true);
 
       alert(`Recompensa "${selectedReward.title}" resgatada com sucesso! ${selectedReward.pointsCost} pontos debitados.`);
       setShowRedeemDialog(false);
@@ -267,6 +268,8 @@ export default function PointsRewardsPage() {
     } catch (error) {
       console.error('Error redeeming reward:', error);
       alert('Erro ao resgatar recompensa. Tente novamente.');
+    } finally {
+      setRedeeming(false);
     }
   };
 
@@ -691,9 +694,9 @@ export default function PointsRewardsPage() {
                 <Button
                   className="flex-1"
                   onClick={handleRedeem}
-                  disabled={redeemMutation.isLoading}
+                  disabled={redeeming}
                 >
-                  {redeemMutation.isLoading ? 'Resgatando...' : 'Confirmar Resgate'}
+                  {redeeming ? 'Resgatando...' : 'Confirmar Resgate'}
                 </Button>
               </div>
             </div>

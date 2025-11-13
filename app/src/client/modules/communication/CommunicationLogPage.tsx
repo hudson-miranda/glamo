@@ -78,7 +78,7 @@ export default function CommunicationLogPage() {
 
   // Fetch communications
   const { data, isLoading, error } = useQuery(listCommunicationLogs, {
-    salonId: activeSalonId,
+     salonId: activeSalonId || undefined,
     type: typeFilter || undefined,
     channel: channelFilter || undefined,
     status: statusFilter || undefined,

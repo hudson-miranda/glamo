@@ -167,7 +167,7 @@ export default function SignatureRequestPage() {
   
   // Queries
   const { data: clients, isLoading: loadingClients } = useQuery(listClients, {
-    salonId: activeSalonId,
+     salonId: activeSalonId || '',
   });
   
   // Filter requests
@@ -200,7 +200,7 @@ export default function SignatureRequestPage() {
       return;
     }
     
-    const client = clients?.find((c: any) => c.id === selectedClientId);
+      const client = (clients?.clients || []).find((c: any) => c.id === selectedClientId);
     if (!client) return;
     
     const newRequest: SignatureRequest = {
@@ -648,7 +648,7 @@ export default function SignatureRequestPage() {
                   <SelectValue placeholder="Selecione o cliente" />
                 </SelectTrigger>
                 <SelectContent>
-                  {clients?.map((client: any) => (
+                    {(clients?.clients || []).map((client: any) => (
                     <SelectItem key={client.id} value={client.id}>
                       {client.name} ({client.email})
                     </SelectItem>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, Link } from 'wasp/client/router';
+import { Link } from 'wasp/client/router';
 import { useQuery, getClient } from 'wasp/client/operations';
 import { Button } from '../../../components/ui/button';
 import { Card, CardContent } from '../../../components/ui/card';
@@ -19,7 +19,9 @@ import ClientDocumentsTab from './components/ClientDocumentsTab';
 import ClientHistoryTab from './components/ClientHistoryTab';
 
 export default function ClientDetailPage() {
-  const { id } = useParams();
+  const id = typeof window !== 'undefined'
+    ? window.location.pathname.split('/clients/')[1]?.split('/')[0]
+    : undefined;
   const { activeSalonId } = useSalonContext();
 
   const { data: client, isLoading, error } = useQuery(
@@ -131,18 +133,14 @@ export default function ClientDetailPage() {
 
             {/* Actions */}
             <div className='flex gap-2 flex-shrink-0'>
-              <Link to={`/clients/${client.id}/edit`}>
                 <Button variant='outline'>
                   <Edit className='mr-2 h-4 w-4' />
                   Editar
                 </Button>
-              </Link>
-              <Link to={`/appointments/new?clientId=${client.id}`}>
                 <Button>
                   <Calendar className='mr-2 h-4 w-4' />
                   Novo Agendamento
                 </Button>
-              </Link>
             </div>
           </div>
         </CardContent>

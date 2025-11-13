@@ -92,22 +92,22 @@ export default function BulkMessagingPage() {
 
   // Fetch data
   const { data: clientsData } = useQuery(listClients, {
-    salonId: activeSalonId,
+   salonId: activeSalonId || '',
     status: 'ACTIVE',
     page: 1,
     pageSize: 1000,
   });
 
   const { data: segmentsData } = useQuery(listSegments, {
-    salonId: activeSalonId,
+   salonId: activeSalonId || undefined,
     isActive: true,
   });
 
   const { data: templatesData } = useQuery(listCampaignTemplates, {
-    salonId: activeSalonId,
+   salonId: activeSalonId || undefined,
   });
 
-  const sendMessageFn = sendManualMessage();
+  const sendMessageFn = sendManualMessage;
 
   // Calculate recipients
   const getRecipients = () => {
@@ -136,7 +136,7 @@ export default function BulkMessagingPage() {
 
   const handleTemplateSelect = (templateId: string) => {
     setSelectedTemplateId(templateId);
-    const template = templatesData?.templates?.find((t: any) => t.id === templateId);
+      const template = Array.isArray(templatesData) ? templatesData.find((t: any) => t.id === templateId) : undefined;
     if (template) {
       setChannel(template.channel);
       setSubject(template.subject || '');
@@ -478,7 +478,7 @@ export default function BulkMessagingPage() {
                   className='w-full border rounded-md px-3 py-2'
                 >
                   <option value=''>Começar do zero...</option>
-                  {templatesData?.templates?.map((template: any) => (
+                    {Array.isArray(templatesData) && templatesData.map((template: any) => (
                     <option key={template.id} value={template.id}>
                       {template.name} - {CHANNELS[template.channel as keyof typeof CHANNELS]?.label}
                     </option>

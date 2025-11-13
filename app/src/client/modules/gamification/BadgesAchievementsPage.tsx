@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useQuery, useMutation } from 'wasp/client/operations';
+import { useQuery } from 'wasp/client/operations';
 import { 
   listLoyaltyPrograms, 
   getClientLoyaltyBalance,
@@ -110,9 +110,11 @@ export default function BadgesAchievementsPage() {
     { enabled: !!activeSalonId }
   );
 
-  const createTierMutation = useMutation(createLoyaltyTier);
-  const updateTierMutation = useMutation(updateLoyaltyTier);
-  const deleteTierMutation = useMutation(deleteLoyaltyTier);
+  const createTierFn = createLoyaltyTier;
+  const updateTierFn = updateLoyaltyTier;
+  const deleteTierFn = deleteLoyaltyTier;
+  const [creatingTier, setCreatingTier] = useState(false);
+  const [updatingTier, setUpdatingTier] = useState(false);
 
   // Get active program with tiers
   const activeProgram = useMemo(() => {
@@ -178,7 +180,8 @@ export default function BadgesAchievementsPage() {
     if (!activeProgram || !activeSalonId) return;
 
     try {
-      await createTierMutation.mutate({
+      setCreatingTier(true);
+      await createTierFn({
         programId: activeProgram.id,
         salonId: activeSalonId,
         name: tierFormData.name,
@@ -200,6 +203,8 @@ export default function BadgesAchievementsPage() {
       refetchPrograms();
     } catch (error) {
       console.error('Error creating tier:', error);
+    } finally {
+      setCreatingTier(false);
     }
   };
 
@@ -207,7 +212,8 @@ export default function BadgesAchievementsPage() {
     if (!editingTier || !activeSalonId) return;
 
     try {
-      await updateTierMutation.mutate({
+      setUpdatingTier(true);
+      await updateTierFn({
         tierId: editingTier.id,
         salonId: activeSalonId,
         programId: activeProgram?.id || '',
@@ -230,6 +236,8 @@ export default function BadgesAchievementsPage() {
       refetchPrograms();
     } catch (error) {
       console.error('Error updating tier:', error);
+    } finally {
+      setUpdatingTier(false);
     }
   };
 
@@ -237,7 +245,7 @@ export default function BadgesAchievementsPage() {
     if (!activeSalonId || !confirm('Tem certeza que deseja excluir esta conquista?')) return;
 
     try {
-      await deleteTierMutation.mutate({
+      await deleteTierFn({
         tierId,
         salonId: activeSalonId
       });
@@ -344,7 +352,7 @@ export default function BadgesAchievementsPage() {
                   setShowCreateDialog(false);
                   setTierFormData(DEFAULT_TIER);
                 }}
-                isLoading={createTierMutation.isLoading}
+                isLoading={creatingTier}
               />
             </DialogContent>
           </Dialog>
@@ -614,7 +622,7 @@ export default function BadgesAchievementsPage() {
                   setEditingTier(null);
                   setTierFormData(DEFAULT_TIER);
                 }}
-                isLoading={updateTierMutation.isLoading}
+                isLoading={updatingTier}
                 submitLabel="Salvar Alterações"
               />
             </DialogContent>

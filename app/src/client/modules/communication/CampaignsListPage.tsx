@@ -330,19 +330,15 @@ export default function CampaignsListPage() {
 
                     {/* Actions */}
                     <div className='flex gap-2 pt-3 border-t'>
-                      <Link to={`/campaigns/${campaign.id}`} className='flex-1'>
-                        <Button size='sm' variant='outline' className='w-full'>
+                        <Button size='sm' variant='outline' className='flex-1'>
                           <Eye className='mr-1 h-3 w-3' />
                           Ver Detalhes
                         </Button>
-                      </Link>
 
                       {campaign.status === 'DRAFT' && (
-                        <Link to={`/campaigns/${campaign.id}/edit`}>
                           <Button size='sm' variant='ghost'>
                             <Edit className='h-3 w-3' />
                           </Button>
-                        </Link>
                       )}
 
                       {['DRAFT', 'SCHEDULED', 'PAUSED'].includes(campaign.status) && (

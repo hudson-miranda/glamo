@@ -69,7 +69,6 @@ export default function ServicesListPage() {
             description: variant.description,
             price: variant.price,
             duration: variant.duration,
-            active: variant.active,
           });
         }
       }
@@ -89,7 +88,6 @@ export default function ServicesListPage() {
           description: variant.description,
           price: variant.price,
           duration: variant.duration,
-          active: variant.active,
         });
       }
     }
@@ -105,14 +103,12 @@ export default function ServicesListPage() {
     if (variant.id && !variant.id.startsWith('temp-')) {
       // Update existing variant
       await updateServiceVariant({
-        id: variant.id,
-        serviceId,
+          variantId: variant.id,
         salonId: activeSalonId,
         name: variant.name,
         description: variant.description,
         price: variant.price,
         duration: variant.duration,
-        active: variant.active,
       });
     } else {
       // Create new variant
@@ -123,7 +119,6 @@ export default function ServicesListPage() {
         description: variant.description,
         price: variant.price,
         duration: variant.duration,
-        active: variant.active,
       });
     }
 
@@ -136,7 +131,7 @@ export default function ServicesListPage() {
     }
 
     await deleteServiceVariant({
-      id: variantId,
+        variantId: variantId,
       salonId: activeSalonId,
     });
 
@@ -159,7 +154,7 @@ export default function ServicesListPage() {
 
     try {
       await deleteService({
-        id: service.id,
+        serviceId: service.id,
         salonId: activeSalonId,
       });
 
@@ -194,7 +189,6 @@ export default function ServicesListPage() {
           onSubmitVariant={handleSubmitVariant}
           onDeleteVariant={handleDeleteVariant}
           service={selectedService}
-          categories={data?.categories || []}
         />
 
         {/* Header */}

@@ -65,6 +65,7 @@ export default function ClientNotesTab({ clientId }: ClientNotesTabProps) {
     try {
       await updateClientNote({
         noteId,
+          clientId,
         salonId: activeSalonId || '',
         content: editingContent,
       });
@@ -83,6 +84,7 @@ export default function ClientNotesTab({ clientId }: ClientNotesTabProps) {
     try {
       await deleteClientNote({
         noteId,
+          clientId,
         salonId: activeSalonId || '',
       });
       refetch();

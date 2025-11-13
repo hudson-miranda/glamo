@@ -130,12 +130,10 @@ export default function CampaignDetailPage() {
         </div>
 
         {campaign.status === 'DRAFT' && (
-          <Link to={`/campaigns/${campaign.id}/edit`}>
-            <Button>
-              <Edit className='mr-2 h-4 w-4' />
-              Editar Campanha
-            </Button>
-          </Link>
+          <Button variant='outline'>
+            <Edit className='mr-2 h-4 w-4' />
+            Edit Campaign
+          </Button>
         )}
       </div>
 
