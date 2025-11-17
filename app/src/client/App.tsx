@@ -61,7 +61,13 @@ export default function App() {
            location.pathname.startsWith('/programs') ||
            location.pathname.startsWith('/gallery') ||
            location.pathname.startsWith('/forms') ||
-           location.pathname.startsWith('/analytics');
+           location.pathname.startsWith('/analytics') ||
+           location.pathname.startsWith('/financial') ||
+           location.pathname.startsWith('/communication') ||
+           location.pathname.startsWith('/campaigns') ||
+           location.pathname.startsWith('/gamification') ||
+           location.pathname.startsWith('/telemedicine') ||
+           location.pathname.startsWith('/documents');
   }, [location]);
 
   useEffect(() => {
