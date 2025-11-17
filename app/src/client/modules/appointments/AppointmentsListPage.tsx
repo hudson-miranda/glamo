@@ -15,6 +15,7 @@ import { EmptyState } from '../../../components/ui/empty-state';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Plus, Search, Calendar as CalendarIcon } from 'lucide-react';
 import { useSalonContext } from '../../hooks/useSalonContext';
+import AppointmentModal from './components/AppointmentModal';
 
 const statusColors: Record<string, 'default' | 'secondary' | 'success' | 'warning' | 'info'> = {
   PENDING: 'warning',
@@ -29,8 +30,9 @@ export default function AppointmentsListPage() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<"CANCELLED" | "PENDING" | "CONFIRMED" | "IN_SERVICE" | "DONE" | undefined>(undefined);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data, isLoading, error } = useQuery(listAppointments, {
+  const { data, isLoading, error, refetch } = useQuery(listAppointments, {
     salonId: activeSalonId || '',
     status: statusFilter,
     page,
@@ -64,11 +66,18 @@ export default function AppointmentsListPage() {
               Manage salon appointments and schedules
             </p>
           </div>
-          <Button>
+          <Button onClick={() => setIsModalOpen(true)}>
             <Plus className='mr-2 h-4 w-4' />
             New Appointment
           </Button>
         </div>
+
+        {/* Appointment Modal */}
+        <AppointmentModal
+          open={isModalOpen}
+          onOpenChange={setIsModalOpen}
+          onSuccess={() => refetch()}
+        />
 
         {/* Filters */}
         <Card>
@@ -140,7 +149,7 @@ export default function AppointmentsListPage() {
                 }
                 action={
                   !statusFilter && (
-                    <Button>
+                    <Button onClick={() => setIsModalOpen(true)}>
                       <Plus className='mr-2 h-4 w-4' />
                       New Appointment
                     </Button>
