@@ -85,7 +85,7 @@ export default function AppointmentModal({ open, onOpenChange, onSuccess }: Appo
 
       await createAppointment({
         salonId: activeSalonId!,
-        clientId,
+        clientId: clientId as string,
         professionalId: professionalId || undefined,
         serviceIds: selectedServices,
         scheduledDate,
