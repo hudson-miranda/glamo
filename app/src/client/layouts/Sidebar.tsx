@@ -16,12 +16,18 @@ import {
   ChevronRight,
   LucideIcon,
   UserCog,
-  Clock,
+  MessageSquare,
   Gift,
   UserPlus,
   Camera,
   FileText,
   TrendingUp,
+  Wallet,
+  Award,
+  Video,
+  FolderOpen,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Button } from '../../components/ui/button';
@@ -31,102 +37,158 @@ interface NavItem {
   href: string;
   icon: LucideIcon;
   permission?: string;
+  badge?: string;
+  subItems?: NavItem[];
 }
 
-const navItems: NavItem[] = [
+interface NavSection {
+  title: string;
+  items: NavItem[];
+}
+
+const navSections: NavSection[] = [
   {
-    title: 'Dashboard',
-    href: '/dashboard',
-    icon: Home,
+    title: 'Principal',
+    items: [
+      {
+        title: 'Dashboard',
+        href: '/dashboard',
+        icon: Home,
+      },
+      {
+        title: 'Agendamentos',
+        href: '/appointments',
+        icon: Calendar,
+        permission: 'can_view_appointments',
+      },
+      {
+        title: 'PDV / Vendas',
+        href: '/sales',
+        icon: DollarSign,
+        permission: 'can_view_sales',
+      },
+    ],
   },
   {
-    title: 'Clients',
-    href: '/clients',
-    icon: Users,
-    permission: 'can_view_clients',
+    title: 'Gestão',
+    items: [
+      {
+        title: 'Clientes',
+        href: '/clients',
+        icon: Users,
+        permission: 'can_view_clients',
+      },
+      {
+        title: 'Colaboradores',
+        href: '/employees',
+        icon: UserCog,
+        permission: 'can_view_staff',
+      },
+      {
+        title: 'Serviços',
+        href: '/services',
+        icon: Scissors,
+        permission: 'can_view_services',
+      },
+      {
+        title: 'Estoque',
+        href: '/inventory',
+        icon: Package,
+        permission: 'can_view_products',
+      },
+    ],
   },
   {
-    title: 'Employees',
-    href: '/employees',
-    icon: UserCog,
-    permission: 'can_view_staff',
+    title: 'Financeiro',
+    items: [
+      {
+        title: 'Caixa',
+        href: '/cash-register',
+        icon: CreditCard,
+        permission: 'can_view_cash_sessions',
+      },
+      {
+        title: 'Financeiro',
+        href: '/financial/dashboard',
+        icon: Wallet,
+        permission: 'can_view_reports',
+      },
+    ],
   },
   {
-    title: 'Notifications',
-    href: '/notifications',
-    icon: Bell,
+    title: 'Clientes & Engajamento',
+    items: [
+      {
+        title: 'Programa de Fidelidade',
+        href: '/programs/loyalty',
+        icon: Gift,
+        permission: 'can_view_clients',
+      },
+      {
+        title: 'Gamificação',
+        href: '/gamification',
+        icon: Award,
+        permission: 'can_view_clients',
+      },
+      {
+        title: 'Indicações',
+        href: '/programs/referral',
+        icon: UserPlus,
+        permission: 'can_view_clients',
+      },
+      {
+        title: 'Comunicação',
+        href: '/communication',
+        icon: MessageSquare,
+        permission: 'can_view_clients',
+      },
+    ],
   },
   {
-    title: 'Services',
-    href: '/services',
-    icon: Scissors,
-    permission: 'can_view_services',
+    title: 'Recursos Avançados',
+    items: [
+      {
+        title: 'Anamnese',
+        href: '/forms/anamnesis',
+        icon: FileText,
+        permission: 'can_view_clients',
+      },
+      {
+        title: 'Documentos',
+        href: '/documents',
+        icon: FolderOpen,
+        permission: 'can_view_clients',
+      },
+      {
+        title: 'Galeria de Fotos',
+        href: '/gallery/photos',
+        icon: Camera,
+        permission: 'can_view_clients',
+      },
+      {
+        title: 'Telemedicina',
+        href: '/telemedicine',
+        icon: Video,
+        permission: 'can_view_appointments',
+      },
+    ],
   },
   {
-    title: 'Appointments',
-    href: '/appointments',
-    icon: Calendar,
-    permission: 'can_view_appointments',
-  },
-  {
-    title: 'Sales',
-    href: '/sales',
-    icon: DollarSign,
-    permission: 'can_view_sales',
-  },
-  {
-    title: 'Inventory',
-    href: '/inventory',
-    icon: Package,
-    permission: 'can_view_products',
-  },
-  {
-    title: 'Cash Register',
-    href: '/cash-register',
-    icon: CreditCard,
-    permission: 'can_view_cash_sessions',
-  },
-  {
-    title: 'Reports',
-    href: '/reports',
-    icon: BarChart3,
-    permission: 'can_view_reports',
-  },
-  {
-    title: 'Advanced Scheduling',
-    href: '/scheduling/advanced',
-    icon: Clock,
-    permission: 'can_view_appointments',
-  },
-  {
-    title: 'Loyalty Program',
-    href: '/programs/loyalty',
-    icon: Gift,
-    permission: 'can_view_clients',
-  },
-  {
-    title: 'Referral Program',
-    href: '/programs/referral',
-    icon: UserPlus,
-    permission: 'can_view_clients',
-  },
-  {
-    title: 'Photo Gallery',
-    href: '/gallery/photos',
-    icon: Camera,
-    permission: 'can_view_clients',
-  },
-  {
-    title: 'Anamnesis Forms',
-    href: '/forms/anamnesis',
-    icon: FileText,
-    permission: 'can_view_clients',
-  },
-  {
-    title: 'Advanced Analytics',
-    href: '/analytics/advanced',
-    icon: TrendingUp,
-    permission: 'can_view_reports',
+    title: 'Análises',
+    items: [
+      {
+        title: 'Relatórios',
+        href: '/reports',
+        icon: BarChart3,
+        permission: 'can_view_reports',
+      },
+      {
+        title: 'Analytics Avançado',
+        href: '/analytics/advanced',
+        icon: TrendingUp,
+        permission: 'can_view_reports',
+      },
+    ],
   },
 ];
 
@@ -134,12 +196,20 @@ export function Sidebar({ className }: { className?: string }) {
   const { data: user } = useAuth();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
 
   // TODO: Filter navigation items based on user permissions
-  const visibleNavItems = navItems;
+  const visibleSections = navSections;
 
   const isActive = (href: string) => {
     return location.pathname === href || location.pathname.startsWith(href + '/');
+  };
+
+  const toggleSection = (sectionTitle: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [sectionTitle]: !prev[sectionTitle]
+    }));
   };
 
   return (
@@ -171,27 +241,60 @@ export function Sidebar({ className }: { className?: string }) {
       </div>
 
       {/* Navigation */}
-      <nav className='flex-1 space-y-1 px-2 py-4'>
-        {visibleNavItems.map((item) => {
-          const Icon = item.icon;
-          const active = isActive(item.href);
+      <nav className='flex-1 overflow-y-auto px-2 py-4 space-y-4'>
+        {visibleSections.map((section) => {
+          const isExpanded = expandedSections[section.title] ?? true;
           
           return (
-            <Link
-              key={item.href}
-              to={item.href as any}
-              className={cn(
-                'flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200',
-                isCollapsed ? 'justify-center' : 'space-x-3',
-                active
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+            <div key={section.title} className='space-y-1'>
+              {!isCollapsed && (
+                <button
+                  onClick={() => toggleSection(section.title)}
+                  className='flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors'
+                >
+                  <span>{section.title}</span>
+                  {isExpanded ? (
+                    <ChevronUp className='h-3 w-3' />
+                  ) : (
+                    <ChevronDown className='h-3 w-3' />
+                  )}
+                </button>
               )}
-              title={isCollapsed ? item.title : undefined}
-            >
-              <Icon className='h-5 w-5 flex-shrink-0' />
-              {!isCollapsed && <span>{item.title}</span>}
-            </Link>
+              
+              {(isCollapsed || isExpanded) && (
+                <div className='space-y-0.5'>
+                  {section.items.map((item) => {
+                    const Icon = item.icon;
+                    const active = isActive(item.href);
+                    
+                    return (
+                      <Link
+                        key={item.href}
+                        to={item.href as any}
+                        className={cn(
+                          'flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200',
+                          isCollapsed ? 'justify-center' : 'space-x-3',
+                          active
+                            ? 'bg-primary text-primary-foreground shadow-sm'
+                            : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                        )}
+                        title={isCollapsed ? item.title : undefined}
+                      >
+                        <Icon className='h-4 w-4 flex-shrink-0' />
+                        {!isCollapsed && (
+                          <span className='flex-1'>{item.title}</span>
+                        )}
+                        {!isCollapsed && item.badge && (
+                          <span className='ml-auto text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full'>
+                            {item.badge}
+                          </span>
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           );
         })}
       </nav>
@@ -199,15 +302,29 @@ export function Sidebar({ className }: { className?: string }) {
       {/* Footer */}
       <div className='border-t p-2 space-y-2'>
         <Link
+          to='/notifications'
+          className={cn(
+            'flex items-center rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground',
+            isCollapsed ? 'justify-center' : 'space-x-3',
+            isActive('/notifications') && 'bg-primary text-primary-foreground'
+          )}
+          title={isCollapsed ? 'Notificações' : undefined}
+        >
+          <Bell className='h-5 w-5 flex-shrink-0' />
+          {!isCollapsed && <span>Notificações</span>}
+        </Link>
+        
+        <Link
           to='/account'
           className={cn(
             'flex items-center rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground',
-            isCollapsed ? 'justify-center' : 'space-x-3'
+            isCollapsed ? 'justify-center' : 'space-x-3',
+            isActive('/account') && 'bg-primary text-primary-foreground'
           )}
-          title={isCollapsed ? 'Settings' : undefined}
+          title={isCollapsed ? 'Configurações' : undefined}
         >
           <Settings className='h-5 w-5 flex-shrink-0' />
-          {!isCollapsed && <span>Settings</span>}
+          {!isCollapsed && <span>Configurações</span>}
         </Link>
         
         <Button
@@ -224,7 +341,7 @@ export function Sidebar({ className }: { className?: string }) {
           ) : (
             <>
               <ChevronLeft className='mr-2 h-4 w-4' />
-              Collapse
+              Recolher
             </>
           )}
         </Button>

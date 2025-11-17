@@ -1363,6 +1363,12 @@ page CampaignSegmentationPage {
 // Phase 3: Communication Multicanal Routes
 // ============================================================================
 
+route CommunicationDashboardRoute { path: "/communication", to: CommunicationDashboard }
+page CommunicationDashboard {
+  authRequired: true,
+  component: import CommunicationDashboard from "@src/client/modules/communication/CommunicationDashboard"
+}
+
 route CommunicationLogRoute { path: "/communication/log", to: CommunicationLogPage }
 page CommunicationLogPage {
   authRequired: true,
