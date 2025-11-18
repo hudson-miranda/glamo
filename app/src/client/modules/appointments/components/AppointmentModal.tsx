@@ -39,9 +39,10 @@ export default function AppointmentModal({ open, onOpenChange, onSuccess }: Appo
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState('09:00');
   const [clientId, setClientId] = useState('');
-  const [professionalId, setProfessionalId] = useState('');
+  const [professionalId, setProfessionalId] = useState<string | undefined>(undefined);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
+  const [noProfessional, setNoProfessional] = useState(true);
 
   // Queries
   const { data: clientsData, isLoading: loadingClients } = useQuery(
@@ -86,10 +87,10 @@ export default function AppointmentModal({ open, onOpenChange, onSuccess }: Appo
       await createAppointment({
         salonId: activeSalonId!,
         clientId: clientId as string,
-        professionalId: professionalId || undefined,
-        serviceIds: selectedServices,
-        scheduledDate,
-        notes: notes || undefined,
+        professionalId: professionalId || clientId, // Use clientId as default if no professional selected
+        startAt: scheduledDate.toISOString(),
+        services: selectedServices.map(serviceId => ({ serviceId })),
+        notes: notes ? notes : undefined,
       });
 
       toast({
@@ -101,7 +102,8 @@ export default function AppointmentModal({ open, onOpenChange, onSuccess }: Appo
       setSelectedDate(new Date());
       setSelectedTime('09:00');
       setClientId('');
-      setProfessionalId('');
+      setProfessionalId(undefined);
+      setNoProfessional(true);
       setSelectedServices([]);
       setNotes('');
 
@@ -192,16 +194,23 @@ export default function AppointmentModal({ open, onOpenChange, onSuccess }: Appo
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="professional">Profissional (Opcional)</Label>
-                <Select value={professionalId} onValueChange={setProfessionalId}>
-                  <SelectTrigger id="professional">
-                    <SelectValue placeholder="Selecione um profissional" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Sem preferência</SelectItem>
-                    {/* TODO: Add professionals list when available */}
-                  </SelectContent>
-                </Select>
+                <Label>Profissional (Opcional)</Label>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="no-professional"
+                    checked={noProfessional}
+                    onChange={(e) => {
+                      setNoProfessional(e.target.checked);
+                      if (e.target.checked) setProfessionalId(undefined);
+                    }}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                  <Label htmlFor="no-professional" className="font-normal cursor-pointer">
+                    Sem preferência de profissional
+                  </Label>
+                </div>
+                {/* TODO: Add professionals list when available */}
               </div>
             </div>
           </div>

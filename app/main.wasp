@@ -251,6 +251,11 @@ query getDailyStats {
   entities: [User, DailyStats]
 }
 
+query getDashboardAnalytics {
+  fn: import { getDashboardAnalytics } from "@src/dashboard/operations",
+  entities: [User, Salon, Sale, SaleService, SaleProduct, SalePackage, Appointment, AppointmentService, Client, Employee, CashRegisterSession, Payment, Service, Product, UserSalon]
+}
+
 job dailyStatsJob {
   executor: PgBoss,
   perform: {
