@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery, listServices, createService, updateService, deleteService, createServiceVariant, updateServiceVariant, deleteServiceVariant } from 'wasp/client/operations';
+import { useQuery, listServices, createService, updateService, deleteService, listEmployees, listProducts } from 'wasp/client/operations';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import {
@@ -35,6 +35,18 @@ export default function ServicesListPage() {
     enabled: !!activeSalonId,
   });
 
+  const { data: employees = [] } = useQuery(listEmployees, {
+    salonId: activeSalonId || '',
+  }, {
+    enabled: !!activeSalonId,
+  });
+
+  const { data: products = [] } = useQuery(listProducts, {
+    salonId: activeSalonId || '',
+  }, {
+    enabled: !!activeSalonId,
+  });
+
   const handleOpenModal = (service: any = null) => {
     setSelectedService(service);
     setIsModalOpen(true);
@@ -45,7 +57,7 @@ export default function ServicesListPage() {
     setSelectedService(null);
   };
 
-  const handleSubmitService = async (formData: any, variants: any[]) => {
+  const handleSubmitService = async (formData: any) => {
     if (!activeSalonId) {
       throw new Error('No active salon');
     }
@@ -53,90 +65,79 @@ export default function ServicesListPage() {
     if (selectedService) {
       // Update existing service
       await updateService({
-        id: selectedService.id,
+        serviceId: selectedService.id,
         salonId: activeSalonId,
-        ...formData,
+        name: formData.name,
+        description: formData.description || undefined,
+        duration: formData.defaultDuration,
+        price: formData.defaultPrice,
+        categoryId: formData.categoryId || undefined,
+        priceType: formData.priceType || undefined,
+        costValue: formData.costValue || undefined,
+        costValueType: formData.costValueType || undefined,
+        commissionValue: formData.commissionValue || undefined,
+        commissionValueType: formData.commissionValueType || undefined,
+        cardColor: formData.color || undefined,
+        active: formData.active !== undefined ? formData.active : true,
+        isFavorite: formData.isFavorite || false,
+        isVisible: formData.isVisible !== undefined ? formData.isVisible : true,
+        requiresDeposit: formData.requiresDeposit || false,
+        depositAmount: formData.depositAmount || undefined,
+        allowOnlineBooking: formData.allowOnlineBooking !== undefined ? formData.allowOnlineBooking : true,
+        advanceBookingTime: formData.advanceBookingTime || undefined,
+        imagePath: formData.imagePath || undefined,
+        instructions: formData.instructions || undefined,
+        cashbackActive: formData.cashbackActive || false,
+        cashbackValue: formData.cashbackValue || undefined,
+        cashbackValueType: formData.cashbackValueType || undefined,
+        returnActive: formData.returnActive || false,
+        returnDays: formData.returnDays || undefined,
+        returnMessage: formData.returnMessage || undefined,
+        serviceListItem: formData.serviceListItem || undefined,
+        cnae: formData.cnae || undefined,
+        municipalServiceCode: formData.municipalServiceCode || undefined,
       });
-
-      // Handle variants
-      for (const variant of variants) {
-        if (!variant.id || variant.id.startsWith('temp-')) {
-          // Create new variant
-          await createServiceVariant({
-            serviceId: selectedService.id,
-            salonId: activeSalonId,
-            name: variant.name,
-            description: variant.description,
-            price: variant.price,
-            duration: variant.duration,
-          });
-        }
-      }
     } else {
       // Create new service
-      const newService = await createService({
+      await createService({
         salonId: activeSalonId,
-        ...formData,
-      });
-
-      // Create variants
-      for (const variant of variants) {
-        await createServiceVariant({
-          serviceId: newService.id,
-          salonId: activeSalonId,
-          name: variant.name,
-          description: variant.description,
-          price: variant.price,
-          duration: variant.duration,
-        });
-      }
-    }
-
-    await refetch();
-  };
-
-  const handleSubmitVariant = async (serviceId: string, variant: any) => {
-    if (!activeSalonId) {
-      throw new Error('No active salon');
-    }
-
-    if (variant.id && !variant.id.startsWith('temp-')) {
-      // Update existing variant
-      await updateServiceVariant({
-          variantId: variant.id,
-        salonId: activeSalonId,
-        name: variant.name,
-        description: variant.description,
-        price: variant.price,
-        duration: variant.duration,
-      });
-    } else {
-      // Create new variant
-      await createServiceVariant({
-        serviceId,
-        salonId: activeSalonId,
-        name: variant.name,
-        description: variant.description,
-        price: variant.price,
-        duration: variant.duration,
+        name: formData.name,
+        description: formData.description || undefined,
+        duration: formData.defaultDuration,
+        price: formData.defaultPrice,
+        hasVariants: false,
+        categoryId: formData.categoryId || undefined,
+        priceType: formData.priceType || undefined,
+        costValue: formData.costValue || undefined,
+        costValueType: formData.costValueType || undefined,
+        commissionValue: formData.commissionValue || undefined,
+        commissionValueType: formData.commissionValueType || undefined,
+        cardColor: formData.color || undefined,
+        active: formData.active !== undefined ? formData.active : true,
+        isFavorite: formData.isFavorite || false,
+        isVisible: formData.isVisible !== undefined ? formData.isVisible : true,
+        requiresDeposit: formData.requiresDeposit || false,
+        depositAmount: formData.depositAmount || undefined,
+        allowOnlineBooking: formData.allowOnlineBooking !== undefined ? formData.allowOnlineBooking : true,
+        advanceBookingTime: formData.advanceBookingTime || undefined,
+        imagePath: formData.imagePath || undefined,
+        instructions: formData.instructions || undefined,
+        cashbackActive: formData.cashbackActive || false,
+        cashbackValue: formData.cashbackValue || undefined,
+        cashbackValueType: formData.cashbackValueType || undefined,
+        returnActive: formData.returnActive || false,
+        returnDays: formData.returnDays || undefined,
+        returnMessage: formData.returnMessage || undefined,
+        serviceListItem: formData.serviceListItem || undefined,
+        cnae: formData.cnae || undefined,
+        municipalServiceCode: formData.municipalServiceCode || undefined,
       });
     }
 
     await refetch();
   };
 
-  const handleDeleteVariant = async (serviceId: string, variantId: string) => {
-    if (!activeSalonId) {
-      throw new Error('No active salon');
-    }
 
-    await deleteServiceVariant({
-        variantId: variantId,
-      salonId: activeSalonId,
-    });
-
-    await refetch();
-  };
 
   const handleDeleteService = async (service: any) => {
     if (!activeSalonId) {
@@ -186,9 +187,10 @@ export default function ServicesListPage() {
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           onSubmit={handleSubmitService}
-          onSubmitVariant={handleSubmitVariant}
-          onDeleteVariant={handleDeleteVariant}
           service={selectedService}
+          salonId={activeSalonId || ''}
+          employees={(employees as any)?.employees || []}
+          products={(products as any)?.products || []}
         />
 
         {/* Header */}
@@ -272,27 +274,34 @@ export default function ServicesListPage() {
                     {data.services.map((service: any) => (
                       <TableRow key={service.id}>
                         <TableCell className='font-medium'>
-                          {service.name}
+                          <div>
+                            <div>{service.name}</div>
+                            {(service as any).description && (
+                              <div className="text-xs text-muted-foreground truncate max-w-xs">
+                                {(service as any).description}
+                              </div>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell>
-                          {service.category?.name || '-'}
+                          {service.categories?.[0]?.name || '-'}
                         </TableCell>
                         <TableCell>
-                          {service.defaultPrice
-                            ? formatCurrency(service.defaultPrice)
+                          {(service as any).price
+                            ? formatCurrency((service as any).price)
                             : '-'}
                         </TableCell>
                         <TableCell>
-                          {service.defaultDuration
-                            ? `${service.defaultDuration} min`
+                          {(service as any).duration
+                            ? `${(service as any).duration} min`
                             : '-'}
                         </TableCell>
                         <TableCell>
                           {service.variants?.length || 0}
                         </TableCell>
                         <TableCell>
-                          <Badge variant={service.active ? 'success' : 'secondary'}>
-                            {service.active ? 'Active' : 'Inactive'}
+                          <Badge variant={(service as any).deletedAt ? 'secondary' : 'success'}>
+                            {(service as any).deletedAt ? 'Inactive' : 'Active'}
                           </Badge>
                         </TableCell>
                         <TableCell className='text-right'>

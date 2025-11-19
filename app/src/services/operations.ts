@@ -45,11 +45,33 @@ type CreateServiceInput = {
   price: number;
   hasVariants?: boolean;
   serviceRoomId?: string;
+  categoryId?: string;
+  priceType?: 'FIXED' | 'FROM' | 'CONSULTATION';
   costValue?: number;
   costValueType?: 'FIXED' | 'PERCENT';
+  commissionValue?: number;
+  commissionValueType?: 'FIXED' | 'PERCENT';
   nonCommissionableValue?: number;
   nonCommissionableValueType?: 'FIXED' | 'PERCENT';
   cardColor?: string;
+  active?: boolean;
+  requiresDeposit?: boolean;
+  depositAmount?: number;
+  allowOnlineBooking?: boolean;
+  imagePath?: string;
+  instructions?: string;
+  isFavorite?: boolean;
+  isVisible?: boolean;
+  advanceBookingTime?: number;
+  cashbackActive?: boolean;
+  cashbackValue?: number;
+  cashbackValueType?: 'FIXED' | 'PERCENT';
+  returnActive?: boolean;
+  returnDays?: number;
+  returnMessage?: string;
+  serviceListItem?: string;
+  cnae?: string;
+  municipalServiceCode?: string;
 };
 
 type UpdateServiceInput = {
@@ -61,16 +83,33 @@ type UpdateServiceInput = {
   price?: number;
   hasVariants?: boolean;
   serviceRoomId?: string;
+  categoryId?: string;
+  priceType?: 'FIXED' | 'FROM' | 'CONSULTATION';
   costValue?: number;
   costValueType?: 'FIXED' | 'PERCENT';
+  commissionValue?: number;
+  commissionValueType?: 'FIXED' | 'PERCENT';
   nonCommissionableValue?: number;
   nonCommissionableValueType?: 'FIXED' | 'PERCENT';
   cardColor?: string;
-};
-
-type DeleteServiceInput = {
-  serviceId: string;
-  salonId: string;
+  active?: boolean;
+  requiresDeposit?: boolean;
+  depositAmount?: number;
+  allowOnlineBooking?: boolean;
+  imagePath?: string;
+  instructions?: string;
+  isFavorite?: boolean;
+  isVisible?: boolean;
+  advanceBookingTime?: number;
+  cashbackActive?: boolean;
+  cashbackValue?: number;
+  cashbackValueType?: 'FIXED' | 'PERCENT';
+  returnActive?: boolean;
+  returnDays?: number;
+  returnMessage?: string;
+  serviceListItem?: string;
+  cnae?: string;
+  municipalServiceCode?: string;
 };
 
 type CreateServiceVariantInput = {
@@ -84,6 +123,7 @@ type CreateServiceVariantInput = {
   costValueType?: 'FIXED' | 'PERCENT';
   nonCommissionableValue?: number;
   nonCommissionableValueType?: 'FIXED' | 'PERCENT';
+  active?: boolean;
 };
 
 type UpdateServiceVariantInput = {
@@ -96,7 +136,13 @@ type UpdateServiceVariantInput = {
   costValue?: number;
   costValueType?: 'FIXED' | 'PERCENT';
   nonCommissionableValue?: number;
+  active?: boolean;
   nonCommissionableValueType?: 'FIXED' | 'PERCENT';
+};
+
+type DeleteServiceInput = {
+  serviceId: string;
+  salonId: string;
 };
 
 type DeleteServiceVariantInput = {
@@ -246,11 +292,33 @@ export const createService: CreateService<CreateServiceInput, any> = async (
     price,
     hasVariants = false,
     serviceRoomId,
+    categoryId,
+    priceType = 'FIXED',
     costValue = 0,
     costValueType = 'FIXED',
+    commissionValue = 0,
+    commissionValueType = 'FIXED',
     nonCommissionableValue = 0,
     nonCommissionableValueType = 'FIXED',
     cardColor,
+    active = true,
+    requiresDeposit = false,
+    depositAmount,
+    allowOnlineBooking = true,
+    imagePath,
+    instructions,
+    isFavorite = false,
+    isVisible = true,
+    advanceBookingTime = 0,
+    cashbackActive = false,
+    cashbackValue = 0,
+    cashbackValueType = 'FIXED',
+    returnActive = false,
+    returnDays = 0,
+    returnMessage,
+    serviceListItem,
+    cnae,
+    municipalServiceCode,
   },
   context
 ) => {
@@ -266,8 +334,12 @@ export const createService: CreateService<CreateServiceInput, any> = async (
     throw new HttpError(400, 'Service name is required');
   }
 
-  if (duration <= 0) {
-    throw new HttpError(400, 'Service duration must be greater than 0');
+  if (!duration || duration <= 0) {
+    throw new HttpError(400, 'Service duration is required and must be greater than 0');
+  }
+
+  if (price === undefined || price === null) {
+    throw new HttpError(400, 'Service price is required');
   }
 
   if (price < 0) {
@@ -285,6 +357,42 @@ export const createService: CreateService<CreateServiceInput, any> = async (
     }
   }
 
+  // Validate categoryId if provided
+  if (categoryId) {
+    const category = await context.entities.Category.findUnique({
+      where: { id: categoryId },
+    });
+
+    if (!category || category.salonId !== salonId || category.deletedAt) {
+      throw new HttpError(400, 'Invalid category');
+    }
+  }
+
+  // Validate numeric values
+  if (advanceBookingTime < 0) {
+    throw new HttpError(400, 'Advance booking time cannot be negative');
+  }
+
+  if (cashbackValue < 0) {
+    throw new HttpError(400, 'Cashback value cannot be negative');
+  }
+
+  if (cashbackValueType === 'PERCENT' && cashbackValue > 100) {
+    throw new HttpError(400, 'Cashback percentage cannot exceed 100%');
+  }
+
+  if (returnDays < 0) {
+    throw new HttpError(400, 'Return days cannot be negative');
+  }
+
+  if (commissionValue < 0) {
+    throw new HttpError(400, 'Commission value cannot be negative');
+  }
+
+  if (commissionValueType === 'PERCENT' && commissionValue > 100) {
+    throw new HttpError(400, 'Commission percentage cannot exceed 100%');
+  }
+
   // Create the service
   const service = await context.entities.Service.create({
     data: {
@@ -296,14 +404,37 @@ export const createService: CreateService<CreateServiceInput, any> = async (
       price,
       hasVariants,
       serviceRoomId,
+      categoryId,
+      priceType,
       costValue,
       costValueType,
+      commissionValue,
+      commissionValueType,
       nonCommissionableValue,
       nonCommissionableValueType,
       cardColor,
+      active,
+      requiresDeposit,
+      depositAmount,
+      allowOnlineBooking,
+      imagePath,
+      instructions,
+      isFavorite,
+      isVisible,
+      advanceBookingTime,
+      cashbackActive,
+      cashbackValue,
+      cashbackValueType,
+      returnActive,
+      returnDays,
+      returnMessage: returnMessage?.trim(),
+      serviceListItem: serviceListItem?.trim(),
+      cnae: cnae?.trim(),
+      municipalServiceCode: municipalServiceCode?.trim(),
     },
     include: {
       serviceRoom: true,
+      category: true,
       createdBy: {
         select: { id: true, name: true, email: true },
       },
@@ -344,11 +475,33 @@ export const updateService: UpdateService<UpdateServiceInput, any> = async (
     price,
     hasVariants,
     serviceRoomId,
+    categoryId,
+    priceType,
     costValue,
     costValueType,
+    commissionValue,
+    commissionValueType,
     nonCommissionableValue,
     nonCommissionableValueType,
     cardColor,
+    active,
+    requiresDeposit,
+    depositAmount,
+    allowOnlineBooking,
+    imagePath,
+    instructions,
+    isFavorite,
+    isVisible,
+    advanceBookingTime,
+    cashbackActive,
+    cashbackValue,
+    cashbackValueType,
+    returnActive,
+    returnDays,
+    returnMessage,
+    serviceListItem,
+    cnae,
+    municipalServiceCode,
   },
   context
 ) => {
@@ -405,17 +558,75 @@ export const updateService: UpdateService<UpdateServiceInput, any> = async (
     updatedByUserId: context.user.id,
   };
 
+  // Validate categoryId if provided
+  if (categoryId !== undefined && categoryId !== null) {
+    const category = await context.entities.Category.findUnique({
+      where: { id: categoryId },
+    });
+
+    if (!category || category.salonId !== salonId || category.deletedAt) {
+      throw new HttpError(400, 'Invalid category');
+    }
+  }
+
+  // Validate numeric values
+  if (advanceBookingTime !== undefined && advanceBookingTime < 0) {
+    throw new HttpError(400, 'Advance booking time cannot be negative');
+  }
+
+  if (cashbackValue !== undefined && cashbackValue < 0) {
+    throw new HttpError(400, 'Cashback value cannot be negative');
+  }
+
+  if (cashbackValueType === 'PERCENT' && cashbackValue !== undefined && cashbackValue > 100) {
+    throw new HttpError(400, 'Cashback percentage cannot exceed 100%');
+  }
+
+  if (returnDays !== undefined && returnDays < 0) {
+    throw new HttpError(400, 'Return days cannot be negative');
+  }
+
+  if (commissionValue !== undefined && commissionValue < 0) {
+    throw new HttpError(400, 'Commission value cannot be negative');
+  }
+
+  if (commissionValueType === 'PERCENT' && commissionValue !== undefined && commissionValue > 100) {
+    throw new HttpError(400, 'Commission percentage cannot exceed 100%');
+  }
+
   if (name !== undefined) updateData.name = name.trim();
   if (description !== undefined) updateData.description = description?.trim();
   if (duration !== undefined) updateData.duration = duration;
   if (price !== undefined) updateData.price = price;
   if (hasVariants !== undefined) updateData.hasVariants = hasVariants;
   if (serviceRoomId !== undefined) updateData.serviceRoomId = serviceRoomId;
+  if (categoryId !== undefined) updateData.categoryId = categoryId;
+  if (priceType !== undefined) updateData.priceType = priceType;
   if (costValue !== undefined) updateData.costValue = costValue;
   if (costValueType !== undefined) updateData.costValueType = costValueType;
+  if (commissionValue !== undefined) updateData.commissionValue = commissionValue;
+  if (commissionValueType !== undefined) updateData.commissionValueType = commissionValueType;
   if (nonCommissionableValue !== undefined) updateData.nonCommissionableValue = nonCommissionableValue;
   if (nonCommissionableValueType !== undefined) updateData.nonCommissionableValueType = nonCommissionableValueType;
   if (cardColor !== undefined) updateData.cardColor = cardColor;
+  if (active !== undefined) updateData.active = active;
+  if (requiresDeposit !== undefined) updateData.requiresDeposit = requiresDeposit;
+  if (depositAmount !== undefined) updateData.depositAmount = depositAmount;
+  if (allowOnlineBooking !== undefined) updateData.allowOnlineBooking = allowOnlineBooking;
+  if (imagePath !== undefined) updateData.imagePath = imagePath;
+  if (instructions !== undefined) updateData.instructions = instructions;
+  if (isFavorite !== undefined) updateData.isFavorite = isFavorite;
+  if (isVisible !== undefined) updateData.isVisible = isVisible;
+  if (advanceBookingTime !== undefined) updateData.advanceBookingTime = advanceBookingTime;
+  if (cashbackActive !== undefined) updateData.cashbackActive = cashbackActive;
+  if (cashbackValue !== undefined) updateData.cashbackValue = cashbackValue;
+  if (cashbackValueType !== undefined) updateData.cashbackValueType = cashbackValueType;
+  if (returnActive !== undefined) updateData.returnActive = returnActive;
+  if (returnDays !== undefined) updateData.returnDays = returnDays;
+  if (returnMessage !== undefined) updateData.returnMessage = returnMessage?.trim();
+  if (serviceListItem !== undefined) updateData.serviceListItem = serviceListItem?.trim();
+  if (cnae !== undefined) updateData.cnae = cnae?.trim();
+  if (municipalServiceCode !== undefined) updateData.municipalServiceCode = municipalServiceCode?.trim();
 
   // Update the service
   const service = await context.entities.Service.update({
@@ -423,6 +634,7 @@ export const updateService: UpdateService<UpdateServiceInput, any> = async (
     data: updateData,
     include: {
       serviceRoom: true,
+      category: true,
       createdBy: {
         select: { id: true, name: true, email: true },
       },
@@ -552,6 +764,7 @@ export const createServiceVariant: CreateServiceVariant<CreateServiceVariantInpu
     costValueType = 'FIXED',
     nonCommissionableValue = 0,
     nonCommissionableValueType = 'FIXED',
+    active = true,
   },
   context
 ) => {
@@ -584,12 +797,12 @@ export const createServiceVariant: CreateServiceVariant<CreateServiceVariantInpu
     throw new HttpError(400, 'Variant name is required');
   }
 
-  if (duration <= 0) {
-    throw new HttpError(400, 'Variant duration must be greater than 0');
+  if (!duration || duration <= 0) {
+    throw new HttpError(400, 'Variant duration is required and must be greater than 0');
   }
 
-  if (price < 0) {
-    throw new HttpError(400, 'Variant price cannot be negative');
+  if (price === undefined || price === null || price < 0) {
+    throw new HttpError(400, 'Variant price is required and cannot be negative');
   }
 
   // Create the variant
@@ -598,12 +811,13 @@ export const createServiceVariant: CreateServiceVariant<CreateServiceVariantInpu
       serviceId,
       name: name.trim(),
       description: description?.trim(),
-      duration,
-      price,
+      duration: duration as number, // Validated above
+      price: price as number, // Validated above
       costValue,
       costValueType,
       nonCommissionableValue,
       nonCommissionableValueType,
+      deletedAt: active ? null : new Date(), // Se active=false, marca como deletado
     },
   });
 
@@ -654,6 +868,7 @@ export const updateServiceVariant: UpdateServiceVariant<UpdateServiceVariantInpu
     costValueType,
     nonCommissionableValue,
     nonCommissionableValueType,
+    active,
   },
   context
 ) => {
@@ -706,6 +921,7 @@ export const updateServiceVariant: UpdateServiceVariant<UpdateServiceVariantInpu
   if (costValueType !== undefined) updateData.costValueType = costValueType;
   if (nonCommissionableValue !== undefined) updateData.nonCommissionableValue = nonCommissionableValue;
   if (nonCommissionableValueType !== undefined) updateData.nonCommissionableValueType = nonCommissionableValueType;
+  if (active !== undefined) updateData.deletedAt = active ? null : new Date(); // Se active=false, marca como deletado
 
   // Update the variant
   const variant = await context.entities.ServiceVariant.update({

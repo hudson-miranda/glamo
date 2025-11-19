@@ -1,6 +1,6 @@
 import { HttpError } from 'wasp/server';
 import type { GetDashboardAnalytics } from 'wasp/server/operations';
-import { requirePermission } from '../rbac/permissions';
+import { requirePermission } from '../rbac/requirePermission';
 
 type DateRange = {
   startDate: string;
@@ -203,6 +203,7 @@ export const getDashboardAnalytics: GetDashboardAnalytics<
         salePackages: true,
         payments: true,
         employee: true,
+        client: true,
       },
     }),
     context.entities.Sale.findMany({
@@ -515,7 +516,7 @@ export const getDashboardAnalytics: GetDashboardAnalytics<
 
   sales.forEach((sale) => {
     sale.saleServices?.forEach((ss) => {
-      const category = ss.service?.category || 'Outros';
+      const category = 'Serviços';
       if (!categoryMap.has(category)) {
         categoryMap.set(category, { category, revenue: 0, count: 0 });
       }
@@ -534,7 +535,7 @@ export const getDashboardAnalytics: GetDashboardAnalytics<
 
   sales.forEach((sale) => {
     sale.payments?.forEach((payment) => {
-      const method = payment.method || 'Outros';
+      const method = payment.methodId || 'Outros';
       if (!paymentMethodMap.has(method)) {
         paymentMethodMap.set(method, { method, total: 0, count: 0 });
       }
@@ -726,7 +727,7 @@ export const getDashboardAnalytics: GetDashboardAnalytics<
     employeeStats,
 
     newClients,
-    newClientsPreviousPeriod,
+    newClientsPreviousPeriod: previousNewClients,
     topClients,
     upcomingBirthdays,
     retentionRate,

@@ -519,17 +519,17 @@ query listServices {
 
 query getService {
   fn: import { getService } from "@src/services/operations",
-  entities: [User, Service, ServiceRoom, ServiceVariant, CommissionConfig, ServiceCategory, UserSalon]
+  entities: [User, Service, ServiceRoom, ServiceVariant, CommissionConfig, ServiceCategory, Category, ServiceCareMessage, ServiceEmployeeCustomization, ServiceProductConsumption, UserSalon]
 }
 
 action createService {
   fn: import { createService } from "@src/services/operations",
-  entities: [User, Service, ServiceRoom, Log, UserSalon]
+  entities: [User, Service, ServiceRoom, Category, Log, UserSalon]
 }
 
 action updateService {
   fn: import { updateService } from "@src/services/operations",
-  entities: [User, Service, ServiceRoom, Log, UserSalon]
+  entities: [User, Service, ServiceRoom, Category, Log, UserSalon]
 }
 
 action deleteService {
@@ -555,6 +555,105 @@ action deleteServiceVariant {
 action manageCommissionConfig {
   fn: import { manageCommissionConfig } from "@src/services/operations",
   entities: [User, Service, CommissionConfig, Log, UserSalon]
+}
+
+// Category operations
+query listCategories {
+  fn: import { listCategories } from "@src/services/categoryOperations",
+  entities: [User, Category, Service, UserSalon]
+}
+
+query getCategory {
+  fn: import { getCategory } from "@src/services/categoryOperations",
+  entities: [User, Category, Service, UserSalon]
+}
+
+action createCategory {
+  fn: import { createCategory } from "@src/services/categoryOperations",
+  entities: [User, Category, Log, UserSalon]
+}
+
+action updateCategory {
+  fn: import { updateCategory } from "@src/services/categoryOperations",
+  entities: [User, Category, Log, UserSalon]
+}
+
+action deleteCategory {
+  fn: import { deleteCategory } from "@src/services/categoryOperations",
+  entities: [User, Category, Service, Log, UserSalon]
+}
+
+// Service Care Message operations
+query listServiceCareMessages {
+  fn: import { listServiceCareMessages } from "@src/services/careMessageOperations",
+  entities: [User, Service, ServiceCareMessage, UserSalon]
+}
+
+action createServiceCareMessage {
+  fn: import { createServiceCareMessage } from "@src/services/careMessageOperations",
+  entities: [User, Service, ServiceCareMessage, Log, UserSalon]
+}
+
+action updateServiceCareMessage {
+  fn: import { updateServiceCareMessage } from "@src/services/careMessageOperations",
+  entities: [User, Service, ServiceCareMessage, Log, UserSalon]
+}
+
+action deleteServiceCareMessage {
+  fn: import { deleteServiceCareMessage } from "@src/services/careMessageOperations",
+  entities: [User, Service, ServiceCareMessage, Log, UserSalon]
+}
+
+action reorderServiceCareMessages {
+  fn: import { reorderServiceCareMessages } from "@src/services/careMessageOperations",
+  entities: [User, Service, ServiceCareMessage, Log, UserSalon]
+}
+
+// Service Employee Customization operations
+query listServiceEmployeeCustomizations {
+  fn: import { listServiceEmployeeCustomizations } from "@src/services/employeeCustomizationOperations",
+  entities: [User, Service, Employee, ServiceEmployeeCustomization, UserSalon]
+}
+
+query getServiceEmployeeCustomization {
+  fn: import { getServiceEmployeeCustomization } from "@src/services/employeeCustomizationOperations",
+  entities: [User, Service, Employee, ServiceEmployeeCustomization, UserSalon]
+}
+
+action createServiceEmployeeCustomization {
+  fn: import { createServiceEmployeeCustomization } from "@src/services/employeeCustomizationOperations",
+  entities: [User, Service, Employee, ServiceEmployeeCustomization, Log, UserSalon]
+}
+
+action updateServiceEmployeeCustomization {
+  fn: import { updateServiceEmployeeCustomization } from "@src/services/employeeCustomizationOperations",
+  entities: [User, Service, Employee, ServiceEmployeeCustomization, Log, UserSalon]
+}
+
+action deleteServiceEmployeeCustomization {
+  fn: import { deleteServiceEmployeeCustomization } from "@src/services/employeeCustomizationOperations",
+  entities: [User, Service, Employee, ServiceEmployeeCustomization, Log, UserSalon]
+}
+
+// Service Product Consumption operations
+query listServiceProductConsumptions {
+  fn: import { listServiceProductConsumptions } from "@src/services/productConsumptionOperations",
+  entities: [User, Service, Product, ServiceProductConsumption, UserSalon]
+}
+
+action createServiceProductConsumption {
+  fn: import { createServiceProductConsumption } from "@src/services/productConsumptionOperations",
+  entities: [User, Service, Product, ServiceProductConsumption, Log, UserSalon]
+}
+
+action updateServiceProductConsumption {
+  fn: import { updateServiceProductConsumption } from "@src/services/productConsumptionOperations",
+  entities: [User, Service, Product, ServiceProductConsumption, Log, UserSalon]
+}
+
+action deleteServiceProductConsumption {
+  fn: import { deleteServiceProductConsumption } from "@src/services/productConsumptionOperations",
+  entities: [User, Service, Product, ServiceProductConsumption, Log, UserSalon]
 }
 //#endregion
 

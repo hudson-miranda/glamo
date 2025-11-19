@@ -1,275 +1,716 @@
+import { useState } from 'react';
+import { useQuery, getDashboardAnalytics } from 'wasp/client/operations';
+import { useSalonContext } from '../../hooks/useSalonContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
-import { EmptyState } from '../../../components/ui/empty-state';
-import { Users, Calendar, DollarSign, TrendingUp, Plus, Loader2, Building2 } from 'lucide-react';
-import { useSalonContext } from '../../hooks/useSalonContext';
-import { useQuery, listClients, listAppointments, listSales } from 'wasp/client/operations';
-import { Link } from 'wasp/client/router';
+import { Avatar, AvatarFallback, AvatarImage } from '../../../components/ui/avatar';
+import {
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Calendar,
+  FileText,
+  Users,
+  Clock,
+  Target,
+  CreditCard,
+  ShoppingBag,
+  Loader2,
+  Cake,
+  TrendingDownIcon,
+} from 'lucide-react';
+import { DateRangeFilter } from './components/DateRangeFilter';
+import {
+  LineChart,
+  BarChart,
+  DonutChart,
+  FunnelChart,
+  HeatmapChart,
+  SparklineChart,
+} from '../../../components/charts';
 
 export default function DashboardPage() {
   const { activeSalonId } = useSalonContext();
+  const [currentPage, setCurrentPage] = useState(1);
+  const employeesPerPage = 3;
 
-  // Fetch real data
-  const { data: clientsData, isLoading: isLoadingClients } = useQuery(
-    listClients,
+  const [dateRange, setDateRange] = useState<{ startDate?: string; endDate?: string }>(() => {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 14);
+    return {
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+    };
+  });
+
+  const { data: analytics, isLoading } = useQuery(
+    getDashboardAnalytics,
     {
       salonId: activeSalonId || '',
-      page: 1,
-      perPage: 1, // We only need the count
+      startDate: dateRange.startDate,
+      endDate: dateRange.endDate,
     },
     {
       enabled: !!activeSalonId,
     }
   );
 
-  const { data: appointmentsData, isLoading: isLoadingAppointments } = useQuery(
-    listAppointments,
-    {
-      salonId: activeSalonId || '',
-      page: 1,
-      perPage: 100, // Get today's appointments
-    },
-    {
-      enabled: !!activeSalonId,
-    }
-  );
+  const handleApplyFilter = (startDate: Date, endDate: Date) => {
+    setDateRange({
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+    });
+  };
 
-  // Get sales data for current month
-  const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  
-  // Previous month for comparison
-  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+  const handleClearFilter = () => {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 14);
+    setDateRange({
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+    });
+  };
 
-  const { data: currentMonthSales, isLoading: isLoadingSales } = useQuery(
-    listSales,
-    {
-      salonId: activeSalonId || '',
-      startDate: startOfMonth.toISOString(),
-      endDate: endOfMonth.toISOString(),
-      page: 1,
-      perPage: 1000,
-    },
-    {
-      enabled: !!activeSalonId,
-    }
-  );
-
-  const { data: lastMonthSales, isLoading: isLoadingLastMonth } = useQuery(
-    listSales,
-    {
-      salonId: activeSalonId || '',
-      startDate: startOfLastMonth.toISOString(),
-      endDate: endOfLastMonth.toISOString(),
-      page: 1,
-      perPage: 1000,
-    },
-    {
-      enabled: !!activeSalonId,
-    }
-  );
-
-  // Calculate stats
-  const totalClients = clientsData?.total || 0;
-  
-  // Filter today's appointments
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  
-  const todayAppointments = appointmentsData?.appointments?.filter((apt: any) => {
-    const aptDate = new Date(apt.date);
-    return aptDate >= today && aptDate < tomorrow;
-  }) || [];
-
-  const appointmentsToday = todayAppointments.length;
-  const completedToday = todayAppointments.filter((apt: any) => apt.status === 'DONE').length;
-  const pendingToday = todayAppointments.filter((apt: any) => 
-    apt.status === 'PENDING' || apt.status === 'CONFIRMED' || apt.status === 'IN_SERVICE'
-  ).length;
-
-  // Calculate revenue
-  const currentMonthRevenue = currentMonthSales?.sales?.reduce((sum: number, sale: any) => {
-    return sum + (sale.finalAmount || 0);
-  }, 0) || 0;
-
-  const lastMonthRevenue = lastMonthSales?.sales?.reduce((sum: number, sale: any) => {
-    return sum + (sale.finalAmount || 0);
-  }, 0) || 0;
-
-  // Calculate growth rate
-  const growthRate = lastMonthRevenue > 0
-    ? ((currentMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100
-    : 0;
-
-  const isGrowthPositive = growthRate > 0;
-
-  // Show empty state if no salon selected
-  if (!activeSalonId) {
+  if (isLoading) {
     return (
-      <EmptyState
-        icon={Building2}
-        title='No salon selected'
-        description='Create or select a salon to start managing your business'
-        action={
-          <Button asChild>
-            <Link to='/onboarding/create-salon'>
-              <Plus className='mr-2 h-4 w-4' />
-              Create Salon
-            </Link>
-          </Button>
-        }
-      />
+      <div className="flex items-center justify-center h-96">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
     );
   }
 
-  const isLoading = isLoadingClients || isLoadingAppointments || isLoadingSales || isLoadingLastMonth;
+  if (!analytics) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <p className="text-muted-foreground">Nenhum dado disponível</p>
+      </div>
+    );
+  }
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value);
-  };
+  const formatCurrency = (value: number) =>
+    value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  const formatPercent = (value: number) => `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
+
+  const GrowthBadge = ({ value }: { value: number }) => (
+    <div className="flex items-center gap-1">
+      {value >= 0 ? (
+        <TrendingUp className="h-3 w-3 text-green-600" />
+      ) : (
+        <TrendingDown className="h-3 w-3 text-red-600" />
+      )}
+      <span className={`text-xs font-medium ${value >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+        {formatPercent(value)}
+      </span>
+    </div>
+  );
+
+  const totalPages = Math.ceil(analytics.employeeStats.length / employeesPerPage);
+  const paginatedEmployees = analytics.employeeStats.slice(
+    (currentPage - 1) * employeesPerPage,
+    currentPage * employeesPerPage
+  );
 
   return (
-    <div className='space-y-6'>
+    <div className="space-y-6 pb-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className='text-3xl font-bold tracking-tight'>Dashboard</h1>
-          <p className='text-muted-foreground'>
-            Welcome to your salon management dashboard
-          </p>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground">Visão geral do seu negócio</p>
         </div>
+        <DateRangeFilter
+          onApply={handleApplyFilter}
+          onClear={handleClearFilter}
+          defaultStartDate={dateRange.startDate ? new Date(dateRange.startDate) : undefined}
+          defaultEndDate={dateRange.endDate ? new Date(dateRange.endDate) : undefined}
+        />
+      </div>
 
-        {/* Stats Cards */}
-        <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>
-                Total Clients
-              </CardTitle>
-              <Users className='h-4 w-4 text-muted-foreground' />
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
-              ) : (
-                <>
-                  <div className='text-2xl font-bold'>{totalClients}</div>
-                  <p className='text-xs text-muted-foreground'>
-                    Registered clients
-                  </p>
-                </>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>
-                Appointments Today
-              </CardTitle>
-              <Calendar className='h-4 w-4 text-muted-foreground' />
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
-              ) : (
-                <>
-                  <div className='text-2xl font-bold'>{appointmentsToday}</div>
-                  <p className='text-xs text-muted-foreground'>
-                    {completedToday} completed, {pendingToday} pending
-                  </p>
-                </>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>
-                Revenue (Month)
-              </CardTitle>
-              <DollarSign className='h-4 w-4 text-muted-foreground' />
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
-              ) : (
-                <>
-                  <div className='text-2xl font-bold'>{formatCurrency(currentMonthRevenue)}</div>
-                  <p className='text-xs text-muted-foreground'>
-                    From {currentMonthSales?.total || 0} sales
-                  </p>
-                </>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>
-                Growth Rate
-              </CardTitle>
-              <TrendingUp className='h-4 w-4 text-muted-foreground' />
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
-              ) : (
-                <>
-                  <div className={`text-2xl font-bold ${isGrowthPositive ? 'text-green-600' : 'text-red-600'}`}>
-                    {isGrowthPositive ? '+' : ''}{growthRate.toFixed(1)}%
-                  </div>
-                  <p className='text-xs text-muted-foreground'>
-                    vs. last month
-                  </p>
-                </>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Quick Actions */}
+      {/* Top KPIs */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Vendas Totais</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
-              <Button asChild variant='outline' className='h-auto py-4'>
-                <Link to='/appointments' className='flex flex-col items-center space-y-2'>
-                  <Calendar className='h-6 w-6' />
-                  <span>New Appointment</span>
-                </Link>
-              </Button>
-              
-              <Button asChild variant='outline' className='h-auto py-4'>
-                <Link to='/sales' className='flex flex-col items-center space-y-2'>
-                  <DollarSign className='h-6 w-6' />
-                  <span>New Sale</span>
-                </Link>
-              </Button>
-              
-              <Button asChild variant='outline' className='h-auto py-4'>
-                <Link to='/clients' className='flex flex-col items-center space-y-2'>
-                  <Users className='h-6 w-6' />
-                  <span>Add Client</span>
-                </Link>
-              </Button>
-              
-              <Button asChild variant='outline' className='h-auto py-4'>
-                <Link to='/services' className='flex flex-col items-center space-y-2'>
-                  <Plus className='h-6 w-6' />
-                  <span>Add Service</span>
-                </Link>
-              </Button>
+            <div className="text-2xl font-bold">{formatCurrency(analytics.totalSales)}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Hoje: {formatCurrency(analytics.totalSalesCurrentDay)}
+            </p>
+            <div className="flex items-center gap-2 mt-2">
+              <GrowthBadge value={analytics.salesGrowth} />
+              <span className="text-xs text-muted-foreground">vs Período Anterior</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Agendamentos</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{analytics.totalAppointments}</div>
+            <div className="mt-2 -mb-2">
+              <SparklineChart
+                data={analytics.dailyData.map((d) => d.appointments)}
+                height={40}
+                color="#10b981"
+              />
+            </div>
+            <div className="flex items-center gap-2 mt-2">
+              <GrowthBadge value={analytics.appointmentsGrowth} />
+              <span className="text-xs text-muted-foreground">Taxa de crescimento</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Comandas</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{analytics.totalSessions}</div>
+            <div className="mt-2 -mb-2">
+              <SparklineChart
+                data={analytics.dailyData.map((d) => d.sales)}
+                height={40}
+                color="#f59e0b"
+              />
+            </div>
+            <div className="flex items-center gap-2 mt-2">
+              <GrowthBadge value={analytics.sessionsGrowth} />
+              <span className="text-xs text-muted-foreground">Taxa de conversão</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Novos Clientes</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{analytics.newClients}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Período anterior: {analytics.newClientsPreviousPeriod}
+            </p>
+            <div className="flex items-center gap-2 mt-2">
+              <GrowthBadge
+                value={
+                  ((analytics.newClients - analytics.newClientsPreviousPeriod) /
+                    (analytics.newClientsPreviousPeriod || 1)) *
+                  100
+                }
+              />
+              <span className="text-xs text-muted-foreground">vs Período Anterior</span>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Sales and Appointments Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Comandas e Agendamentos</CardTitle>
+          <p className="text-sm text-muted-foreground">Visão diária do período</p>
+        </CardHeader>
+        <CardContent>
+          <LineChart
+            data={[
+              {
+                name: 'Receita (R$)',
+                data: analytics.dailyData.map((d) => d.revenue),
+              },
+              {
+                name: 'Agendamentos',
+                data: analytics.dailyData.map((d) => d.appointments),
+              },
+            ]}
+            categories={analytics.dailyData.map((d) =>
+              new Date(d.date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+            )}
+            height={350}
+            colors={['#6366f1', '#10b981']}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Average Ticket */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Ticket Médio</CardTitle>
+          <p className="text-sm text-muted-foreground">Comparação entre períodos</p>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-3xl font-bold">{formatCurrency(analytics.averageTicket)}</p>
+                <p className="text-sm text-muted-foreground">Ticket médio do período</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <GrowthBadge value={analytics.averageTicketGrowth} />
+                <span className="text-sm text-muted-foreground">vs Período Anterior</span>
+              </div>
+            </div>
+            <BarChart
+              data={[
+                {
+                  name: 'Período Anterior',
+                  data: [analytics.averageTicketPreviousPeriod],
+                },
+                {
+                  name: 'Período Atual',
+                  data: [analytics.averageTicket],
+                },
+              ]}
+              categories={['Ticket Médio']}
+              height={200}
+              colors={['#9ca3af', '#6366f1']}
+              showDataLabels={true}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Employee Stats and Top Clients */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* Employee Stats */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Atendimentos por Colaborador</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Total: {analytics.employeeStats.reduce((sum, e) => sum + e.appointmentCount, 0)}
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              <div className="-mx-2">
+                <SparklineChart
+                  data={analytics.dailyData.map((d) => d.appointments)}
+                  height={60}
+                  color="#8b5cf6"
+                  type="area"
+                />
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold">🏆 Top 3 Colaboradores</h4>
+                {analytics.employeeStats.slice(0, 3).map((emp, index) => (
+                  <div
+                    key={emp.id}
+                    className="flex items-center gap-3 p-3 rounded-lg bg-muted/50"
+                  >
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-bold text-sm">
+                      {index + 1}
+                    </div>
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={emp.profilePhoto || undefined} />
+                      <AvatarFallback>
+                        {emp.name
+                          .split(' ')
+                          .map((n) => n[0])
+                          .join('')
+                          .toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{emp.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {emp.appointmentCount} atendimentos
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-semibold">{formatCurrency(emp.totalRevenue)}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Média: {formatCurrency(emp.averageTicket)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {analytics.employeeStats.length > 3 && (
+                <div className="space-y-3 pt-3 border-t">
+                  <h4 className="text-sm font-semibold">Todos os Colaboradores</h4>
+                  <div className="space-y-2">
+                    {paginatedEmployees.map((emp) => (
+                      <div
+                        key={emp.id}
+                        className="flex items-center justify-between p-2 rounded hover:bg-muted/50"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src={emp.profilePhoto || undefined} />
+                            <AvatarFallback className="text-xs">
+                              {emp.name
+                                .split(' ')
+                                .map((n) => n[0])
+                                .join('')}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm font-medium">{emp.name}</span>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm">
+                          <span className="text-muted-foreground">{emp.appointmentCount}</span>
+                          <span className="font-medium">{formatCurrency(emp.totalRevenue)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-between pt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                      >
+                        Anterior
+                      </Button>
+                      <span className="text-xs text-muted-foreground">
+                        Página {currentPage} de {totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                      >
+                        Próxima
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Top Clients */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Top 3 Clientes</CardTitle>
+            <p className="text-sm text-muted-foreground">Clientes que mais gastaram</p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {analytics.topClients.map((client, index) => (
+                <div
+                  key={client.id}
+                  className="flex items-center gap-3 p-3 rounded-lg bg-muted/50"
+                >
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-400 font-bold text-sm">
+                    {index + 1}
+                  </div>
+                  <Avatar className="h-10 w-10">
+                    <AvatarFallback>
+                      {client.name
+                        .split(' ')
+                        .map((n) => n[0])
+                        .join('')
+                        .toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm truncate">{client.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{client.email}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-semibold">{formatCurrency(client.totalSpent)}</p>
+                    <p className="text-xs text-muted-foreground">{client.visitCount} visitas</p>
+                  </div>
+                </div>
+              ))}
+
+              {analytics.upcomingBirthdays.length > 0 && (
+                <div className="pt-4 border-t space-y-3">
+                  <h4 className="text-sm font-semibold flex items-center gap-2">
+                    <Cake className="h-4 w-4" />
+                    Próximos Aniversariantes
+                  </h4>
+                  {analytics.upcomingBirthdays.map((client) => (
+                    <div
+                      key={client.id}
+                      className="flex items-center justify-between p-2 rounded hover:bg-muted/50"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback className="text-xs">
+                            {client.name
+                              .split(' ')
+                              .map((n) => n[0])
+                              .join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm font-medium">{client.name}</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {client.birthDate &&
+                          new Date(client.birthDate).toLocaleDateString('pt-BR', {
+                            day: '2-digit',
+                            month: 'long',
+                          })}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="pt-4 border-t">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-950">
+                  <div>
+                    <p className="text-sm font-medium">Taxa de Retenção</p>
+                    <p className="text-xs text-muted-foreground">Clientes que retornaram</p>
+                  </div>
+                  <p className="text-2xl font-bold text-green-600">
+                    {analytics.retentionRate.toFixed(1)}%
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Sales by Category and Funnel */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Vendas por Categoria</CardTitle>
+            <p className="text-sm text-muted-foreground">Distribuição de receita</p>
+          </CardHeader>
+          <CardContent>
+            {analytics.salesByCategory.length > 0 ? (
+              <DonutChart
+                data={analytics.salesByCategory.map((c) => c.revenue)}
+                labels={analytics.salesByCategory.map((c) => c.category)}
+                height={300}
+              />
+            ) : (
+              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                Nenhuma venda no período
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Funil de Agendamentos</CardTitle>
+            <p className="text-sm text-muted-foreground">Taxa de conversão</p>
+          </CardHeader>
+          <CardContent>
+            <FunnelChart
+              data={[
+                {
+                  label: 'Todos',
+                  value: analytics.appointmentsByStatus.all,
+                  percentage: 100,
+                },
+                {
+                  label: 'Confirmados',
+                  value: analytics.appointmentsByStatus.confirmed,
+                  percentage:
+                    (analytics.appointmentsByStatus.confirmed /
+                      (analytics.appointmentsByStatus.all || 1)) *
+                    100,
+                },
+                {
+                  label: 'Faturados',
+                  value: analytics.appointmentsByStatus.billed,
+                  percentage:
+                    (analytics.appointmentsByStatus.billed /
+                      (analytics.appointmentsByStatus.all || 1)) *
+                    100,
+                },
+              ]}
+              height={300}
+            />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Financial Metrics */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Produtos vs Serviços</CardTitle>
+            <ShoppingBag className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-muted-foreground">Serviços</span>
+                <span className="text-sm font-medium">{formatCurrency(analytics.servicesRevenue)}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-muted-foreground">Produtos</span>
+                <span className="text-sm font-medium">{formatCurrency(analytics.productsRevenue)}</span>
+              </div>
+              <div className="flex justify-between items-center pt-2 border-t">
+                <span className="text-xs text-muted-foreground">Pacotes</span>
+                <span className="text-sm font-medium">{formatCurrency(analytics.packagesRevenue)}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Taxa de Conversão</CardTitle>
+            <Target className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-green-600">
+              {analytics.conversionRate.toFixed(1)}%
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">Agendamentos → Vendas</p>
+            <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-green-600"
+                style={{ width: `${analytics.conversionRate}%` }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Taxa de Cancelamento</CardTitle>
+            <TrendingDownIcon className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-red-600">
+              {analytics.cancellationRate.toFixed(1)}%
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {analytics.appointmentsByStatus.cancelled} cancelados
+            </p>
+            <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-red-600"
+                style={{ width: `${analytics.cancellationRate}%` }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Tempo Médio</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">{Math.round(analytics.averageServiceTime)} min</div>
+            <p className="text-xs text-muted-foreground mt-1">Por atendimento</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Payment Methods */}
+      {analytics.paymentMethods.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Formas de Pagamento</CardTitle>
+            <p className="text-sm text-muted-foreground">Distribuição de pagamentos</p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {analytics.paymentMethods.map((pm, index) => (
+                <div key={index} className="flex items-center justify-between p-4 rounded-lg border">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-full bg-primary/10">
+                      <CreditCard className="h-4 w-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">{pm.method}</p>
+                      <p className="text-xs text-muted-foreground">{pm.count} transações</p>
+                    </div>
+                  </div>
+                  <p className="font-semibold">{formatCurrency(pm.total)}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Peak Hours */}
+      {analytics.peakHours.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Horários de Pico</CardTitle>
+            <p className="text-sm text-muted-foreground">Horários mais movimentados</p>
+          </CardHeader>
+          <CardContent>
+            <BarChart
+              data={[
+                {
+                  name: 'Agendamentos',
+                  data: analytics.peakHours.map((h) => h.count),
+                },
+              ]}
+              categories={analytics.peakHours.map((h) => `${h.hour}:00`)}
+              height={250}
+              colors={['#8b5cf6']}
+              showDataLabels={true}
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Occupancy */}
+      {analytics.occupancyData.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Ocupação da Agenda por Colaborador</CardTitle>
+            <p className="text-sm text-muted-foreground">% ocupação vs disponibilidade</p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {analytics.occupancyData.map((occ) => (
+                <div key={occ.employeeId} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium truncate">{occ.employeeName}</p>
+                    <p className="text-sm font-bold text-primary">
+                      {occ.occupancyPercentage.toFixed(1)}%
+                    </p>
+                  </div>
+                  <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary"
+                      style={{ width: `${Math.min(100, occ.occupancyPercentage)}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>{Math.round(occ.totalMinutesBooked / 60)}h ocupadas</span>
+                    <span>{Math.round(occ.totalMinutesAvailable / 60)}h disponíveis</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Heatmap */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Mapa de Calor de Agendamentos</CardTitle>
+          <p className="text-sm text-muted-foreground">Horários mais concorridos por dia</p>
+        </CardHeader>
+        <CardContent>
+          <HeatmapChart data={analytics.heatmapData} height={400} />
+        </CardContent>
+      </Card>
+    </div>
   );
 }

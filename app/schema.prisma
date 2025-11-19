@@ -230,6 +230,7 @@ model Salon {
   roles              Role[]
   clients            Client[]
   services           Service[]
+  categories         Category[]
   products           Product[]
   packages           Package[]
   appointments       Appointment[]
@@ -753,29 +754,55 @@ model Service {
   createdByUserId            String
   updatedByUserId            String?
   serviceRoomId              String?
+  categoryId                 String?
   name                       String
   description                String?
-  hasVariants                Boolean   @default(false)
+  hasVariants                Boolean      @default(false)
   duration                   Int
   price                      Float
-  costValue                  Float     @default(0)
-  costValueType              ValueType @default(FIXED)
-  nonCommissionableValue     Float     @default(0)
-  nonCommissionableValueType ValueType @default(FIXED)
+  priceType                  String       @default("FIXED") // FIXED, FROM, CONSULTATION
+  costValue                  Float        @default(0)
+  costValueType              ValueType    @default(FIXED)
+  commissionValue            Float        @default(0)
+  commissionValueType        ValueType    @default(PERCENT)
+  nonCommissionableValue     Float        @default(0)
+  nonCommissionableValueType ValueType    @default(FIXED)
   cardColor                  String?
+  imagePath                  String?
+  active                     Boolean      @default(true)
+  isFavorite                 Boolean      @default(false)
+  isVisible                  Boolean      @default(true)
+  requiresDeposit            Boolean      @default(false)
+  depositAmount              Float?
+  allowOnlineBooking         Boolean      @default(true)
+  advanceBookingTime         Int          @default(0) // minutos de antecedência
+  cashbackActive             Boolean      @default(false)
+  cashbackValue              Float        @default(0)
+  cashbackValueType          ValueType    @default(FIXED)
+  returnActive               Boolean      @default(false)
+  returnDays                 Int          @default(0)
+  returnMessage              String?
+  instructions               String?
+  serviceListItem            String?
+  cnae                       String?
+  municipalServiceCode       String?
   deletedAt                  DateTime?
 
-  salon               Salon                @relation(fields: [salonId], references: [id], onDelete: Restrict)
-  createdBy           User                 @relation("ServiceCreatedBy", fields: [createdByUserId], references: [id], onDelete: Restrict)
-  updatedBy           User?                @relation("ServiceUpdatedBy", fields: [updatedByUserId], references: [id], onDelete: SetNull)
-  serviceRoom         ServiceRoom?         @relation(fields: [serviceRoomId], references: [id], onDelete: SetNull)
+  salon               Salon                     @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  createdBy           User                      @relation("ServiceCreatedBy", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  updatedBy           User?                     @relation("ServiceUpdatedBy", fields: [updatedByUserId], references: [id], onDelete: SetNull)
+  serviceRoom         ServiceRoom?              @relation(fields: [serviceRoomId], references: [id], onDelete: SetNull)
+  category            Category?                 @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   variants            ServiceVariant[]
   categories          ServiceCategory[]
   commissionConfig    CommissionConfig?
   appointmentServices AppointmentService[]
   saleServices        SaleService[]
   packageServices     PackageService[]
-  employeeServices    EmployeeService[] // Relação com colaboradores que podem executar este serviço
+  employeeServices    EmployeeService[]
+  careMessages        ServiceCareMessage[]
+  employeeCustomizations ServiceEmployeeCustomization[]
+  productConsumptions ServiceProductConsumption[]
 }
 
 model ServiceVariant {
@@ -811,24 +838,93 @@ model ServiceCategory {
   service Service @relation(fields: [serviceId], references: [id], onDelete: Restrict)
 }
 
+model Category {
+  id          String    @id @default(uuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  salonId     String
+  name        String
+  description String?
+  active      Boolean   @default(true)
+  deletedAt   DateTime?
+
+  salon    Salon     @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  services Service[]
+}
+
+model ServiceCareMessage {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  serviceId     String
+  type          String // PRE_APPOINTMENT, POST_APPOINTMENT
+  timeValue     Int
+  timeUnit      String // HOURS, DAYS
+  message       String
+  active        Boolean @default(true)
+  order         Int     @default(0)
+
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+}
+
+model ServiceEmployeeCustomization {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  serviceId          String
+  employeeId         String
+  price              Float?
+  duration           Int?
+  costValue          Float?
+  costValueType      ValueType?
+  allowOnlineBooking Boolean   @default(true)
+
+  service  Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([serviceId, employeeId])
+}
+
+model ServiceProductConsumption {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  serviceId String
+  productId String
+  quantity  Int @default(1)
+
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([serviceId, productId])
+}
+
 model CommissionConfig {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  serviceId                        String    @unique
+  serviceId                        String?   @unique
+  employeeId                       String?
   commissionType                   String
   baseValueType                    ValueType
   baseValue                        Float
   deductAssistantsFromProfessional Boolean   @default(false)
+  deductFrom                       String    @default("ESTABLISHMENT") // ESTABLISHMENT, PROFESSIONAL
   soloValue                        Float
   soloValueType                    ValueType
   withAssistantValue               Float
   withAssistantValueType           ValueType
   asAssistantValue                 Float
   asAssistantValueType             ValueType
+  active                           Boolean   @default(true)
 
-  service Service @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  service  Service?  @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  employee Employee? @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 }
 
 // ============================================================================
@@ -1098,14 +1194,15 @@ model Product {
   sku                 String?
   deletedAt           DateTime?
 
-  salon        Salon            @relation(fields: [salonId], references: [id], onDelete: Restrict)
-  category     ProductCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  brand        ProductBrand?    @relation(fields: [brandId], references: [id], onDelete: SetNull)
-  supplier     Supplier?        @relation(fields: [supplierId], references: [id], onDelete: SetNull)
-  createdBy    User             @relation("ProductCreatedBy", fields: [createdByUserId], references: [id], onDelete: Restrict)
-  updatedBy    User?            @relation("ProductUpdatedBy", fields: [updatedByUserId], references: [id], onDelete: SetNull)
-  stockRecords StockRecord[]
-  saleProducts SaleProduct[]
+  salon                   Salon                       @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  category                ProductCategory?            @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  brand                   ProductBrand?               @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  supplier                Supplier?                   @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  createdBy               User                        @relation("ProductCreatedBy", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  updatedBy               User?                       @relation("ProductUpdatedBy", fields: [updatedByUserId], references: [id], onDelete: SetNull)
+  stockRecords            StockRecord[]
+  saleProducts            SaleProduct[]
+  serviceProductConsumptions ServiceProductConsumption[]
 }
 
 enum MovementType {
@@ -1696,13 +1793,15 @@ model Employee {
   deletedAt DateTime?
 
   // Relações
-  salon              Salon              @relation(fields: [salonId], references: [id], onDelete: Restrict)
-  user               User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
-  schedules          EmployeeSchedule[]
-  serviceAssignments EmployeeService[]
-  appointments       Appointment[]      @relation("EmployeeAppointments")
-  timeBlocks         TimeBlock[]
-  waitingLists       WaitingList[]
+  salon                   Salon                          @relation(fields: [salonId], references: [id], onDelete: Restrict)
+  user                    User?                          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  schedules               EmployeeSchedule[]
+  serviceAssignments      EmployeeService[]
+  appointments            Appointment[]                  @relation("EmployeeAppointments")
+  timeBlocks              TimeBlock[]
+  waitingLists            WaitingList[]
+  commissionConfigs       CommissionConfig[]
+  serviceCustomizations   ServiceEmployeeCustomization[]
 
   @@index([salonId])
   @@index([userId])
