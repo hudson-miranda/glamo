@@ -26,6 +26,7 @@ interface ValueTypeInputProps {
   required?: boolean;
   id?: string;
   tooltip?: React.ReactNode;
+  reversedLayout?: boolean;
 }
 
 export const ValueTypeInput: React.FC<ValueTypeInputProps> = ({
@@ -43,6 +44,7 @@ export const ValueTypeInput: React.FC<ValueTypeInputProps> = ({
   required = false,
   id,
   tooltip,
+  reversedLayout = false,
 }) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseFloat(e.target.value) || 0;
@@ -60,7 +62,31 @@ export const ValueTypeInput: React.FC<ValueTypeInputProps> = ({
         {tooltip}
       </div>
       
-      <div className="flex gap-2">
+      <div className={`flex ${reversedLayout ? 'gap-0' : 'gap-2'}`}>
+        {reversedLayout && (
+          <div className="w-20 flex-shrink-0">
+            <Select
+              value={valueType}
+              onValueChange={(val: ValueType) => {
+                onValueTypeChange(val);
+                // Se mudou para PERCENT e o valor é maior que 100, limita a 100
+                if (val === 'PERCENT' && value > 100) {
+                  onValueChange(100);
+                }
+              }}
+              disabled={disabled}
+            >
+              <SelectTrigger className={error ? 'border-red-500 rounded-r-none' : 'rounded-r-none'}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="FIXED">R$</SelectItem>
+                <SelectItem value="PERCENT">%</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+        
         <div className="flex-1">
           <Input
             id={id}
@@ -72,48 +98,39 @@ export const ValueTypeInput: React.FC<ValueTypeInputProps> = ({
             max={effectiveMax}
             step={step}
             disabled={disabled}
-            className={error ? 'border-red-500' : ''}
+            className={error ? 'border-red-500' : reversedLayout ? 'rounded-l-none -ml-px' : ''}
           />
         </div>
         
-        <div className="w-24">
-          <Select
-            value={valueType}
-            onValueChange={(val: ValueType) => {
-              onValueTypeChange(val);
-              // Se mudou para PERCENT e o valor é maior que 100, limita a 100
-              if (val === 'PERCENT' && value > 100) {
-                onValueChange(100);
-              }
-            }}
-            disabled={disabled}
-          >
-            <SelectTrigger className={error ? 'border-red-500' : ''}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="FIXED">R$</SelectItem>
-              <SelectItem value="PERCENT">%</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {!reversedLayout && (
+          <div className="w-24 flex-shrink-0">
+            <Select
+              value={valueType}
+              onValueChange={(val: ValueType) => {
+                onValueTypeChange(val);
+                // Se mudou para PERCENT e o valor é maior que 100, limita a 100
+                if (val === 'PERCENT' && value > 100) {
+                  onValueChange(100);
+                }
+              }}
+              disabled={disabled}
+            >
+              <SelectTrigger className={error ? 'border-red-500' : ''}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="FIXED">R$</SelectItem>
+                <SelectItem value="PERCENT">%</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
       
       {error && (
         <p className="text-sm text-red-500">{error}</p>
       )}
       
-      {valueType === 'PERCENT' && value > 0 && (
-        <p className="text-xs text-gray-500">
-          Valor percentual: {value.toFixed(2)}%
-        </p>
-      )}
-      
-      {valueType === 'FIXED' && value > 0 && (
-        <p className="text-xs text-gray-500">
-          Valor fixo: R$ {value.toFixed(2)}
-        </p>
-      )}
     </div>
   );
 };

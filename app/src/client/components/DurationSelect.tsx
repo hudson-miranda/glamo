@@ -111,12 +111,6 @@ export const DurationSelect: React.FC<DurationSelectProps> = ({
       {error && (
         <p className="text-sm text-red-500">{error}</p>
       )}
-      
-      {value > 0 && (
-        <p className="text-xs text-gray-500">
-          Duração total: {formatDuration(value)}
-        </p>
-      )}
     </div>
   );
 };

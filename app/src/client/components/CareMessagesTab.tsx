@@ -27,7 +27,7 @@ import {
 } from '../../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Badge } from '../../components/ui/badge';
-import { Loader2, Plus, Trash2, Edit2, GripVertical, Clock } from 'lucide-react';
+import { Loader2, Plus, Trash2, Edit2, GripVertical, Clock, ArrowUpDown } from 'lucide-react';
 import { useToast } from '../../components/ui/use-toast';
 import { MessageVariableHelper } from './MessageVariableHelper';
 import { InfoTooltip } from './InfoTooltip';
@@ -50,6 +50,7 @@ export function CareMessagesTab({ serviceId, salonId }: CareMessagesTabProps) {
   const [activeType, setActiveType] = useState<'PRE_APPOINTMENT' | 'POST_APPOINTMENT'>('PRE_APPOINTMENT');
   const [isAdding, setIsAdding] = useState(false);
   const [editingMessage, setEditingMessage] = useState<CareMessageForm | null>(null);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [formData, setFormData] = useState<CareMessageForm>({
     type: 'PRE_APPOINTMENT',
     timeValue: 1,
@@ -59,17 +60,35 @@ export function CareMessagesTab({ serviceId, salonId }: CareMessagesTabProps) {
 
   const { data: messages, isLoading, refetch } = useQuery(
     listServiceCareMessages,
-    serviceId ? { serviceId, type: activeType, salonId } : undefined
+    serviceId ? { serviceId, salonId } : undefined
   );
 
   useEffect(() => {
     setFormData((prev) => ({ ...prev, type: activeType }));
   }, [activeType]);
 
-  const preMessages = messages?.filter((m: any) => m.type === 'PRE_APPOINTMENT') || [];
-  const postMessages = messages?.filter((m: any) => m.type === 'POST_APPOINTMENT') || [];
+  // Função para converter tempo para minutos para ordenação
+  const convertToMinutes = (timeValue: number, timeUnit: 'HOURS' | 'DAYS') => {
+    return timeUnit === 'HOURS' ? timeValue * 60 : timeValue * 60 * 24;
+  };
+
+  // Ordenar mensagens por tempo de envio
+  const sortMessages = (msgs: any[]) => {
+    return [...msgs].sort((a, b) => {
+      const timeA = convertToMinutes(a.timeValue, a.timeUnit);
+      const timeB = convertToMinutes(b.timeValue, b.timeUnit);
+      return sortOrder === 'asc' ? timeA - timeB : timeB - timeA;
+    });
+  };
+
+  const preMessages = sortMessages(messages?.filter((m: any) => m.type === 'PRE_APPOINTMENT') || []);
+  const postMessages = sortMessages(messages?.filter((m: any) => m.type === 'POST_APPOINTMENT') || []);
   const currentMessages = activeType === 'PRE_APPOINTMENT' ? preMessages : postMessages;
   const canAddMore = currentMessages.length < 10;
+
+  const toggleSortOrder = () => {
+    setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+  };
 
   const handleInsertVariable = (variable: string) => {
     const textarea = document.getElementById('care-message-textarea') as HTMLTextAreaElement;
@@ -253,6 +272,20 @@ export function CareMessagesTab({ serviceId, salonId }: CareMessagesTabProps) {
         </TabsList>
 
         <TabsContent value="PRE_APPOINTMENT" className="space-y-4">
+          {currentMessages.length > 0 && (
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={toggleSortOrder}
+                className="gap-2"
+              >
+                <ArrowUpDown className="h-4 w-4" />
+                {sortOrder === 'asc' ? 'Mais antigo primeiro' : 'Mais recente primeiro'}
+              </Button>
+            </div>
+          )}
           <MessagesList
             messages={preMessages}
             onEdit={handleEdit}
@@ -263,6 +296,20 @@ export function CareMessagesTab({ serviceId, salonId }: CareMessagesTabProps) {
         </TabsContent>
 
         <TabsContent value="POST_APPOINTMENT" className="space-y-4">
+          {currentMessages.length > 0 && (
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={toggleSortOrder}
+                className="gap-2"
+              >
+                <ArrowUpDown className="h-4 w-4" />
+                {sortOrder === 'asc' ? 'Mais antigo primeiro' : 'Mais recente primeiro'}
+              </Button>
+            </div>
+          )}
           <MessagesList
             messages={postMessages}
             onEdit={handleEdit}
@@ -398,6 +445,16 @@ function MessagesList({
     );
   }
 
+  const formatTimeDisplay = (timeValue: number, timeUnit: string) => {
+    if (timeUnit === 'HOURS') {
+      if (timeValue === 1) return '1 hora';
+      return `${timeValue} horas`;
+    } else {
+      if (timeValue === 1) return '1 dia';
+      return `${timeValue} dias`;
+    }
+  };
+
   return (
     <div className="space-y-2">
       {messages.map((message: any, index: number) => (
@@ -406,13 +463,11 @@ function MessagesList({
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 space-y-2">
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline">
-                    {message.timeValue} {message.timeUnit === 'HOURS' ? 'hora(s)' : 'dia(s)'}{' '}
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <Badge variant="outline" className="font-normal">
+                    {formatTimeDisplay(message.timeValue, message.timeUnit)}{' '}
                     {type === 'PRE_APPOINTMENT' ? 'antes' : 'após'}
                   </Badge>
-                  <span className="text-xs text-muted-foreground">
-                    Ordem: {message.order}
-                  </span>
                 </div>
                 <p className="text-sm whitespace-pre-wrap">{message.message}</p>
               </div>

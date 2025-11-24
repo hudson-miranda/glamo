@@ -80,7 +80,11 @@ export function CategorySelect({
           type="button"
           variant="outline"
           size="icon"
-          onClick={() => setIsModalOpen(true)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsModalOpen(true);
+          }}
           disabled={disabled}
           title="Criar nova categoria"
         >

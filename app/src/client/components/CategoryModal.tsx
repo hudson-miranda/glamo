@@ -78,9 +78,30 @@ export function CategoryModal({
     }
   };
 
+  const handleOpenChange = (open: boolean) => {
+    // Prevent closing during submission
+    if (!open && !isSubmitting) {
+      handleClose();
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[425px]">
+    <Dialog open={isOpen} onOpenChange={handleOpenChange} modal>
+      <DialogContent 
+        className="sm:max-w-[425px]"
+        onPointerDownOutside={(e) => {
+          // Prevent closing when clicking outside during submission
+          if (isSubmitting) {
+            e.preventDefault();
+          }
+        }}
+        onInteractOutside={(e) => {
+          // Prevent interaction with parent modal
+          if (isSubmitting) {
+            e.preventDefault();
+          }
+        }}
+      >
         <DialogHeader>
           <DialogTitle>Nova Categoria</DialogTitle>
           <DialogDescription>
@@ -88,7 +109,14 @@ export function CategoryModal({
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form 
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleSubmit(onSubmit)(e);
+          }} 
+          className="space-y-4"
+        >
           <div className="space-y-2">
             <Label htmlFor="name">
               Nome da categoria <span className="text-red-500">*</span>

@@ -30,6 +30,7 @@ import { useToast } from '../../../../components/ui/use-toast';
 import { CategorySelect } from '../../../components/CategorySelect';
 import { ValueTypeInput } from '../../../components/ValueTypeInput';
 import { DurationSelect } from '../../../components/DurationSelect';
+import { AdvanceTimeSelect } from '../../../components/AdvanceTimeSelect';
 import { ImageUpload } from '../../../components/ImageUpload';
 import { InfoTooltip } from '../../../components/InfoTooltip';
 import { CareMessagesTab } from '../../../components/CareMessagesTab';
@@ -167,22 +168,39 @@ export function ServiceFormModal({
           name: service.name,
           description: service.description || '',
           categoryId: service.categoryId || '',
+          priceType: (service as any).priceType || 'FIXED',
           defaultPrice: (service as any).price || 0,
           defaultDuration: (service as any).duration || 30,
+          costValue: (service as any).costValue || 0,
+          costValueType: (service as any).costValueType || 'FIXED',
+          commissionValue: (service as any).commissionValue || 0,
+          commissionValueType: (service as any).commissionValueType || 'PERCENT',
           color: (service as any).cardColor || '#8B5CF6',
           active: (service as any).active !== undefined ? (service as any).active : true,
+          isFavorite: (service as any).isFavorite || false,
+          isVisible: (service as any).isVisible !== undefined ? (service as any).isVisible : true,
           requiresDeposit: service.requiresDeposit || false,
           depositAmount: service.depositAmount || 0,
           allowOnlineBooking: service.allowOnlineBooking !== undefined ? service.allowOnlineBooking : true,
+          advanceBookingTime: (service as any).advanceBookingTime || 0,
           imagePath: service.imagePath || '',
           instructions: service.instructions || '',
+          cashbackActive: (service as any).cashbackActive || false,
+          cashbackValue: (service as any).cashbackValue || 0,
+          cashbackValueType: (service as any).cashbackValueType || 'FIXED',
+          returnActive: (service as any).returnActive || false,
+          returnDays: (service as any).returnDays || 0,
+          returnMessage: (service as any).returnMessage || '',
+          serviceListItem: (service as any).serviceListItem || '',
+          cnae: (service as any).cnae || '',
+          municipalServiceCode: (service as any).municipalServiceCode || '',
         });
       } else {
         reset();
       }
       setActiveTab('service'); // Sempre volta para aba de serviço ao abrir
     }
-  }, [isOpen, reset]);
+  }, [isOpen, reset, service]);
 
 
 
@@ -208,8 +226,15 @@ export function ServiceFormModal({
 
 
 
+  const handleDialogChange = (open: boolean) => {
+    // Only close if user explicitly closes, not from child modal events
+    if (!open) {
+      onClose();
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleDialogChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{service ? 'Editar Serviço' : 'Novo Serviço'}</DialogTitle>
@@ -234,28 +259,55 @@ export function ServiceFormModal({
           </TabsList>
 
           <TabsContent value="service" className="space-y-6 mt-6">
-            <form onSubmit={handleSubmit(handleFormSubmit)} id="service-form" className="space-y-6">
+            <form 
+              onSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleSubmit(handleFormSubmit)(e);
+              }} 
+              id="service-form" 
+              className="space-y-6"
+            >
               {/* Basic Information */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Informações Básicas</h3>
                 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="col-span-2">
-                    <Label htmlFor="name">
-                      Nome do Serviço <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="name"
-                      {...register('name')}
-                      placeholder="Ex: Corte de Cabelo Masculino"
-                      className={errors.name ? 'border-red-500' : ''}
-                    />
-                    {errors.name && (
-                      <p className="text-sm text-red-500 mt-1">{errors.name.message}</p>
-                    )}
+                <div className="space-y-4">
+                  {/* Nome do Serviço e Cor (Agenda) na mesma linha */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="name">
+                        Nome do Serviço <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="name"
+                        {...register('name')}
+                        placeholder="Ex: Corte de Cabelo Masculino"
+                        className={errors.name ? 'border-red-500' : ''}
+                      />
+                      {errors.name && (
+                        <p className="text-sm text-red-500 mt-1">{errors.name.message}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <Label htmlFor="color" className="flex items-center gap-1">
+                        Cor (Agenda)
+                        <InfoTooltip content="Cor de exibição do serviço na agenda" />
+                      </Label>
+                      <Input
+                        id="color"
+                        type="color"
+                        {...register('color')}
+                        value={watch('color') || '#8B5CF6'}
+                        onChange={(e) => setValue('color', e.target.value)}
+                        className="h-10"
+                      />
+                    </div>
                   </div>
 
-                  <div className="col-span-2">
+                  {/* Descrição */}
+                  <div>
                     <Label htmlFor="description">Descrição</Label>
                     <Textarea
                       id="description"
@@ -265,7 +317,8 @@ export function ServiceFormModal({
                     />
                   </div>
 
-                  <div className="col-span-2">
+                  {/* Categoria */}
+                  <div>
                     <Label className="flex items-center gap-1">
                       Categoria
                       <InfoTooltip content="Organize seus serviços em categorias para melhor visualização" />
@@ -278,31 +331,21 @@ export function ServiceFormModal({
                     />
                   </div>
 
-                  <div>
-                    <Label htmlFor="color" className="flex items-center gap-1">
-                      Cor (Agenda)
-                      <InfoTooltip content="Cor de exibição do serviço na agenda" />
-                    </Label>
-                    <Input
-                      id="color"
-                      type="color"
-                      {...register('color')}
-                      className="h-10"
-                    />
-                  </div>
-
-                  <div>
-                    <ImageUpload
-                      label="Imagem do Serviço"
-                      value={watch('imagePath')}
-                      onChange={(path) => setValue('imagePath', path)}
-                      onFileSelect={async (file) => {
-                        // TODO: Implementar upload real para S3
-                        const tempPath = `/uploads/${file.name}`;
-                        return tempPath;
-                      }}
-                      tooltip={<InfoTooltip content="Imagem de destaque do serviço para agendamento online" />}
-                    />
+                  {/* Imagem do Serviço - Centralizada */}
+                  <div className="flex justify-center">
+                    <div className="w-full max-w-md">
+                      <ImageUpload
+                        label="Imagem do Serviço"
+                        value={watch('imagePath')}
+                        onChange={(path) => setValue('imagePath', path)}
+                        onFileSelect={async (file) => {
+                          // TODO: Implementar upload real para S3
+                          const tempPath = `/uploads/${file.name}`;
+                          return tempPath;
+                        }}
+                        tooltip={<InfoTooltip content="Imagem de destaque do serviço para agendamento online" />}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -311,56 +354,60 @@ export function ServiceFormModal({
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Preço e Duração</h3>
                 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="col-span-2">
-                    <Label className="flex items-center gap-1">
-                      Tipo de Preço
-                      <InfoTooltip content="FIXO: preço único | A PARTIR DE: preço inicial | CONSULTAR: preço sob consulta" />
-                    </Label>
-                    <Select
-                      value={watch('priceType') || 'FIXED'}
-                      onValueChange={(v) => setValue('priceType', v as any)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="FIXED">Preço Fixo</SelectItem>
-                        <SelectItem value="FROM">A partir de</SelectItem>
-                        <SelectItem value="CONSULTATION">Sob Consulta</SelectItem>
-                      </SelectContent>
-                    </Select>
+                <div className="space-y-4">
+                  {/* Primeira linha: Tipo de Preço, Preço e Duração */}
+                  <div className="grid grid-cols-3 gap-4 items-end">
+                    <div>
+                      <Label className="flex items-center gap-1">
+                        Tipo de Preço
+                        <InfoTooltip content="FIXO: preço único | A PARTIR DE: preço inicial | CONSULTAR: preço sob consulta" />
+                      </Label>
+                      <Select
+                        value={watch('priceType') || 'FIXED'}
+                        onValueChange={(v) => setValue('priceType', v as any)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="FIXED">Preço Fixo</SelectItem>
+                          <SelectItem value="FROM">A partir de</SelectItem>
+                          <SelectItem value="CONSULTATION">Sob Consulta</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="defaultPrice">
+                        Preço <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="defaultPrice"
+                        type="number"
+                        step="0.01"
+                        {...register('defaultPrice', { valueAsNumber: true })}
+                        placeholder="0.00"
+                        className={errors.defaultPrice ? 'border-red-500' : ''}
+                      />
+                      {errors.defaultPrice && (
+                        <p className="text-sm text-red-500 mt-1">{errors.defaultPrice.message}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <DurationSelect
+                        label="Duração"
+                        value={watch('defaultDuration')}
+                        onChange={(v) => setValue('defaultDuration', v)}
+                        error={errors.defaultDuration?.message}
+                        required
+                        tooltip={<InfoTooltip content="Tempo estimado de execução do serviço" />}
+                      />
+                    </div>
                   </div>
 
-                  <div>
-                    <Label htmlFor="defaultPrice">
-                      Preço <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="defaultPrice"
-                      type="number"
-                      step="0.01"
-                      {...register('defaultPrice', { valueAsNumber: true })}
-                      placeholder="0.00"
-                      className={errors.defaultPrice ? 'border-red-500' : ''}
-                    />
-                    {errors.defaultPrice && (
-                      <p className="text-sm text-red-500 mt-1">{errors.defaultPrice.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <DurationSelect
-                      label="Duração"
-                      value={watch('defaultDuration')}
-                      onChange={(v) => setValue('defaultDuration', v)}
-                      error={errors.defaultDuration?.message}
-                      required
-                      tooltip={<InfoTooltip content="Tempo estimado de execução do serviço" />}
-                    />
-                  </div>
-
-                  <div>
+                  {/* Segunda linha: Custo do Serviço e Comissão Padrão */}
+                  <div className="grid grid-cols-2 gap-4">
                     <ValueTypeInput
                       label="Custo do Serviço"
                       value={watch('costValue') || 0}
@@ -369,10 +416,9 @@ export function ServiceFormModal({
                       onValueTypeChange={(t) => setValue('costValueType', t)}
                       placeholder="Custo"
                       tooltip={<InfoTooltip content="Custo de execução (produtos, energia, etc.)" />}
+                      reversedLayout
                     />
-                  </div>
 
-                  <div>
                     <ValueTypeInput
                       label="Comissão Padrão"
                       value={watch('commissionValue') || 0}
@@ -381,6 +427,7 @@ export function ServiceFormModal({
                       onValueTypeChange={(t) => setValue('commissionValueType', t)}
                       placeholder="Comissão"
                       tooltip={<InfoTooltip content="Comissão padrão do profissional que executa o serviço" />}
+                      reversedLayout
                     />
                   </div>
                 </div>
@@ -416,36 +463,6 @@ export function ServiceFormModal({
                       />
                     </div>
                   )}
-                </div>
-              </div>
-
-              {/* Additional Info */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Informações Adicionais</h3>
-                
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="instructions">Instruções/Preparação</Label>
-                    <Textarea
-                      id="instructions"
-                      {...register('instructions')}
-                      placeholder="Ex: Lavar o cabelo antes, trazer fotos de referência..."
-                      rows={3}
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="imagePath">Caminho da Imagem</Label>
-                    <Input
-                      id="imagePath"
-                      {...register('imagePath')}
-                      placeholder="caminho/para/imagem.jpg"
-                      className={errors.imagePath ? 'border-red-500' : ''}
-                    />
-                    {errors.imagePath && (
-                      <p className="text-sm text-red-500 mt-1">{errors.imagePath.message}</p>
-                    )}
-                  </div>
                 </div>
               </div>
 
@@ -518,22 +535,12 @@ export function ServiceFormModal({
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="advanceBookingTime" className="flex items-center gap-1">
-                    Tempo Mínimo de Antecedência
-                    <InfoTooltip content="Tempo mínimo (em horas) de antecedência necessário para agendar online" />
-                  </Label>
-                  <Input
-                    id="advanceBookingTime"
-                    type="number"
-                    min="0"
-                    {...register('advanceBookingTime', { valueAsNumber: true })}
-                    placeholder="Ex: 24 (horas)"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    0 = sem restrição | Ex: 24 = cliente deve agendar com 24h de antecedência
-                  </p>
-                </div>
+                <AdvanceTimeSelect
+                  label="Tempo Mínimo de Antecedência"
+                  value={watch('advanceBookingTime') || 0}
+                  onChange={(hours) => setValue('advanceBookingTime', hours)}
+                  tooltip={<InfoTooltip content="Tempo mínimo de antecedência necessário para agendar online" />}
+                />
               </div>
             </div>
           </TabsContent>
@@ -569,18 +576,17 @@ export function ServiceFormModal({
               </div>
 
               {watch('cashbackActive') && (
-                <div className="space-y-4 p-4 border rounded-lg bg-accent/50">
-                  <div className="space-y-2">
-                    <ValueTypeInput
-                      label="Valor do Cashback"
-                      value={watch('cashbackValue') || 0}
-                      valueType={watch('cashbackValueType') || 'FIXED'}
-                      onValueChange={(v) => setValue('cashbackValue', v)}
-                      onValueTypeChange={(t) => setValue('cashbackValueType', t)}
-                      placeholder="Valor do cashback"
-                      tooltip={<InfoTooltip content="Valor ou percentual que o cliente receberá de volta" />}
-                    />
-                  </div>
+                <div className="space-y-4">
+                  <ValueTypeInput
+                    label="Valor do Cashback"
+                    value={watch('cashbackValue') || 0}
+                    valueType={watch('cashbackValueType') || 'FIXED'}
+                    onValueChange={(v) => setValue('cashbackValue', v)}
+                    onValueTypeChange={(t) => setValue('cashbackValueType', t)}
+                    placeholder="Valor do cashback"
+                    tooltip={<InfoTooltip content="Valor ou percentual que o cliente receberá de volta" />}
+                    reversedLayout
+                  />
 
                   <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-sm text-blue-900 font-medium">Como funciona:</p>
@@ -635,7 +641,7 @@ export function ServiceFormModal({
               </div>
 
               {watch('returnActive') && (
-                <div className="space-y-4 p-4 border rounded-lg bg-accent/50">
+                <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="returnDays" className="flex items-center gap-1">
                       Prazo de Retorno (dias)
@@ -828,8 +834,8 @@ export function ServiceFormModal({
             Cancelar
           </Button>
           <Button 
-            type={activeTab === 'service' ? 'submit' : 'button'} 
-            form={activeTab === 'service' ? 'service-form' : undefined}
+            type="button"
+            onClick={handleSubmit(handleFormSubmit)}
             disabled={isSubmitting || isLoading}
           >
             {(isSubmitting || isLoading) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
