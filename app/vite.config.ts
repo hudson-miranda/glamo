@@ -22,9 +22,10 @@ export default defineConfig({
       host: publicIp, // IP público do servidor para desenvolvimento remoto
       clientPort: 3000,
     },
-    // DESABILITA polling para melhorar performance em servidor
+    // HABILITA polling para garantir hot reload consistente
     watch: {
-      usePolling: false, // Desabilita polling para economizar recursos
+      usePolling: true, // Habilita polling para detectar mudanças em arquivos
+      interval: 1000, // Intervalo de polling em ms (1 segundo)
       ignored: ['**/node_modules/**', '**/.git/**'], // Ignora pastas desnecessárias
     },
     // Otimizações de rede
@@ -58,6 +59,6 @@ export default defineConfig({
   },
   // Cache agressivo para melhorar velocidade
   cacheDir: 'node_modules/.vite',
-  // Reduz logs
-  logLevel: 'error',
+  // Logs informativos para ver hot reload
+  logLevel: 'info',
 })
