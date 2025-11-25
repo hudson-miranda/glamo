@@ -95,7 +95,7 @@ export function CategoryViewModal({
                     Descrição
                   </label>
                   {category.description ? (
-                    <p className='text-base mt-1 whitespace-pre-wrap'>{category.description}</p>
+                    <p className='text-base mt-1 whitespace-pre-wrap break-words'>{category.description}</p>
                   ) : (
                     <p className='text-sm text-muted-foreground italic mt-1'>
                       Sem descrição
