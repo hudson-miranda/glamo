@@ -204,6 +204,7 @@ type CreateEmployeeInput = {
     startTime: string;
     endTime: string;
   }>;
+  serviceIds?: string[];
   sendInvite?: boolean;
 };
 
@@ -283,6 +284,16 @@ export const createEmployee: CreateEmployee<CreateEmployeeInput, Employee> = asy
         dayOfWeek: schedule.dayOfWeek,
         startTime: schedule.startTime,
         endTime: schedule.endTime,
+      })),
+    });
+  }
+
+  // Criar associações de serviços se fornecidas
+  if (args.serviceIds && args.serviceIds.length > 0) {
+    await context.entities.EmployeeService.createMany({
+      data: args.serviceIds.map((serviceId) => ({
+        employeeId: employee.id,
+        serviceId,
       })),
     });
   }

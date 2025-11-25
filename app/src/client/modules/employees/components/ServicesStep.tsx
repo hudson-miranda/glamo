@@ -1,49 +1,49 @@
 import { EmployeeFormData } from '../CreateEmployeePage';
 import { Checkbox } from '../../../../components/ui/checkbox';
 import { Input } from '../../../../components/ui/input';
-import { Scissors, Search, AlertCircle } from 'lucide-react';
+import { Scissors, Search, Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import { useQuery, listServices } from 'wasp/client/operations';
+import { useSalonContext } from '../../../hooks/useSalonContext';
+import { Badge } from '../../../../components/ui/badge';
 
 type ServicesStepProps = {
   formData: EmployeeFormData;
   updateFormData: (data: Partial<EmployeeFormData>) => void;
 };
 
-// Mockup de serviços - será substituído quando o módulo de Serviços estiver completo
-const MOCKUP_SERVICES = [
-  { id: '1', name: 'Corte Feminino', category: 'Cabelo', duration: 60, price: 80 },
-  { id: '2', name: 'Corte Masculino', category: 'Cabelo', duration: 45, price: 50 },
-  { id: '3', name: 'Corte Infantil', category: 'Cabelo', duration: 30, price: 40 },
-  { id: '4', name: 'Escova', category: 'Cabelo', duration: 45, price: 60 },
-  { id: '5', name: 'Hidratação', category: 'Tratamento Capilar', duration: 60, price: 100 },
-  { id: '6', name: 'Coloração', category: 'Coloração', duration: 120, price: 180 },
-  { id: '7', name: 'Luzes', category: 'Coloração', duration: 180, price: 250 },
-  { id: '8', name: 'Mechas', category: 'Coloração', duration: 150, price: 200 },
-  { id: '9', name: 'Manicure', category: 'Unhas', duration: 45, price: 35 },
-  { id: '10', name: 'Pedicure', category: 'Unhas', duration: 60, price: 45 },
-  { id: '11', name: 'Unha em Gel', category: 'Unhas', duration: 90, price: 80 },
-  { id: '12', name: 'Alongamento de Unhas', category: 'Unhas', duration: 120, price: 120 },
-  { id: '13', name: 'Design de Sobrancelhas', category: 'Estética', duration: 30, price: 40 },
-  { id: '14', name: 'Aplicação de Cílios', category: 'Estética', duration: 90, price: 150 },
-  { id: '15', name: 'Limpeza de Pele', category: 'Estética', duration: 60, price: 120 },
-  { id: '16', name: 'Massagem Relaxante', category: 'Estética', duration: 60, price: 100 },
-];
-
 export function ServicesStep({ formData, updateFormData }: ServicesStepProps) {
+  const { activeSalonId } = useSalonContext();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredServices = MOCKUP_SERVICES.filter((service) =>
-    service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    service.category.toLowerCase().includes(searchTerm.toLowerCase())
+  const { data: servicesData, isLoading } = useQuery(
+    listServices,
+    {
+      salonId: activeSalonId || '',
+      search: '',
+      page: 1,
+      perPage: 1000,
+    },
+    {
+      enabled: !!activeSalonId,
+    }
   );
 
-  const groupedServices = filteredServices.reduce((acc, service) => {
-    if (!acc[service.category]) {
-      acc[service.category] = [];
+  const services = servicesData?.services?.filter((s: any) => s.active && !s.deletedAt) || [];
+
+  const filteredServices = services.filter((service: any) =>
+    service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (service.category?.name || '').toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const groupedServices = filteredServices.reduce((acc: any, service: any) => {
+    const categoryName = service.category?.name || 'Sem Categoria';
+    if (!acc[categoryName]) {
+      acc[categoryName] = [];
     }
-    acc[service.category].push(service);
+    acc[categoryName].push(service);
     return acc;
-  }, {} as Record<string, typeof MOCKUP_SERVICES>);
+  }, {} as Record<string, any[]>);
 
   const toggleService = (serviceId: string) => {
     const newServiceIds = formData.serviceIds.includes(serviceId)
@@ -53,9 +53,11 @@ export function ServicesStep({ formData, updateFormData }: ServicesStepProps) {
   };
 
   const toggleCategory = (category: string) => {
-    const categoryServices = MOCKUP_SERVICES.filter((s) => s.category === category);
-    const categoryServiceIds = categoryServices.map((s) => s.id);
-    const allSelected = categoryServiceIds.every((id) =>
+    const categoryServices = services.filter(
+      (s: any) => (s.category?.name || 'Sem Categoria') === category
+    );
+    const categoryServiceIds = categoryServices.map((s: any) => s.id);
+    const allSelected = categoryServiceIds.every((id: string) =>
       formData.serviceIds.includes(id)
     );
 
@@ -76,7 +78,8 @@ export function ServicesStep({ formData, updateFormData }: ServicesStepProps) {
   };
 
   const selectAll = () => {
-    updateFormData({ serviceIds: MOCKUP_SERVICES.map((s) => s.id) });
+    const allServiceIds = (services as any[]).map((s: any) => s.id);
+    updateFormData({ serviceIds: allServiceIds });
   };
 
   const clearAll = () => {
@@ -101,6 +104,33 @@ export function ServicesStep({ formData, updateFormData }: ServicesStepProps) {
     }).format(price);
   };
 
+  if (isLoading) {
+    return (
+      <div className='flex items-center justify-center py-12'>
+        <div className='text-center'>
+          <Loader2 className='h-8 w-8 animate-spin mx-auto text-brand-600' />
+          <p className='mt-3 text-sm text-gray-600 dark:text-gray-400'>
+            Carregando serviços...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!services || services.length === 0) {
+    return (
+      <div className='text-center py-12'>
+        <Scissors className='h-12 w-12 mx-auto mb-3 text-gray-400' />
+        <p className='text-gray-600 dark:text-gray-400 mb-4'>
+          Nenhum serviço cadastrado ainda
+        </p>
+        <p className='text-sm text-gray-500 dark:text-gray-500'>
+          Cadastre serviços primeiro para associá-los aos colaboradores
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className='space-y-6'>
       {/* Header */}
@@ -112,20 +142,6 @@ export function ServicesStep({ formData, updateFormData }: ServicesStepProps) {
         <p className='text-sm text-gray-600 dark:text-gray-400 mt-1'>
           Selecione os serviços que este colaborador está habilitado a executar
         </p>
-      </div>
-
-      {/* Alerta Mockup */}
-      <div className='flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800'>
-        <AlertCircle className='h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5' />
-        <div className='text-sm'>
-          <p className='font-semibold text-blue-900 dark:text-blue-100'>
-            Versão de Demonstração
-          </p>
-          <p className='text-blue-700 dark:text-blue-300 mt-1'>
-            Esta é uma lista mockup de serviços. Quando o módulo de Serviços estiver completo,
-            esta lista será automaticamente sincronizada com os serviços cadastrados no sistema.
-          </p>
-        </div>
       </div>
 
       {/* Barra de Pesquisa e Ações */}
@@ -158,8 +174,9 @@ export function ServicesStep({ formData, updateFormData }: ServicesStepProps) {
       {/* Lista de Serviços Agrupados por Categoria */}
       <div className='space-y-4'>
         {Object.entries(groupedServices).map(([category, services]) => {
-          const allSelected = services.every((s) => formData.serviceIds.includes(s.id));
-          const someSelected = services.some((s) => formData.serviceIds.includes(s.id));
+          const servicesList = services as any[];
+          const allSelected = servicesList.every((s) => formData.serviceIds.includes(s.id));
+          const someSelected = servicesList.some((s) => formData.serviceIds.includes(s.id));
 
           return (
             <div
@@ -183,9 +200,9 @@ export function ServicesStep({ formData, updateFormData }: ServicesStepProps) {
                   <div>
                     <p className='font-semibold text-gray-900 dark:text-white'>{category}</p>
                     <p className='text-xs text-gray-600 dark:text-gray-400'>
-                      {services.length} serviço{services.length > 1 ? 's' : ''} •{' '}
-                      {services.filter((s) => formData.serviceIds.includes(s.id)).length}{' '}
-                      selecionado{services.filter((s) => formData.serviceIds.includes(s.id)).length !== 1 ? 's' : ''}
+                      {servicesList.length} serviço{servicesList.length > 1 ? 's' : ''} •{' '}
+                      {servicesList.filter((s) => formData.serviceIds.includes(s.id)).length}{' '}
+                      selecionado{servicesList.filter((s) => formData.serviceIds.includes(s.id)).length !== 1 ? 's' : ''}
                     </p>
                   </div>
                 </div>
@@ -193,7 +210,7 @@ export function ServicesStep({ formData, updateFormData }: ServicesStepProps) {
 
               {/* Serviços da Categoria */}
               <div className='divide-y divide-gray-200 dark:divide-gray-700'>
-                {services.map((service) => (
+                {servicesList.map((service) => (
                   <div
                     key={service.id}
                     className={`p-4 flex items-center gap-4 cursor-pointer transition-colors ${

@@ -94,7 +94,6 @@ export function EmployeeCustomizationsTab({
     }
     setFormData({
       employeeId: '',
-      customPriceType: 'FIXED',
       costValueType: 'FIXED',
       allowOnlineBooking: true,
     });
