@@ -50,9 +50,8 @@ interface EmployeeCustomizationsTabProps {
 interface CustomizationForm {
   id?: string;
   employeeId: string;
-  customPrice?: number;
-  customPriceType: 'FIXED' | 'PERCENT';
-  customDuration?: number;
+  price?: number;
+  duration?: number;
   costValue?: number;
   costValueType: 'FIXED' | 'PERCENT';
   allowOnlineBooking: boolean;
@@ -70,7 +69,6 @@ export function EmployeeCustomizationsTab({
   const [customizationToDelete, setCustomizationToDelete] = useState<any>(null);
   const [formData, setFormData] = useState<CustomizationForm>({
     employeeId: '',
-    customPriceType: 'FIXED',
     costValueType: 'FIXED',
     allowOnlineBooking: true,
   });
@@ -108,9 +106,8 @@ export function EmployeeCustomizationsTab({
     setFormData({
       id: customization.id,
       employeeId: customization.employeeId,
-      customPrice: customization.customPrice || undefined,
-      customPriceType: customization.customPriceType || 'FIXED',
-      customDuration: customization.customDuration || undefined,
+      price: customization.price || undefined,
+      duration: customization.duration || undefined,
       costValue: customization.costValue || undefined,
       costValueType: customization.costValueType || 'FIXED',
       allowOnlineBooking: customization.allowOnlineBooking !== false,
@@ -124,7 +121,6 @@ export function EmployeeCustomizationsTab({
     setEditingCustomization(null);
     setFormData({
       employeeId: '',
-      customPriceType: 'FIXED',
       costValueType: 'FIXED',
       allowOnlineBooking: true,
     });
@@ -150,15 +146,6 @@ export function EmployeeCustomizationsTab({
     }
 
     // Validate percentages
-    if (formData.customPriceType === 'PERCENT' && formData.customPrice && formData.customPrice > 100) {
-      toast({
-        title: 'Valor inválido',
-        description: 'Percentual não pode ser maior que 100%',
-        variant: 'destructive',
-      });
-      return;
-    }
-
     if (formData.costValueType === 'PERCENT' && formData.costValue && formData.costValue > 100) {
       toast({
         title: 'Valor inválido',
@@ -173,8 +160,8 @@ export function EmployeeCustomizationsTab({
         await updateServiceEmployeeCustomization({
           customizationId: formData.id!,
           salonId,
-          price: formData.customPrice,
-          duration: formData.customDuration,
+          price: formData.price,
+          duration: formData.duration,
           costValue: formData.costValue,
           costValueType: formData.costValueType,
           allowOnlineBooking: formData.allowOnlineBooking,
@@ -188,8 +175,8 @@ export function EmployeeCustomizationsTab({
           serviceId,
           employeeId: formData.employeeId,
           salonId,
-          price: formData.customPrice,
-          duration: formData.customDuration,
+          price: formData.price,
+          duration: formData.duration,
           costValue: formData.costValue,
           costValueType: formData.costValueType,
           allowOnlineBooking: formData.allowOnlineBooking,
@@ -298,20 +285,18 @@ export function EmployeeCustomizationsTab({
                       )}
                     </div>
                     <div className="grid grid-cols-3 gap-4 text-sm">
-                      {customization.customPrice !== null && customization.customPrice !== undefined && (
+                      {customization.price !== null && customization.price !== undefined && (
                         <div>
                           <span className="text-muted-foreground">Preço: </span>
                           <span className="font-medium">
-                            {customization.customPriceType === 'PERCENT' 
-                              ? `${customization.customPrice}%`
-                              : `R$ ${customization.customPrice.toFixed(2)}`}
+                            R$ {customization.price.toFixed(2)}
                           </span>
                         </div>
                       )}
-                      {customization.customDuration !== null && (
+                      {customization.duration !== null && customization.duration !== undefined && (
                         <div>
                           <span className="text-muted-foreground">Duração: </span>
-                          <span className="font-medium">{customization.customDuration} min</span>
+                          <span className="font-medium">{customization.duration} min</span>
                         </div>
                       )}
                       {customization.costValue !== null && customization.costValue !== undefined && (
@@ -407,29 +392,30 @@ export function EmployeeCustomizationsTab({
             </div>
 
             <div className="space-y-2">
-              <Label className="flex items-center gap-1">
+              <Label htmlFor="price" className="flex items-center gap-1">
                 Preço Personalizado
                 <InfoTooltip content="Deixe vazio para usar o preço padrão do serviço" />
               </Label>
-              <ValueTypeInput
-                label=""
-                value={formData.customPrice || 0}
-                valueType={formData.customPriceType}
-                onValueChange={(v) => setFormData({ ...formData, customPrice: v })}
-                onValueTypeChange={(t) => setFormData({ ...formData, customPriceType: t })}
-                placeholder="Preço personalizado"
+              <Input
+                id="price"
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.price || ''}
+                onChange={(e) => setFormData({ ...formData, price: e.target.value ? parseFloat(e.target.value) : undefined })}
+                placeholder="Preço personalizado (R$)"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="customDuration" className="flex items-center gap-1">
+              <Label htmlFor="duration" className="flex items-center gap-1">
                 Duração Personalizada
                 <InfoTooltip content="Deixe vazio para usar a duração padrão do serviço" />
               </Label>
               <DurationSelect
                 label=""
-                value={formData.customDuration || 60}
-                onChange={(v) => setFormData({ ...formData, customDuration: v })}
+                value={formData.duration || 60}
+                onChange={(v) => setFormData({ ...formData, duration: v })}
               />
             </div>
 
