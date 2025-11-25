@@ -181,8 +181,16 @@ export function ProductConsumptionsTab({
 
   if (!serviceId) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        <p>Salve o serviço primeiro para vincular produtos consumidos</p>
+      <div className="text-center py-8 border-2 border-dashed rounded-lg">
+        <div className="space-y-2">
+          <p className="text-muted-foreground font-medium">💡 Salve o serviço primeiro</p>
+          <p className="text-sm text-muted-foreground">
+            Para vincular produtos consumidos, você precisa salvar o serviço antes.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Clique no botão <span className="font-semibold">"Criar Serviço"</span> no rodapé do modal.
+          </p>
+        </div>
       </div>
     );
   }
@@ -198,6 +206,18 @@ export function ProductConsumptionsTab({
           Configure quais produtos são utilizados neste serviço
         </p>
       </div>
+
+      {products.length === 0 && (
+        <div className="p-4 border border-amber-200 bg-amber-50 rounded-lg">
+          <p className="text-sm text-amber-900 font-medium mb-2">
+            ⚠️ Nenhum produto cadastrado
+          </p>
+          <p className="text-sm text-amber-800">
+            Para vincular produtos, primeiro cadastre produtos no módulo de{' '}
+            <span className="font-semibold">Estoque/Produtos</span>.
+          </p>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="flex items-center justify-center py-8">
@@ -286,11 +306,13 @@ export function ProductConsumptionsTab({
           type="button"
           variant="outline"
           onClick={handleStartAdd}
-          disabled={availableProducts.length === 0}
+          disabled={availableProducts.length === 0 || products.length === 0}
           className="w-full"
+          title={products.length === 0 ? 'Cadastre produtos primeiro' : availableProducts.length === 0 ? 'Todos os produtos já foram vinculados' : 'Vincular novo produto'}
         >
           <Plus className="mr-2 h-4 w-4" />
           Vincular Produto
+          {products.length === 0 && ' (Cadastre produtos primeiro)'}
         </Button>
       )}
 
