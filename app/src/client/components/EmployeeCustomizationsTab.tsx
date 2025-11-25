@@ -276,7 +276,7 @@ export function EmployeeCustomizationsTab({
                       )}
                     </div>
                     <div className="grid grid-cols-3 gap-4 text-sm">
-                      {customization.customPrice !== null && (
+                      {customization.customPrice !== null && customization.customPrice !== undefined && (
                         <div>
                           <span className="text-muted-foreground">Preço: </span>
                           <span className="font-medium">
@@ -292,7 +292,7 @@ export function EmployeeCustomizationsTab({
                           <span className="font-medium">{customization.customDuration} min</span>
                         </div>
                       )}
-                      {customization.costValue !== null && (
+                      {customization.costValue !== null && customization.costValue !== undefined && (
                         <div>
                           <span className="text-muted-foreground">Custo: </span>
                           <span className="font-medium">
