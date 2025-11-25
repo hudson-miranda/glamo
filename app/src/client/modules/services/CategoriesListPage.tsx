@@ -23,7 +23,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '../../../components/ui/alert-dialog';
-import { Plus, Search, Edit, Trash2, Tag, Eye } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '../../../components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../../../components/ui/dropdown-menu';
+import { Label } from '../../../components/ui/label';
+import { Checkbox } from '../../../components/ui/checkbox';
+import { Plus, Search, Edit, Trash2, Tag, Eye, Filter, ArrowUpDown, Settings2, X } from 'lucide-react';
 import { useSalonContext } from '../../hooks/useSalonContext';
 import { CategoryFormModal } from './components/CategoryFormModal';
 import { CategoryViewModal } from './components/CategoryViewModal';
@@ -35,16 +52,38 @@ import {
   TooltipTrigger,
 } from '../../../components/ui/tooltip';
 
+// Definição de colunas disponíveis
+const AVAILABLE_COLUMNS = [
+  { id: 'name', label: 'Nome', enabled: true },
+  { id: 'description', label: 'Descrição', enabled: true },
+  { id: 'services', label: 'Serviços', enabled: true },
+  { id: 'status', label: 'Status', enabled: true },
+];
+
 export default function CategoriesListPage() {
   const { activeSalonId } = useSalonContext();
   const { toast } = useToast();
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isColumnsModalOpen, setIsColumnsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
   const [categoryToView, setCategoryToView] = useState<string | null>(null);
   const [categoryToDelete, setCategoryToDelete] = useState<any>(null);
+  
+  // Filtros
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterServices, setFilterServices] = useState<string>('all');
+  
+  // Ordenação
+  const [sortBy, setSortBy] = useState<string>('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  
+  // Colunas visíveis
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(
+    AVAILABLE_COLUMNS.filter(col => col.enabled).map(col => col.id)
+  );
 
   const { data: categories, isLoading, error, refetch } = useQuery(
     listCategories,
@@ -76,6 +115,22 @@ export default function CategoriesListPage() {
     setCategoryToView(null);
     setIsViewModalOpen(false);
   };
+
+  const handleToggleColumn = (columnId: string) => {
+    setVisibleColumns(prev => 
+      prev.includes(columnId) 
+        ? prev.filter(id => id !== columnId)
+        : [...prev, columnId]
+    );
+  };
+
+  const handleClearFilters = () => {
+    setFilterStatus('all');
+    setFilterServices('all');
+    setSearch('');
+  };
+
+  const hasActiveFilters = filterStatus !== 'all' || filterServices !== 'all' || search !== '';
 
   const handleSubmitCategory = async (formData: any) => {
     if (!activeSalonId) {
@@ -188,7 +243,40 @@ export default function CategoriesListPage() {
     );
   }
 
-  const filteredCategories = categories || [];
+  // Filtrar e ordenar categorias
+  const filteredAndSortedCategories = (categories || [])
+    .filter((category: any) => {
+      // Filtro por status
+      if (filterStatus === 'active' && !category.active) return false;
+      if (filterStatus === 'inactive' && category.active) return false;
+      // Filtro por quantidade de serviços
+      const servicesCount = category._count?.services || 0;
+      if (filterServices === 'with' && servicesCount === 0) return false;
+      if (filterServices === 'without' && servicesCount > 0) return false;
+      return true;
+    })
+    .sort((a: any, b: any) => {
+      let aValue, bValue;
+      switch (sortBy) {
+        case 'name':
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case 'description':
+          aValue = (a.description || '').toLowerCase();
+          bValue = (b.description || '').toLowerCase();
+          break;
+        case 'services':
+          aValue = a._count?.services || 0;
+          bValue = b._count?.services || 0;
+          break;
+        default:
+          return 0;
+      }
+      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
 
   return (
     <div className='space-y-6'>
@@ -219,41 +307,146 @@ export default function CategoriesListPage() {
         </Button>
       </div>
 
-      {/* Search */}
+      {/* Search, Filters and Actions */}
       <Card>
         <CardContent className='pt-6'>
-          <div className='flex items-center gap-4'>
+          <div className='flex flex-col gap-4'>
+            {/* Busca */}
             <div className='relative flex-1'>
               <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
               <Input
                 placeholder='Buscar categorias...'
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className='pl-9'
+                className='pl-10'
               />
             </div>
-            <span className='text-sm text-muted-foreground whitespace-nowrap'>
-              {filteredCategories.length} {filteredCategories.length === 1 ? 'categoria' : 'categorias'}
-            </span>
+
+            {/* Barra de Ações */}
+            <div className='flex items-center gap-2 flex-wrap'>
+              {/* Filtros */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant='outline' size='sm' className='gap-2'>
+                    <Filter className='h-4 w-4' />
+                    Filtros
+                    {hasActiveFilters && (
+                      <Badge variant='secondary' className='ml-1 px-1.5 py-0.5 text-xs'>
+                        {[filterStatus !== 'all', filterServices !== 'all'].filter(Boolean).length}
+                      </Badge>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='start' className='w-56'>
+                  <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  
+                  <div className='p-2 space-y-2'>
+                    <div>
+                      <Label className='text-xs text-muted-foreground mb-1.5 block'>Status</Label>
+                      <select
+                        className='w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
+                        value={filterStatus}
+                        onChange={(e) => setFilterStatus(e.target.value)}
+                      >
+                        <option value='all'>Todos</option>
+                        <option value='active'>Ativas</option>
+                        <option value='inactive'>Inativas</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <Label className='text-xs text-muted-foreground mb-1.5 block'>Serviços</Label>
+                      <select
+                        className='w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
+                        value={filterServices}
+                        onChange={(e) => setFilterServices(e.target.value)}
+                      >
+                        <option value='all'>Todos</option>
+                        <option value='with'>Com serviços</option>
+                        <option value='without'>Sem serviços</option>
+                      </select>
+                    </div>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Ordenação */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant='outline' size='sm' className='gap-2'>
+                    <ArrowUpDown className='h-4 w-4' />
+                    Ordenar
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='start'>
+                  <DropdownMenuLabel>Ordenar por</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => { setSortBy('name'); setSortOrder('asc'); }}>
+                    Nome (A-Z)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { setSortBy('name'); setSortOrder('desc'); }}>
+                    Nome (Z-A)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { setSortBy('services'); setSortOrder('desc'); }}>
+                    Mais Serviços
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { setSortBy('services'); setSortOrder('asc'); }}>
+                    Menos Serviços
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { setSortBy('description'); setSortOrder('asc'); }}>
+                    Descrição (A-Z)
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Customizar Colunas */}
+              <Button 
+                variant='outline' 
+                size='sm' 
+                className='gap-2'
+                onClick={() => setIsColumnsModalOpen(true)}
+              >
+                <Settings2 className='h-4 w-4' />
+                Colunas
+              </Button>
+
+              {/* Limpar Filtros */}
+              {hasActiveFilters && (
+                <Button 
+                  variant='ghost' 
+                  size='sm' 
+                  className='gap-2'
+                  onClick={handleClearFilters}
+                >
+                  <X className='h-4 w-4' />
+                  Limpar filtros
+                </Button>
+              )}
+
+              <div className='ml-auto text-sm text-muted-foreground'>
+                {filteredAndSortedCategories.length} {filteredAndSortedCategories.length === 1 ? 'categoria' : 'categorias'}
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Table */}
+      {/* Categories Table */}
       <Card>
         <CardContent className='p-0'>
-          {filteredCategories.length === 0 ? (
+          {filteredAndSortedCategories.length === 0 ? (
             <div className='py-12'>
               <EmptyState
                 icon={Tag}
-                title='Nenhuma categoria encontrada'
+                title={hasActiveFilters ? 'Nenhuma categoria encontrada' : 'Nenhuma categoria cadastrada'}
                 description={
-                  search
-                    ? 'Nenhuma categoria corresponde à sua busca.'
-                    : 'Comece criando sua primeira categoria.'
+                  hasActiveFilters
+                    ? 'Tente ajustar seus filtros de busca'
+                    : 'Comece criando sua primeira categoria'
                 }
                 action={
-                  !search && (
+                  !hasActiveFilters && (
                     <Button onClick={() => handleOpenModal()}>
                       <Plus className='mr-2 h-4 w-4' />
                       Nova Categoria
@@ -266,18 +459,21 @@ export default function CategoriesListPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Descrição</TableHead>
-                  <TableHead className='text-center'>Serviços</TableHead>
-                  <TableHead className='text-center'>Status</TableHead>
+                  {visibleColumns.includes('name') && <TableHead>Nome</TableHead>}
+                  {visibleColumns.includes('description') && <TableHead>Descrição</TableHead>}
+                  {visibleColumns.includes('services') && <TableHead className='text-center'>Serviços</TableHead>}
+                  {visibleColumns.includes('status') && <TableHead className='text-center'>Status</TableHead>}
                   <TableHead className='text-right'>Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredCategories.map((category: any) => (
+                {filteredAndSortedCategories.map((category: any) => (
                   <TableRow key={category.id}>
-                    <TableCell className='font-medium'>{category.name}</TableCell>
-                    <TableCell className='max-w-xs'>
+                    {visibleColumns.includes('name') && (
+                      <TableCell className='font-medium'>{category.name}</TableCell>
+                    )}
+                    {visibleColumns.includes('description') && (
+                      <TableCell className='max-w-xs'>
                       {category.description ? (
                         <TooltipProvider>
                           <Tooltip>
@@ -296,17 +492,22 @@ export default function CategoriesListPage() {
                           Sem descrição
                         </span>
                       )}
-                    </TableCell>
-                    <TableCell className='text-center'>
-                      <Badge variant='secondary'>
-                        {category._count?.services || 0}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className='text-center'>
-                      <Badge variant={category.active ? 'default' : 'secondary'}>
-                        {category.active ? 'Ativa' : 'Inativa'}
-                      </Badge>
-                    </TableCell>
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes('services') && (
+                      <TableCell className='text-center'>
+                        <Badge variant='secondary'>
+                          {category._count?.services || 0}
+                        </Badge>
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes('status') && (
+                      <TableCell className='text-center'>
+                        <Badge variant={category.active ? 'default' : 'secondary'}>
+                          {category.active ? 'Ativa' : 'Inativa'}
+                        </Badge>
+                      </TableCell>
+                    )}
                     <TableCell className='text-right'>
                       <div className='flex justify-end gap-2'>
                         <Button
@@ -342,6 +543,50 @@ export default function CategoriesListPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Modal de Customização de Colunas */}
+      <Dialog open={isColumnsModalOpen} onOpenChange={setIsColumnsModalOpen}>
+        <DialogContent className='max-w-md'>
+          <DialogHeader>
+            <DialogTitle>Customizar Colunas</DialogTitle>
+            <DialogDescription>
+              Selecione quais colunas deseja visualizar na tabela
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className='space-y-4 py-4'>
+            {AVAILABLE_COLUMNS.map((column) => (
+              <div key={column.id} className='flex items-center space-x-2'>
+                <Checkbox
+                  id={column.id}
+                  checked={visibleColumns.includes(column.id)}
+                  onCheckedChange={() => handleToggleColumn(column.id)}
+                />
+                <Label
+                  htmlFor={column.id}
+                  className='text-sm font-normal cursor-pointer flex-1'
+                >
+                  {column.label}
+                </Label>
+              </div>
+            ))}
+          </div>
+
+          <div className='flex justify-between gap-2 pt-4'>
+            <Button 
+              variant='outline' 
+              onClick={() => {
+                setVisibleColumns(AVAILABLE_COLUMNS.map(col => col.id));
+              }}
+            >
+              Selecionar Todas
+            </Button>
+            <Button onClick={() => setIsColumnsModalOpen(false)}>
+              Concluído
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Modal de Confirmação de Exclusão */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
