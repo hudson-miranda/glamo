@@ -265,14 +265,19 @@ export default function CreateEmployeePage() {
       <div className='flex items-center justify-between'>
         {STEPS.map((step, index) => (
           <div key={step.id} className='flex items-center flex-1'>
-            <div className='flex items-center'>
+            <button
+              type='button'
+              onClick={() => setCurrentStep(step.id)}
+              disabled={isSubmitting}
+              className='flex items-center group disabled:cursor-not-allowed'
+            >
               <div
-                className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all ${
+                className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all cursor-pointer ${
                   currentStep > step.id
-                    ? 'border-brand-600 bg-brand-600 text-white'
+                    ? 'border-brand-600 bg-brand-600 text-white group-hover:bg-brand-700'
                     : currentStep === step.id
                     ? 'border-brand-600 bg-white dark:bg-gray-900 text-brand-600'
-                    : 'border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-500'
+                    : 'border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-500 group-hover:border-brand-400 group-hover:text-brand-600'
                 }`}
               >
                 {currentStep > step.id ? (
@@ -286,13 +291,13 @@ export default function CreateEmployeePage() {
                   className={`text-sm font-medium ${
                     currentStep >= step.id
                       ? 'text-gray-900 dark:text-white'
-                      : 'text-gray-500 dark:text-gray-500'
+                      : 'text-gray-500 dark:text-gray-500 group-hover:text-brand-600'
                   }`}
                 >
                   {step.name}
                 </p>
               </div>
-            </div>
+            </button>
             {index < STEPS.length - 1 && (
               <div
                 className={`mx-4 h-0.5 flex-1 transition-all ${
@@ -329,35 +334,58 @@ export default function CreateEmployeePage() {
         <Button
           variant='outline'
           onClick={handleBack}
-          disabled={currentStep === 1}
+          disabled={currentStep === 1 || isSubmitting}
           className='border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
         >
           <ChevronLeft className='mr-2 h-4 w-4' />
           Anterior
         </Button>
 
-        <Button
-          onClick={handleNext}
-          disabled={isSubmitting}
-          className='bg-gradient-to-r from-brand-400 to-brand-600 hover:from-brand-500 hover:to-brand-700 text-white shadow-lg shadow-brand-500/30'
-        >
-          {isSubmitting ? (
-            <>
-              <div className='mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin' />
-              Salvando...
-            </>
-          ) : currentStep === STEPS.length ? (
-            <>
-              <Check className='mr-2 h-4 w-4' />
-              Finalizar Cadastro
-            </>
-          ) : (
-            <>
-              Próximo
-              <ChevronRight className='ml-2 h-4 w-4' />
-            </>
+        <div className='flex gap-3'>
+          {currentStep < STEPS.length && (
+            <Button
+              type='button'
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              variant='outline'
+              className='border-brand-600 text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20'
+            >
+              {isSubmitting ? (
+                <>
+                  <div className='mr-2 h-4 w-4 border-2 border-brand-600 border-t-transparent rounded-full animate-spin' />
+                  Salvando...
+                </>
+              ) : (
+                <>
+                  <Check className='mr-2 h-4 w-4' />
+                  Salvar Alterações
+                </>
+              )}
+            </Button>
           )}
-        </Button>
+          <Button
+            onClick={handleNext}
+            disabled={isSubmitting}
+            className='bg-gradient-to-r from-brand-400 to-brand-600 hover:from-brand-500 hover:to-brand-700 text-white shadow-lg shadow-brand-500/30'
+          >
+            {isSubmitting ? (
+              <>
+                <div className='mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin' />
+                Salvando...
+              </>
+            ) : currentStep === STEPS.length ? (
+              <>
+                <Check className='mr-2 h-4 w-4' />
+                Finalizar Cadastro
+              </>
+            ) : (
+              <>
+                Próximo
+                <ChevronRight className='ml-2 h-4 w-4' />
+              </>
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );
