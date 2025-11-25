@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from '../../../../components/ui/table';
-import { formatCurrency } from '@src/shared/utils';
+import { formatCurrency } from '../../../lib/formatters';
 
 interface CategoryViewModalProps {
   isOpen: boolean;
