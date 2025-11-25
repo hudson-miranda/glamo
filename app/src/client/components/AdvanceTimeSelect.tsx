@@ -148,12 +148,7 @@ export const AdvanceTimeSelect: React.FC<AdvanceTimeSelectProps> = ({
       {error && (
         <p className="text-sm text-red-500">{error}</p>
       )}
-      
-      {value > 0 && (
-        <p className="text-xs text-muted-foreground">
-          Cliente deve agendar com pelo menos {formatAdvanceTime(value)} de antecedência
-        </p>
-      )}
+  
     </div>
   );
 };

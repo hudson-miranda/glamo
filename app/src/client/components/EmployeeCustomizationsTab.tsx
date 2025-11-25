@@ -218,8 +218,16 @@ export function EmployeeCustomizationsTab({
 
   if (!serviceId) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        <p>Salve o serviço primeiro para configurar personalizações por funcionário</p>
+      <div className="text-center py-8 border-2 border-dashed rounded-lg">
+        <div className="space-y-2">
+          <p className="text-muted-foreground font-medium">💡 Salve o serviço primeiro</p>
+          <p className="text-sm text-muted-foreground">
+            Para adicionar personalizações por profissional, você precisa salvar o serviço antes.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Clique no botão <span className="font-semibold">"Criar Serviço"</span> no rodapé do modal.
+          </p>
+        </div>
       </div>
     );
   }
@@ -235,6 +243,18 @@ export function EmployeeCustomizationsTab({
           Defina valores específicos para cada profissional
         </p>
       </div>
+
+      {employees.length === 0 && (
+        <div className="p-4 border border-amber-200 bg-amber-50 rounded-lg">
+          <p className="text-sm text-amber-900 font-medium mb-2">
+            ⚠️ Nenhum funcionário cadastrado
+          </p>
+          <p className="text-sm text-amber-800">
+            Para adicionar personalizações, primeiro cadastre funcionários no módulo de{' '}
+            <span className="font-semibold">Funcionários</span>.
+          </p>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="flex items-center justify-center py-8">
@@ -320,11 +340,13 @@ export function EmployeeCustomizationsTab({
           type="button"
           variant="outline"
           onClick={handleStartAdd}
-          disabled={availableEmployees.length === 0}
+          disabled={availableEmployees.length === 0 || employees.length === 0}
           className="w-full"
+          title={employees.length === 0 ? 'Cadastre funcionários primeiro' : availableEmployees.length === 0 ? 'Todos os funcionários já possuem personalização' : 'Adicionar nova personalização'}
         >
           <Plus className="mr-2 h-4 w-4" />
           Adicionar Personalização
+          {employees.length === 0 && ' (Cadastre funcionários primeiro)'}
         </Button>
       )}
 

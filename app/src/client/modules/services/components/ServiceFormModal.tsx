@@ -246,13 +246,12 @@ export function ServiceFormModal({
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 lg:grid-cols-9">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
             <TabsTrigger value="service">Cadastro</TabsTrigger>
             <TabsTrigger value="config">Configurações</TabsTrigger>
             <TabsTrigger value="cashback">Cashback</TabsTrigger>
             <TabsTrigger value="care">Cuidados</TabsTrigger>
             <TabsTrigger value="return">Retorno</TabsTrigger>
-            <TabsTrigger value="commission">Comissões</TabsTrigger>
             <TabsTrigger value="employee">Profissionais</TabsTrigger>
             <TabsTrigger value="products">Produtos</TabsTrigger>
             <TabsTrigger value="fiscal">Nota Fiscal</TabsTrigger>
@@ -692,44 +691,6 @@ export function ServiceFormModal({
                   </div>
                 </div>
               )}
-            </div>
-          </TabsContent>
-
-          {/* Aba Comissões */}
-          <TabsContent value="commission" className="space-y-6 mt-6">
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                  Comissões e Auxiliares
-                  <InfoTooltip content="Configure regras de comissão para profissionais e auxiliares" />
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  A comissão padrão já foi configurada na aba Cadastro
-                </p>
-              </div>
-
-              <div className="p-4 bg-muted rounded-lg">
-                <p className="text-sm font-medium mb-2">Comissão Padrão Configurada:</p>
-                <div className="text-sm">
-                  {watch('commissionValueType') === 'PERCENT' 
-                    ? `${watch('commissionValue') || 0}% do valor do serviço`
-                    : `R$ ${(watch('commissionValue') || 0).toFixed(2)}`}
-                </div>
-              </div>
-
-              <div className="p-4 border border-blue-200 bg-blue-50 rounded-lg">
-                <p className="text-sm text-blue-900 font-medium mb-2">
-                  📋 Configurações Avançadas
-                </p>
-                <p className="text-sm text-blue-800">
-                  Para configurar comissões específicas por profissional, utilize a aba 
-                  <span className="font-semibold"> Profissionais</span>.
-                </p>
-                <p className="text-sm text-blue-800 mt-2">
-                  Para configurar comissões de auxiliares e regras mais complexas, 
-                  acesse o módulo de <span className="font-semibold">Gestão Financeira</span>.
-                </p>
-              </div>
             </div>
           </TabsContent>
 
