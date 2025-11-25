@@ -29,6 +29,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../../components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../../../components/ui/alert-dialog';
 import { Label } from '../../../components/ui/label';
 import { Checkbox } from '../../../components/ui/checkbox';
 import { Plus, Search, Scissors, Edit, Trash2, Eye, Filter, ArrowUpDown, Settings2, X } from 'lucide-react';
@@ -59,7 +69,9 @@ export default function ServicesListPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isColumnsModalOpen, setIsColumnsModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<any>(null);
+  const [serviceToDelete, setServiceToDelete] = useState<any>(null);
   
   // Filtros
   const [filterCategory, setFilterCategory] = useState<string>('all');
@@ -102,8 +114,8 @@ export default function ServicesListPage() {
   };
 
   const handleCloseModal = () => {
+    setSelectedService(null); // Limpar primeiro para garantir reset correto
     setIsModalOpen(false);
-    setSelectedService(null);
   };
 
   const handleSubmitService = async (formData: any) => {
@@ -188,7 +200,7 @@ export default function ServicesListPage() {
 
 
 
-  const handleDeleteService = async (service: any) => {
+  const handleDeleteService = (service: any) => {
     if (!activeSalonId) {
       toast({
         title: 'Erro',
@@ -198,13 +210,16 @@ export default function ServicesListPage() {
       return;
     }
 
-    if (!confirm('Tem certeza que deseja excluir este serviço? Esta ação não pode ser desfeita.')) {
-      return;
-    }
+    setServiceToDelete(service);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteService = async () => {
+    if (!serviceToDelete || !activeSalonId) return;
 
     try {
       await deleteService({
-        serviceId: service.id,
+        serviceId: serviceToDelete.id,
         salonId: activeSalonId,
       });
 
@@ -220,6 +235,9 @@ export default function ServicesListPage() {
         description: error.message || 'Erro ao excluir serviço',
         variant: 'destructive',
       });
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setServiceToDelete(null);
     }
   };
 
@@ -264,7 +282,7 @@ export default function ServicesListPage() {
     ? data.services
         .filter((service: any) => {
           // Filtro por categoria
-          if (filterCategory !== 'all' && service.categories?.[0]?.id !== filterCategory) {
+          if (filterCategory !== 'all' && service.category?.id !== filterCategory) {
             return false;
           }
           // Filtro por status
@@ -292,8 +310,8 @@ export default function ServicesListPage() {
               bValue = b.duration || 0;
               break;
             case 'category':
-              aValue = a.categories?.[0]?.name?.toLowerCase() || '';
-              bValue = b.categories?.[0]?.name?.toLowerCase() || '';
+              aValue = a.category?.name?.toLowerCase() || '';
+              bValue = b.category?.name?.toLowerCase() || '';
               break;
             default:
               return 0;
@@ -308,7 +326,7 @@ export default function ServicesListPage() {
   const categories = Array.from(
     new Set(
       data?.services
-        ?.map((s: any) => s.categories?.[0])
+        ?.map((s: any) => s.category)
         .filter(Boolean)
         .map((c: any) => JSON.stringify(c))
     )
@@ -553,7 +571,7 @@ export default function ServicesListPage() {
                         )}
                         {visibleColumns.includes('category') && (
                           <TableCell>
-                            {service.categories?.[0]?.name || '-'}
+                            {service.category?.name || '-'}
                           </TableCell>
                         )}
                         {visibleColumns.includes('price') && (
@@ -702,7 +720,7 @@ export default function ServicesListPage() {
                     </div>
                     <div>
                       <Label className='text-muted-foreground text-sm'>Categoria</Label>
-                      <p className='font-medium'>{selectedService.categories?.[0]?.name || 'Sem categoria'}</p>
+                      <p className='font-medium'>{selectedService.category?.name || 'Sem categoria'}</p>
                     </div>
                     <div className='col-span-2'>
                       <Label className='text-muted-foreground text-sm'>Descrição</Label>
@@ -940,6 +958,29 @@ export default function ServicesListPage() {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Modal de Confirmação de Exclusão */}
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Esta ação não pode ser desfeita. O serviço <strong>{serviceToDelete?.name}</strong> será excluído permanentemente.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setServiceToDelete(null)}>
+                Cancelar
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={confirmDeleteService}
+                className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+              >
+                Excluir
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
   );
 }

@@ -65,7 +65,8 @@ export function EmployeeCustomizationsTab({
 
   const { data: customizations, isLoading, refetch } = useQuery(
     listServiceEmployeeCustomizations,
-    serviceId ? { serviceId, salonId } : undefined
+    { serviceId: serviceId || '', salonId },
+    { enabled: !!serviceId }
   );
 
   const availableEmployees = employees.filter(

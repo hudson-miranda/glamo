@@ -211,6 +211,7 @@ export const listServices: ListServices<ListServicesInput, ListServicesOutput> =
     orderBy: { createdAt: 'desc' },
     include: {
       serviceRoom: true,
+      category: true,
       createdBy: {
         select: { id: true, name: true, email: true },
       },
@@ -218,6 +219,7 @@ export const listServices: ListServices<ListServicesInput, ListServicesOutput> =
         where: { deletedAt: null },
         orderBy: { name: 'asc' },
       },
+      categories: true,
       commissionConfig: true,
     },
   });
@@ -249,6 +251,7 @@ export const getService: GetService<GetServiceInput, any> = async (
     where: { id: serviceId },
     include: {
       serviceRoom: true,
+      category: true,
       createdBy: {
         select: { id: true, name: true, email: true },
       },
@@ -259,8 +262,8 @@ export const getService: GetService<GetServiceInput, any> = async (
         where: { deletedAt: null },
         orderBy: { name: 'asc' },
       },
-      commissionConfig: true,
       categories: true,
+      commissionConfig: true,
     },
   });
 

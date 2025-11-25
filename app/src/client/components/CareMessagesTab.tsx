@@ -60,7 +60,8 @@ export function CareMessagesTab({ serviceId, salonId }: CareMessagesTabProps) {
 
   const { data: messages, isLoading, refetch } = useQuery(
     listServiceCareMessages,
-    serviceId ? { serviceId, salonId } : undefined
+    { serviceId: serviceId || '', salonId },
+    { enabled: !!serviceId }
   );
 
   useEffect(() => {

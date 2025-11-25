@@ -196,7 +196,38 @@ export function ServiceFormModal({
           municipalServiceCode: (service as any).municipalServiceCode || '',
         });
       } else {
-        reset();
+        // Limpar explicitamente com valores padrão
+        reset({
+          name: '',
+          description: '',
+          categoryId: '',
+          priceType: 'FIXED',
+          defaultPrice: 0,
+          defaultDuration: 30,
+          costValue: 0,
+          costValueType: 'FIXED',
+          commissionValue: 0,
+          commissionValueType: 'PERCENT',
+          color: '#8B5CF6',
+          active: true,
+          isFavorite: false,
+          isVisible: true,
+          requiresDeposit: false,
+          depositAmount: 0,
+          allowOnlineBooking: true,
+          advanceBookingTime: 0,
+          imagePath: '',
+          instructions: '',
+          cashbackActive: false,
+          cashbackValue: 0,
+          cashbackValueType: 'FIXED',
+          returnActive: false,
+          returnDays: 0,
+          returnMessage: '',
+          serviceListItem: '',
+          cnae: '',
+          municipalServiceCode: '',
+        });
       }
       setActiveTab('service'); // Sempre volta para aba de serviço ao abrir
     }

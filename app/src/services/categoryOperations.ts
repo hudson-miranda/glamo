@@ -89,7 +89,11 @@ export const listCategories: ListCategories<ListCategoriesInput, any> = async (
     include: {
       _count: {
         select: {
-          services: true,
+          services: {
+            where: {
+              deletedAt: null,
+            },
+          },
         },
       },
     },
@@ -119,7 +123,11 @@ export const getCategory: GetCategory<GetCategoryInput, any> = async (
     include: {
       _count: {
         select: {
-          services: true,
+          services: {
+            where: {
+              deletedAt: null,
+            },
+          },
         },
       },
     },
@@ -195,7 +203,11 @@ export const createCategory: CreateCategory<CreateCategoryInput, any> = async (
     include: {
       _count: {
         select: {
-          services: true,
+          services: {
+            where: {
+              deletedAt: null,
+            },
+          },
         },
       },
     },
@@ -294,7 +306,11 @@ export const updateCategory: UpdateCategory<UpdateCategoryInput, any> = async (
     include: {
       _count: {
         select: {
-          services: true,
+          services: {
+            where: {
+              deletedAt: null,
+            },
+          },
         },
       },
     },

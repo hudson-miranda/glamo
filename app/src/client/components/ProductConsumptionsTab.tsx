@@ -55,7 +55,8 @@ export function ProductConsumptionsTab({
 
   const { data: consumptions, isLoading, refetch } = useQuery(
     listServiceProductConsumptions,
-    serviceId ? { serviceId, salonId } : undefined
+    { serviceId: serviceId || '', salonId },
+    { enabled: !!serviceId }
   );
 
   const availableProducts = products.filter(
