@@ -121,6 +121,14 @@ export const getCategory: GetCategory<GetCategoryInput, any> = async (
   const category = await context.entities.Category.findUnique({
     where: { id: categoryId },
     include: {
+      services: {
+        where: {
+          deletedAt: null,
+        },
+        orderBy: {
+          name: 'asc',
+        },
+      },
       _count: {
         select: {
           services: {

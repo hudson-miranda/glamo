@@ -23,18 +23,27 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '../../../components/ui/alert-dialog';
-import { Plus, Search, Edit, Trash2, Tag } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Tag, Eye } from 'lucide-react';
 import { useSalonContext } from '../../hooks/useSalonContext';
 import { CategoryFormModal } from './components/CategoryFormModal';
+import { CategoryViewModal } from './components/CategoryViewModal';
 import { useToast } from '../../../components/ui/use-toast';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../../../components/ui/tooltip';
 
 export default function CategoriesListPage() {
   const { activeSalonId } = useSalonContext();
   const { toast } = useToast();
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  const [categoryToView, setCategoryToView] = useState<string | null>(null);
   const [categoryToDelete, setCategoryToDelete] = useState<any>(null);
 
   const { data: categories, isLoading, error, refetch } = useQuery(
@@ -56,6 +65,16 @@ export default function CategoriesListPage() {
   const handleCloseModal = () => {
     setSelectedCategory(null);
     setIsModalOpen(false);
+  };
+
+  const handleOpenViewModal = (categoryId: string) => {
+    setCategoryToView(categoryId);
+    setIsViewModalOpen(true);
+  };
+
+  const handleCloseViewModal = () => {
+    setCategoryToView(null);
+    setIsViewModalOpen(false);
   };
 
   const handleSubmitCategory = async (formData: any) => {
@@ -180,6 +199,12 @@ export default function CategoriesListPage() {
         category={selectedCategory}
       />
 
+      <CategoryViewModal
+        isOpen={isViewModalOpen}
+        onClose={handleCloseViewModal}
+        categoryId={categoryToView}
+      />
+
       {/* Header */}
       <div className='flex items-center justify-between'>
         <div>
@@ -252,11 +277,20 @@ export default function CategoriesListPage() {
                 {filteredCategories.map((category: any) => (
                   <TableRow key={category.id}>
                     <TableCell className='font-medium'>{category.name}</TableCell>
-                    <TableCell>
+                    <TableCell className='max-w-xs'>
                       {category.description ? (
-                        <span className='text-sm text-muted-foreground line-clamp-1'>
-                          {category.description}
-                        </span>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className='text-sm text-muted-foreground line-clamp-2 cursor-help'>
+                                {category.description}
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent className='max-w-md'>
+                              <p className='whitespace-pre-wrap'>{category.description}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       ) : (
                         <span className='text-sm text-muted-foreground italic'>
                           Sem descrição
@@ -278,7 +312,16 @@ export default function CategoriesListPage() {
                         <Button
                           variant='ghost'
                           size='sm'
+                          onClick={() => handleOpenViewModal(category.id)}
+                          title='Visualizar categoria'
+                        >
+                          <Eye className='h-4 w-4' />
+                        </Button>
+                        <Button
+                          variant='ghost'
+                          size='sm'
                           onClick={() => handleOpenModal(category)}
+                          title='Editar categoria'
                         >
                           <Edit className='h-4 w-4' />
                         </Button>
@@ -286,6 +329,7 @@ export default function CategoriesListPage() {
                           variant='ghost'
                           size='sm'
                           onClick={() => handleDeleteCategory(category)}
+                          title='Excluir categoria'
                         >
                           <Trash2 className='h-4 w-4' />
                         </Button>
