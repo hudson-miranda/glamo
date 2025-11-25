@@ -25,6 +25,16 @@ import {
 } from '../../components/ui/card';
 import { Switch } from '../../components/ui/switch';
 import { Badge } from '../../components/ui/badge';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../../components/ui/alert-dialog';
 import { Loader2, Plus, Trash2, Edit2, User } from 'lucide-react';
 import { useToast } from '../../components/ui/use-toast';
 import { ValueTypeInput } from './ValueTypeInput';
@@ -56,6 +66,8 @@ export function EmployeeCustomizationsTab({
   const { toast } = useToast();
   const [isAdding, setIsAdding] = useState(false);
   const [editingCustomization, setEditingCustomization] = useState<any | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [customizationToDelete, setCustomizationToDelete] = useState<any>(null);
   const [formData, setFormData] = useState<CustomizationForm>({
     employeeId: '',
     customPriceType: 'FIXED',
@@ -198,16 +210,26 @@ export function EmployeeCustomizationsTab({
     }
   };
 
-  const handleDelete = async (customizationId: string) => {
-    if (!confirm('Tem certeza que deseja excluir esta personalização?')) return;
+  const handleDeleteClick = (customization: any) => {
+    setCustomizationToDelete(customization);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!customizationToDelete) return;
 
     try {
-      await deleteServiceEmployeeCustomization({ customizationId, salonId });
+      await deleteServiceEmployeeCustomization({ 
+        customizationId: customizationToDelete.id, 
+        salonId 
+      });
       toast({
         title: 'Personalização excluída',
         description: 'Personalização removida com sucesso',
       });
       refetch();
+      setIsDeleteDialogOpen(false);
+      setCustomizationToDelete(null);
     } catch (error: any) {
       toast({
         title: 'Erro',
@@ -318,7 +340,7 @@ export function EmployeeCustomizationsTab({
                       type="button"
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleDelete(customization.id)}
+                      onClick={() => handleDeleteClick(customization)}
                       title="Excluir"
                     >
                       <Trash2 className="h-4 w-4 text-red-500" />
@@ -454,6 +476,33 @@ export function EmployeeCustomizationsTab({
           </CardContent>
         </Card>
       )}
+
+      {/* Modal de Confirmação de Exclusão */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. A personalização do funcionário{' '}
+              <strong>
+                {customizationToDelete?.employee?.name || customizationToDelete?.employee?.user?.email}
+              </strong>{' '}
+              será excluída permanentemente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setCustomizationToDelete(null)}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
