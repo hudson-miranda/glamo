@@ -45,7 +45,7 @@ export function CategoryViewModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className='max-w-4xl max-h-[90vh] overflow-y-auto'>
+      <DialogContent className='max-w-4xl max-h-[90vh] overflow-y-auto overflow-x-hidden'>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <Eye className='h-5 w-5' />
@@ -70,13 +70,13 @@ export function CategoryViewModal({
                   Informações da Categoria
                 </CardTitle>
               </CardHeader>
-              <CardContent className='space-y-4'>
+              <CardContent className='space-y-4 overflow-hidden'>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                  <div>
+                  <div className='overflow-hidden'>
                     <label className='text-sm font-medium text-muted-foreground'>
                       Nome
                     </label>
-                    <p className='text-base font-semibold mt-1'>{category.name}</p>
+                    <p className='text-base font-semibold mt-1 break-words'>{category.name}</p>
                   </div>
                   <div>
                     <label className='text-sm font-medium text-muted-foreground'>
@@ -90,12 +90,14 @@ export function CategoryViewModal({
                   </div>
                 </div>
 
-                <div>
+                <div className='overflow-hidden'>
                   <label className='text-sm font-medium text-muted-foreground'>
                     Descrição
                   </label>
                   {category.description ? (
-                    <p className='text-base mt-1 whitespace-pre-wrap break-words'>{category.description}</p>
+                    <p className='text-base mt-1 break-words' style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                      {category.description}
+                    </p>
                   ) : (
                     <p className='text-sm text-muted-foreground italic mt-1'>
                       Sem descrição
