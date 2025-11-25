@@ -28,6 +28,7 @@ import {
   FolderOpen,
   ChevronDown,
   ChevronUp,
+  Tag,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Button } from '../../components/ui/button';
@@ -88,6 +89,12 @@ const navSections: NavSection[] = [
         title: 'Serviços',
         href: '/services',
         icon: Scissors,
+        permission: 'can_view_services',
+      },
+      {
+        title: 'Categorias',
+        href: '/categories',
+        icon: Tag,
         permission: 'can_view_services',
       },
       {

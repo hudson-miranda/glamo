@@ -1138,6 +1138,12 @@ page ServicesListPage {
   component: import ServicesListPage from "@src/client/modules/services/ServicesListPage"
 }
 
+route CategoriesListRoute { path: "/categories", to: CategoriesListPage }
+page CategoriesListPage {
+  authRequired: true,
+  component: import CategoriesListPage from "@src/client/modules/services/CategoriesListPage"
+}
+
 route AppointmentsListRoute { path: "/appointments", to: AppointmentsListPage }
 page AppointmentsListPage {
   authRequired: true,

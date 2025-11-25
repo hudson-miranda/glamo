@@ -314,9 +314,14 @@ export function ServiceFormModal({
                         {...register('name')}
                         placeholder="Ex: Corte de Cabelo Masculino"
                         className={errors.name ? 'border-red-500' : ''}
+                        maxLength={100}
                       />
-                      {errors.name && (
+                      {errors.name ? (
                         <p className="text-sm text-red-500 mt-1">{errors.name.message}</p>
+                      ) : (
+                        <p className="text-xs text-muted-foreground mt-1 text-right">
+                          {watch('name')?.length || 0}/100 caracteres
+                        </p>
                       )}
                     </div>
 
@@ -344,7 +349,11 @@ export function ServiceFormModal({
                       {...register('description')}
                       placeholder="Descrição detalhada do serviço..."
                       rows={3}
+                      maxLength={500}
                     />
+                    <p className="text-xs text-muted-foreground mt-1 text-right">
+                      {watch('description')?.length || 0}/500 caracteres
+                    </p>
                   </div>
 
                   {/* Categoria */}
