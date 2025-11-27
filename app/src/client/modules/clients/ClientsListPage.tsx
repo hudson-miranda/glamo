@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useQuery, listClients, createClient, updateClient } from 'wasp/client/operations';
+import { useQuery, listClients, createClient, updateClient, deleteClient } from 'wasp/client/operations';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
@@ -7,6 +7,7 @@ import { Badge } from '../../../components/ui/badge';
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -27,13 +28,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../../components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../../../components/ui/alert-dialog';
 import { EmptyState } from '../../../components/ui/empty-state';
 import { Card, CardContent } from '../../../components/ui/card';
-import { Plus, Users, Download, Search, Filter, ArrowUpDown, Settings2, X } from 'lucide-react';
+import { Plus, Users, Download, Search, Filter, ArrowUpDown, Settings2, X, Eye, Edit, Trash2 } from 'lucide-react';
 import { useSalonContext } from '../../hooks/useSalonContext';
+import { useToast } from '../../../components/ui/use-toast';
 import { ClientStatsCards } from './components/ClientStatsCards';
-import { ClientTableRow } from './components/ClientTableRow';
 import { ClientFormModal } from './components/ClientFormModal';
+import { formatDate, formatCurrency } from '../../lib/formatters';
 
 // Definição de colunas disponíveis
 const AVAILABLE_COLUMNS = [
@@ -51,12 +63,17 @@ const AVAILABLE_COLUMNS = [
 
 export default function ClientsListPage() {
   const { activeSalonId } = useSalonContext();
+  const { toast } = useToast();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const perPage = 20;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isColumnsModalOpen, setIsColumnsModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<any>(null);
+  const [viewingClient, setViewingClient] = useState<any>(null);
+  const [clientToDelete, setClientToDelete] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Filtros
@@ -222,10 +239,127 @@ export default function ClientsListPage() {
           observations: formData.notes || undefined,
         });
       }
+      
+      toast({
+        title: editingClient ? 'Cliente atualizado!' : 'Cliente cadastrado!',
+        description: `${formData.name} foi ${editingClient ? 'atualizado' : 'cadastrado'} com sucesso.`,
+      });
+      
+      handleCloseModal();
       // Refresh the client list
       // The useQuery hook will automatically refetch
+    } catch (error: any) {
+      toast({
+        title: 'Erro',
+        description: error.message || `Erro ao ${editingClient ? 'atualizar' : 'cadastrar'} cliente`,
+        variant: 'destructive',
+      });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleViewClient = (client: any) => {
+    setViewingClient(client);
+    setIsViewModalOpen(true);
+  };
+
+  const handleDeleteClient = (client: any) => {
+    if (!activeSalonId) {
+      toast({
+        title: 'Erro',
+        description: 'Nenhum salão ativo',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setClientToDelete(client);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteClient = async () => {
+    if (!clientToDelete || !activeSalonId) return;
+
+    try {
+      await deleteClient({
+        clientId: clientToDelete.id,
+        salonId: activeSalonId,
+      });
+
+      toast({
+        title: 'Cliente excluído',
+        description: 'Cliente removido com sucesso',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Erro',
+        description: error.message || 'Erro ao excluir cliente',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setClientToDelete(null);
+    }
+  };
+
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case 'ACTIVE':
+        return 'default';
+      case 'INACTIVE':
+        return 'secondary';
+      case 'VIP':
+        return 'default';
+      case 'BLOCKED':
+        return 'destructive';
+      case 'PROSPECT':
+        return 'outline';
+      default:
+        return 'secondary';
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'ACTIVE':
+        return 'Ativo';
+      case 'INACTIVE':
+        return 'Inativo';
+      case 'VIP':
+        return 'VIP';
+      case 'BLOCKED':
+        return 'Bloqueado';
+      case 'PROSPECT':
+        return 'Prospect';
+      default:
+        return status;
+    }
+  };
+
+  const formatGender = (gender?: string) => {
+    switch (gender) {
+      case 'MALE':
+        return 'Masculino';
+      case 'FEMALE':
+        return 'Feminino';
+      case 'OTHER':
+        return 'Outro';
+      default:
+        return '-';
+    }
+  };
+
+  const formatClientType = (type: string) => {
+    switch (type) {
+      case 'REGULAR':
+        return 'Regular';
+      case 'VIP':
+        return 'VIP';
+      case 'SPORADIC':
+        return 'Esporádico';
+      default:
+        return type;
     }
   };
 
@@ -461,13 +595,85 @@ export default function ClientsListPage() {
                   </TableHeader>
                   <TableBody>
                     {filteredAndSortedClients.map((client: any) => (
-                      <ClientTableRow
-                        key={client.id}
-                        client={client}
-                        visibleColumns={visibleColumns}
-                        onEdit={(client) => handleOpenModal(client)}
-                        onDelete={(client) => console.log('Delete client:', client)}
-                      />
+                      <TableRow key={client.id}>
+                        {visibleColumns.includes('name') && (
+                          <TableCell>
+                            <div>
+                              <div className='font-medium'>{client.name}</div>
+                              {client.notes && (
+                                <div className='text-sm text-muted-foreground line-clamp-1'>
+                                  {client.notes}
+                                </div>
+                              )}
+                            </div>
+                          </TableCell>
+                        )}
+                        {visibleColumns.includes('email') && (
+                          <TableCell>{client.email || '-'}</TableCell>
+                        )}
+                        {visibleColumns.includes('phone') && (
+                          <TableCell>{client.phone || '-'}</TableCell>
+                        )}
+                        {visibleColumns.includes('status') && (
+                          <TableCell>
+                            <Badge variant={getStatusVariant(client.status)}>
+                              {getStatusLabel(client.status)}
+                            </Badge>
+                          </TableCell>
+                        )}
+                        {visibleColumns.includes('clientType') && (
+                          <TableCell>{formatClientType(client.clientType)}</TableCell>
+                        )}
+                        {visibleColumns.includes('gender') && (
+                          <TableCell>{formatGender(client.gender)}</TableCell>
+                        )}
+                        {visibleColumns.includes('birthDate') && (
+                          <TableCell>
+                            {client.birthDate ? formatDate(new Date(client.birthDate)) : '-'}
+                          </TableCell>
+                        )}
+                        {visibleColumns.includes('visits') && (
+                          <TableCell className='text-right'>{client.visits || 0}</TableCell>
+                        )}
+                        {visibleColumns.includes('totalSpent') && (
+                          <TableCell className='text-right'>
+                            {formatCurrency(client.totalSpent || 0)}
+                          </TableCell>
+                        )}
+                        {visibleColumns.includes('lastVisit') && (
+                          <TableCell>
+                            {client.lastVisit ? formatDate(new Date(client.lastVisit)) : '-'}
+                          </TableCell>
+                        )}
+                        <TableCell className='text-right'>
+                          <div className='flex items-center justify-end gap-1'>
+                            <Button
+                              variant='ghost'
+                              size='sm'
+                              onClick={() => handleViewClient(client)}
+                              title='Visualizar'
+                            >
+                              <Eye className='h-4 w-4' />
+                            </Button>
+                            <Button
+                              variant='ghost'
+                              size='sm'
+                              onClick={() => handleOpenModal(client)}
+                              title='Editar'
+                            >
+                              <Edit className='h-4 w-4' />
+                            </Button>
+                            <Button
+                              variant='ghost'
+                              size='sm'
+                              onClick={() => handleDeleteClient(client)}
+                              title='Excluir'
+                            >
+                              <Trash2 className='h-4 w-4 text-destructive' />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
                     ))}
                   </TableBody>
                 </Table>
@@ -549,6 +755,145 @@ export default function ClientsListPage() {
         client={editingClient}
         isLoading={isSubmitting}
       />
+
+      {/* View Client Modal */}
+      <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
+        <DialogContent className='max-w-3xl max-h-[80vh] overflow-y-auto'>
+          <DialogHeader>
+            <DialogTitle>Detalhes do Cliente</DialogTitle>
+            <DialogDescription>
+              Visualização completa de todas as informações do cliente
+            </DialogDescription>
+          </DialogHeader>
+          {viewingClient && (
+            <div className='space-y-6'>
+              {/* Informações Básicas */}
+              <div>
+                <h3 className='text-lg font-semibold mb-3'>Informações Básicas</h3>
+                <div className='grid grid-cols-2 gap-4'>
+                  <div>
+                    <p className='text-sm text-muted-foreground'>Nome</p>
+                    <p className='font-medium'>{viewingClient.name}</p>
+                  </div>
+                  <div>
+                    <p className='text-sm text-muted-foreground'>Status</p>
+                    <Badge variant={getStatusVariant(viewingClient.status)}>
+                      {getStatusLabel(viewingClient.status)}
+                    </Badge>
+                  </div>
+                  <div>
+                    <p className='text-sm text-muted-foreground'>E-mail</p>
+                    <p className='font-medium'>{viewingClient.email || '-'}</p>
+                  </div>
+                  <div>
+                    <p className='text-sm text-muted-foreground'>Telefone</p>
+                    <p className='font-medium'>{viewingClient.phone || '-'}</p>
+                  </div>
+                  <div>
+                    <p className='text-sm text-muted-foreground'>Tipo de Cliente</p>
+                    <p className='font-medium'>{formatClientType(viewingClient.clientType)}</p>
+                  </div>
+                  <div>
+                    <p className='text-sm text-muted-foreground'>Gênero</p>
+                    <p className='font-medium'>{formatGender(viewingClient.gender)}</p>
+                  </div>
+                  <div>
+                    <p className='text-sm text-muted-foreground'>Data de Nascimento</p>
+                    <p className='font-medium'>
+                      {viewingClient.birthDate
+                        ? formatDate(new Date(viewingClient.birthDate))
+                        : '-'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Estatísticas */}
+              <div>
+                <h3 className='text-lg font-semibold mb-3'>Estatísticas</h3>
+                <div className='grid grid-cols-3 gap-4'>
+                  <div>
+                    <p className='text-sm text-muted-foreground'>Visitas</p>
+                    <p className='font-medium text-2xl'>{viewingClient.visits || 0}</p>
+                  </div>
+                  <div>
+                    <p className='text-sm text-muted-foreground'>Total Gasto</p>
+                    <p className='font-medium text-2xl'>
+                      {formatCurrency(viewingClient.totalSpent || 0)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className='text-sm text-muted-foreground'>Última Visita</p>
+                    <p className='font-medium'>
+                      {viewingClient.lastVisit
+                        ? formatDate(new Date(viewingClient.lastVisit))
+                        : '-'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Endereço */}
+              {(viewingClient.address ||
+                viewingClient.city ||
+                viewingClient.state ||
+                viewingClient.zipCode) && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-3'>Endereço</h3>
+                  <div className='grid grid-cols-2 gap-4'>
+                    <div className='col-span-2'>
+                      <p className='text-sm text-muted-foreground'>Endereço</p>
+                      <p className='font-medium'>{viewingClient.address || '-'}</p>
+                    </div>
+                    <div>
+                      <p className='text-sm text-muted-foreground'>Cidade</p>
+                      <p className='font-medium'>{viewingClient.city || '-'}</p>
+                    </div>
+                    <div>
+                      <p className='text-sm text-muted-foreground'>Estado</p>
+                      <p className='font-medium'>{viewingClient.state || '-'}</p>
+                    </div>
+                    <div>
+                      <p className='text-sm text-muted-foreground'>CEP</p>
+                      <p className='font-medium'>{viewingClient.zipCode || '-'}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Observações */}
+              {viewingClient.notes && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-3'>Observações</h3>
+                  <p className='text-sm'>{viewingClient.notes}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o cliente <strong>{clientToDelete?.name}</strong>?
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteClient}
+              className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
