@@ -1414,6 +1414,279 @@ export function ClientFormModalNew({
               )}
             </TabsContent>
 
+            {/* ABA 4: CRÉDITOS */}
+            <TabsContent value="creditos" className="space-y-6 mt-6">
+              {!client ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p>Salve o cliente primeiro para visualizar os créditos</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Créditos Disponíveis */}
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 bg-green-100 rounded-lg">
+                            <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-bold">Créditos</h3>
+                            <p className="text-sm text-muted-foreground">
+                              Saldo disponível para uso
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <svg className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span className="text-2xl font-bold text-green-600">
+                            Total R$ {((client as any)?.totalCredits || 0).toFixed(2)}
+                          </span>
+                          <Button variant="outline" size="sm" className="ml-2">
+                            <Plus className="h-4 w-4 mr-1" />
+                            Adicionar
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Tabela de Créditos */}
+                      <div className="border rounded-lg overflow-hidden">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="bg-muted/50">
+                              <TableHead>Descrição</TableHead>
+                              <TableHead>Data</TableHead>
+                              <TableHead>Tipo</TableHead>
+                              <TableHead className="text-right">Valor Original</TableHead>
+                              <TableHead className="text-right">Valor Usado</TableHead>
+                              <TableHead className="text-right">Saldo</TableHead>
+                              <TableHead className="text-center">Validade</TableHead>
+                              <TableHead className="text-center">Status</TableHead>
+                              <TableHead className="text-center">Ações</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {((client as any)?.credits || []).length > 0 ? (
+                              ((client as any).credits || []).map((credit: any, index: number) => {
+                                const balance = (credit.originalAmount || 0) - (credit.usedAmount || 0);
+                                const isExpired = credit.expiryDate && new Date(credit.expiryDate) < new Date();
+                                const isExpiringSoon = credit.expiryDate && 
+                                  new Date(credit.expiryDate) < new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) && 
+                                  !isExpired;
+
+                                return (
+                                  <TableRow key={index}>
+                                    <TableCell>
+                                      <div>
+                                        <p className="font-medium">{credit.description || 'Crédito'}</p>
+                                        <p className="text-xs text-muted-foreground">
+                                          {credit.reference || credit.origin || 'Crédito manual'}
+                                        </p>
+                                      </div>
+                                    </TableCell>
+                                    <TableCell>
+                                      <div className="text-sm">
+                                        {credit.date ? new Date(credit.date).toLocaleDateString('pt-BR') : '-'}
+                                      </div>
+                                    </TableCell>
+                                    <TableCell>
+                                      <Badge variant="outline" className="text-xs">
+                                        {credit.type === 'refund' ? 'Reembolso' : 
+                                         credit.type === 'promotion' ? 'Promoção' :
+                                         credit.type === 'cashback' ? 'Cashback' :
+                                         credit.type === 'loyalty' ? 'Fidelidade' :
+                                         'Manual'}
+                                      </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                      <span className="text-sm font-medium">
+                                        R$ {(credit.originalAmount || 0).toFixed(2)}
+                                      </span>
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                      <span className="text-sm text-muted-foreground">
+                                        R$ {(credit.usedAmount || 0).toFixed(2)}
+                                      </span>
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                      <span className="text-sm font-semibold text-green-600">
+                                        R$ {balance.toFixed(2)}
+                                      </span>
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                      <div className="text-sm">
+                                        {credit.expiryDate ? (
+                                          <span className={isExpired ? 'text-red-600' : isExpiringSoon ? 'text-orange-600' : ''}>
+                                            {new Date(credit.expiryDate).toLocaleDateString('pt-BR')}
+                                          </span>
+                                        ) : (
+                                          <span className="text-muted-foreground">Sem validade</span>
+                                        )}
+                                      </div>
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                      <Badge 
+                                        variant={
+                                          isExpired ? 'destructive' : 
+                                          balance <= 0 ? 'secondary' : 
+                                          isExpiringSoon ? 'default' : 
+                                          'default'
+                                        }
+                                        className={
+                                          isExpired ? '' : 
+                                          balance <= 0 ? '' : 
+                                          isExpiringSoon ? 'bg-orange-500' : 
+                                          'bg-green-500'
+                                        }
+                                      >
+                                        {isExpired ? 'Expirado' : 
+                                         balance <= 0 ? 'Usado' : 
+                                         isExpiringSoon ? 'Expira em breve' : 
+                                         'Disponível'}
+                                      </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                      <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                          <Button variant="ghost" size="sm">
+                                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                                            </svg>
+                                          </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                          <DropdownMenuItem>
+                                            <Eye className="h-4 w-4 mr-2" />
+                                            Ver histórico
+                                          </DropdownMenuItem>
+                                          <DropdownMenuItem>
+                                            <Edit className="h-4 w-4 mr-2" />
+                                            Editar
+                                          </DropdownMenuItem>
+                                          {balance > 0 && !isExpired && (
+                                            <DropdownMenuItem>
+                                              <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                              </svg>
+                                              Usar crédito
+                                            </DropdownMenuItem>
+                                          )}
+                                          <DropdownMenuSeparator />
+                                          <DropdownMenuItem className="text-destructive">
+                                            <Trash2 className="h-4 w-4 mr-2" />
+                                            Excluir
+                                          </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                      </DropdownMenu>
+                                    </TableCell>
+                                  </TableRow>
+                                );
+                              })
+                            ) : (
+                              <TableRow>
+                                <TableCell colSpan={9} className="h-32">
+                                  <div className="flex flex-col items-center justify-center text-center">
+                                    <div className="p-4 bg-muted rounded-full mb-3">
+                                      <svg className="h-8 w-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                      </svg>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground">Nenhum crédito encontrado</p>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      Clique em "Adicionar" para criar um novo crédito
+                                    </p>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            )}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Resumo de Créditos */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-green-100 rounded-lg">
+                            <svg className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-2xl font-bold text-gray-900">
+                              R$ {((client as any)?.availableCredits || 0).toFixed(2)}
+                            </p>
+                            <p className="text-xs text-muted-foreground">Créditos disponíveis</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-blue-100 rounded-lg">
+                            <svg className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-2xl font-bold text-gray-900">
+                              R$ {((client as any)?.usedCredits || 0).toFixed(2)}
+                            </p>
+                            <p className="text-xs text-muted-foreground">Créditos utilizados</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-orange-100 rounded-lg">
+                            <svg className="h-5 w-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-2xl font-bold text-gray-900">
+                              R$ {((client as any)?.expiringCredits || 0).toFixed(2)}
+                            </p>
+                            <p className="text-xs text-muted-foreground">Expirando em breve</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-red-100 rounded-lg">
+                            <svg className="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-2xl font-bold text-gray-900">
+                              R$ {((client as any)?.expiredCredits || 0).toFixed(2)}
+                            </p>
+                            <p className="text-xs text-muted-foreground">Créditos expirados</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              )}
+            </TabsContent>
+
             {/* Outras abas - Placeholder por enquanto */}
             <TabsContent value="historico" className="space-y-6 mt-6">
               <div className="text-center py-12 text-muted-foreground">
@@ -1427,7 +1700,7 @@ export function ClientFormModalNew({
               </div>
             </TabsContent>
 
-            <TabsContent value="creditos" className="space-y-6 mt-6">
+            <TabsContent value="vendas" className="space-y-6 mt-6">
               <div className="text-center py-12 text-muted-foreground">
                 Aba Créditos - Em desenvolvimento
               </div>
