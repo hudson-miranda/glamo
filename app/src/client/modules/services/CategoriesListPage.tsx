@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, listCategories, createCategory, updateCategory, deleteCategory } from 'wasp/client/operations';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
@@ -45,6 +45,7 @@ import { useSalonContext } from '../../hooks/useSalonContext';
 import { CategoryFormModal } from './components/CategoryFormModal';
 import { CategoryViewModal } from './components/CategoryViewModal';
 import { useToast } from '../../../components/ui/use-toast';
+import { CategoryStatsCards } from './components/CategoryStatsCards';
 import {
   Tooltip,
   TooltipContent,
@@ -64,6 +65,8 @@ export default function CategoriesListPage() {
   const { activeSalonId } = useSalonContext();
   const { toast } = useToast();
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isColumnsModalOpen, setIsColumnsModalOpen] = useState(false);
@@ -220,28 +223,19 @@ export default function CategoriesListPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className='flex items-center justify-center h-96'>
-        <div className='text-center'>
-          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto'></div>
-          <p className='mt-4 text-muted-foreground'>Carregando categorias...</p>
-        </div>
-      </div>
-    );
-  }
+  // Calculate stats from data
+  const stats = useMemo(() => {
+    if (!categories) {
+      return { total: 0, active: 0, inactive: 0, withServices: 0 };
+    }
 
-  if (error) {
-    return (
-      <div className='flex items-center justify-center h-96'>
-        <EmptyState
-          icon={Tag}
-          title='Erro ao carregar categorias'
-          description='Não foi possível carregar as categorias. Tente novamente.'
-        />
-      </div>
-    );
-  }
+    return {
+      total: categories.length,
+      active: categories.filter((c: any) => c.active).length,
+      inactive: categories.filter((c: any) => !c.active).length,
+      withServices: categories.filter((c: any) => (c._count?.services || 0) > 0).length,
+    };
+  }, [categories]);
 
   // Filtrar e ordenar categorias
   const filteredAndSortedCategories = (categories || [])
@@ -306,6 +300,9 @@ export default function CategoriesListPage() {
           Nova Categoria
         </Button>
       </div>
+
+      {/* Stats Cards */}
+      <CategoryStatsCards stats={stats} isLoading={isLoading} />
 
       {/* Search, Filters and Actions */}
       <Card>
@@ -435,7 +432,20 @@ export default function CategoriesListPage() {
       {/* Categories Table */}
       <Card>
         <CardContent className='p-0'>
-          {filteredAndSortedCategories.length === 0 ? (
+          {isLoading ? (
+            <div className='flex items-center justify-center p-8'>
+              <div className='flex flex-col items-center gap-2'>
+                <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent' />
+                <p className='text-sm text-muted-foreground'>Carregando categorias...</p>
+              </div>
+            </div>
+          ) : error ? (
+            <div className='flex items-center justify-center p-8'>
+              <p className='text-sm text-destructive'>
+                Erro ao carregar categorias: {error.message}
+              </p>
+            </div>
+          ) : filteredAndSortedCategories.length === 0 ? (
             <div className='py-12'>
               <EmptyState
                 icon={Tag}
@@ -456,7 +466,9 @@ export default function CategoriesListPage() {
               />
             </div>
           ) : (
-            <Table>
+            <>
+              <div className='overflow-x-auto'>
+                <Table>
               <TableHeader>
                 <TableRow>
                   {visibleColumns.includes('name') && <TableHead>Nome</TableHead>}
@@ -540,6 +552,53 @@ export default function CategoriesListPage() {
                 ))}
               </TableBody>
             </Table>
+              </div>
+
+              {/* Pagination */}
+              <div className='flex items-center justify-between border-t px-6 py-4'>
+                <div className='flex items-center gap-4'>
+                  <div className='text-sm text-muted-foreground'>
+                    Mostrando {filteredAndSortedCategories.length} de {categories?.length || 0} categorias
+                  </div>
+                  <select
+                    value={perPage}
+                    onChange={(e) => {
+                      setPerPage(Number(e.target.value));
+                      setPage(1);
+                    }}
+                    className='h-8 rounded-md border border-input bg-background px-3 pr-8 text-sm'
+                  >
+                    <option value={10}>10</option>
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </select>
+                </div>
+                <div className='flex items-center space-x-2'>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => setPage(page - 1)}
+                    disabled={page === 1}
+                  >
+                    Anterior
+                  </Button>
+                  <div className='flex items-center gap-1 px-2'>
+                    <span className='text-sm'>
+                      Página {page} de {Math.ceil((categories?.length || 0) / perPage)}
+                    </span>
+                  </div>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => setPage(page + 1)}
+                    disabled={!categories || page * perPage >= categories.length}
+                  >
+                    Próxima
+                  </Button>
+                </div>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

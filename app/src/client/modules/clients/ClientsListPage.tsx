@@ -44,7 +44,7 @@ import { Plus, Users, Download, Search, Filter, ArrowUpDown, Settings2, X, Eye, 
 import { useSalonContext } from '../../hooks/useSalonContext';
 import { useToast } from '../../../components/ui/use-toast';
 import { ClientStatsCards } from './components/ClientStatsCards';
-import { ClientFormModal } from './components/ClientFormModal';
+import { ClientFormModalNew } from './components/ClientFormModalNew';
 import { formatDate, formatCurrency } from '../../lib/formatters';
 
 // Definição de colunas disponíveis
@@ -762,12 +762,14 @@ export default function ClientsListPage() {
       </Dialog>
 
       {/* Client Form Modal */}
-      <ClientFormModal
+      <ClientFormModalNew
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSubmit={handleSubmitClient}
         client={editingClient}
         isLoading={isSubmitting}
+        salonId={activeSalonId || ''}
+        allClients={data?.clients || []}
       />
 
       {/* View Client Modal */}
