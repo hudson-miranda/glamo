@@ -54,7 +54,7 @@ const AVAILABLE_COLUMNS = [
   { id: 'contact', label: 'Contato', enabled: true },
   { id: 'cpf', label: 'CPF', enabled: false },
   { id: 'birthDate', label: 'Data de Nascimento', enabled: false },
-  { id: 'hireDate', label: 'Data de Contratação', enabled: false },
+  { id: 'createdAt', label: 'Data de Cadastro', enabled: false },
   { id: 'services', label: 'Serviços', enabled: true },
   { id: 'status', label: 'Status', enabled: true },
 ];
@@ -147,13 +147,13 @@ export default function EmployeesListPage() {
           aValue = a._count.serviceAssignments;
           bValue = b._count.serviceAssignments;
           break;
-        case 'hireDate':
-          aValue = a.hireDate ? new Date(a.hireDate).getTime() : 0;
-          bValue = b.hireDate ? new Date(b.hireDate).getTime() : 0;
-          break;
         case 'birthDate':
           aValue = a.birthDate ? new Date(a.birthDate).getTime() : 0;
           bValue = b.birthDate ? new Date(b.birthDate).getTime() : 0;
+          break;
+        case 'createdAt':
+          aValue = new Date(a.createdAt).getTime();
+          bValue = new Date(b.createdAt).getTime();
           break;
         default:
           aValue = a.name;
@@ -222,8 +222,7 @@ export default function EmployeesListPage() {
 
     try {
       await deleteEmployee({
-        employeeId: employeeToDelete.id,
-        salonId: activeSalonId,
+        id: employeeToDelete.id,
       });
 
       toast({
@@ -425,11 +424,11 @@ export default function EmployeesListPage() {
                   <DropdownMenuItem onClick={() => { setSortBy('services'); setSortOrder('asc'); }}>
                     Menos Serviços
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => { setSortBy('hireDate'); setSortOrder('desc'); }}>
-                    Contratação (Recente)
+                  <DropdownMenuItem onClick={() => { setSortBy('createdAt'); setSortOrder('desc'); }}>
+                    Cadastro (Recente)
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => { setSortBy('hireDate'); setSortOrder('asc'); }}>
-                    Contratação (Antiga)
+                  <DropdownMenuItem onClick={() => { setSortBy('createdAt'); setSortOrder('asc'); }}>
+                    Cadastro (Antigo)
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -511,7 +510,7 @@ export default function EmployeesListPage() {
                       {visibleColumns.includes('contact') && <TableHead className='text-gray-700 dark:text-gray-300'>Contato</TableHead>}
                       {visibleColumns.includes('cpf') && <TableHead className='text-gray-700 dark:text-gray-300'>CPF</TableHead>}
                       {visibleColumns.includes('birthDate') && <TableHead className='text-gray-700 dark:text-gray-300'>Aniversário</TableHead>}
-                      {visibleColumns.includes('hireDate') && <TableHead className='text-gray-700 dark:text-gray-300'>Contratação</TableHead>}
+                      {visibleColumns.includes('createdAt') && <TableHead className='text-gray-700 dark:text-gray-300'>Cadastro</TableHead>}
                       {visibleColumns.includes('services') && <TableHead className='text-gray-700 dark:text-gray-300'>Serviços</TableHead>}
                       {visibleColumns.includes('status') && <TableHead className='text-gray-700 dark:text-gray-300'>Status</TableHead>}
                       <TableHead className='text-right text-gray-700 dark:text-gray-300'>Ações</TableHead>
@@ -586,10 +585,10 @@ export default function EmployeesListPage() {
                             </span>
                           </TableCell>
                         )}
-                        {visibleColumns.includes('hireDate') && (
+                        {visibleColumns.includes('createdAt') && (
                           <TableCell>
                             <span className='text-gray-900 dark:text-gray-300'>
-                              {employee.hireDate ? formatDate(new Date(employee.hireDate)) : '-'}
+                              {formatDate(new Date(employee.createdAt))}
                             </span>
                           </TableCell>
                         )}
@@ -802,11 +801,9 @@ export default function EmployeesListPage() {
                 <h3 className='text-lg font-semibold mb-3'>Informações Profissionais</h3>
                 <div className='grid grid-cols-2 gap-4'>
                   <div>
-                    <p className='text-sm text-muted-foreground'>Data de Contratação</p>
+                    <p className='text-sm text-muted-foreground'>Data de Cadastro</p>
                     <p className='font-medium'>
-                      {viewingEmployee.hireDate
-                        ? formatDate(new Date(viewingEmployee.hireDate))
-                        : '-'}
+                      {formatDate(new Date(viewingEmployee.createdAt))}
                     </p>
                   </div>
                   <div>
