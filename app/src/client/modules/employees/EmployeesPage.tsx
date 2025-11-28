@@ -508,10 +508,12 @@ export default function EmployeesPage() {
                     Mostrando {filteredAndSortedEmployees.length} de {data.employees.length} colaboradores
                   </div>
                   <select
-                    disabled
-                    className='h-8 rounded-md border border-input bg-background px-3 pr-8 text-sm opacity-50 cursor-not-allowed'
+                    className='h-8 rounded-md border border-input bg-background px-3 pr-8 text-sm'
                   >
+                    <option value={10}>10</option>
                     <option value={25}>25</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
                   </select>
                 </div>
                 <div className='flex items-center space-x-2'>
