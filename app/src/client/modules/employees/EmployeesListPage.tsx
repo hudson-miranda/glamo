@@ -45,6 +45,7 @@ import { Plus, Search, Users, Edit, Trash2, Mail, Phone, Calendar, Eye, Filter, 
 import { useSalonContext } from '../../hooks/useSalonContext';
 import { useToast } from '../../../components/ui/use-toast';
 import { formatDate } from '../../lib/formatters';
+import { EmployeeStatsCards } from './components/EmployeeStatsCards';
 
 // Definição de colunas disponíveis
 const AVAILABLE_COLUMNS = [
@@ -264,6 +265,20 @@ export default function EmployeesListPage() {
     return cpf;
   };
 
+  // Calcular estatísticas
+  const stats = useMemo(() => {
+    if (!data?.employees) {
+      return { total: 0, active: 0, inactive: 0, withSystemAccess: 0 };
+    }
+
+    const total = data.employees.length;
+    const active = data.employees.filter(emp => emp.isActive).length;
+    const inactive = data.employees.filter(emp => !emp.isActive).length;
+    const withSystemAccess = data.employees.filter(emp => emp.acceptsOnlineBooking).length;
+
+    return { total, active, inactive, withSystemAccess };
+  }, [data?.employees]);
+
   const hasEmployees = filteredAndSortedEmployees.length > 0;
 
   return (
@@ -271,47 +286,45 @@ export default function EmployeesListPage() {
       {/* Header */}
       <div className='flex items-center justify-between'>
         <div>
-          <h1 className='text-3xl font-bold tracking-tight text-gray-900 dark:text-white'>
-            Colaboradores
-          </h1>
-          <p className='text-gray-600 dark:text-gray-400 mt-1'>
+          <h1 className='text-3xl font-bold tracking-tight'>Colaboradores</h1>
+          <p className='text-muted-foreground'>
             Gerencie os colaboradores do seu salão
           </p>
         </div>
-        <Button 
-          onClick={() => navigate('/employees/new' as any)}
-          className='bg-gradient-to-r from-brand-400 to-brand-600 hover:from-brand-500 hover:to-brand-700 text-white shadow-lg shadow-brand-500/30'
-        >
+        <Button onClick={() => navigate('/employees/new' as any)}>
           <Plus className='mr-2 h-4 w-4' />
-          Cadastrar Colaborador
+          Novo Colaborador
         </Button>
       </div>
 
-      {/* Search and Filters */}
-      <Card className='bg-white dark:bg-gray-900/80 backdrop-blur-md border-gray-200 dark:border-gray-800'>
+      {/* Stats Cards */}
+      <EmployeeStatsCards stats={stats} isLoading={isLoading} />
+
+      {/* Search, Filters and Actions */}
+      <Card>
         <CardContent className='pt-6'>
           <div className='flex flex-col gap-4'>
-            {/* Search Bar */}
-            <div className='relative'>
-              <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500 dark:text-gray-400' />
+            {/* Busca */}
+            <div className='relative flex-1'>
+              <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
               <Input
                 placeholder='Buscar por nome, email, telefone, CPF ou cargo...'
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className='pl-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white'
+                className='pl-10'
               />
             </div>
 
-            {/* Filter Controls */}
-            <div className='flex flex-wrap items-center gap-2'>
-              {/* Filtros Dropdown */}
+            {/* Barra de Ações */}
+            <div className='flex items-center gap-2 flex-wrap'>
+              {/* Filtros */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant='outline' size='sm' className='gap-2'>
                     <Filter className='h-4 w-4' />
                     Filtros
                     {hasActiveFilters && (
-                      <Badge variant='secondary' className='ml-1 h-5 w-5 rounded-full p-0 flex items-center justify-center'>
+                      <Badge variant='secondary' className='ml-1 px-1.5 py-0.5 text-xs'>
                         {[filterStatus !== 'all', filterPosition !== 'all', filterSystemAccess !== 'all'].filter(Boolean).length}
                       </Badge>
                     )}
@@ -321,75 +334,45 @@ export default function EmployeesListPage() {
                   <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   
-                  <div className='px-2 py-1.5'>
-                    <p className='text-xs font-medium text-muted-foreground mb-2'>Status</p>
-                    <div className='space-y-1'>
-                      <DropdownMenuItem onClick={() => setFilterStatus('all')}>
-                        <div className='flex items-center justify-between w-full'>
-                          <span>Todos</span>
-                          {filterStatus === 'all' && <span className='text-brand-600'>✓</span>}
-                        </div>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setFilterStatus('active')}>
-                        <div className='flex items-center justify-between w-full'>
-                          <span>Ativo</span>
-                          {filterStatus === 'active' && <span className='text-brand-600'>✓</span>}
-                        </div>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setFilterStatus('inactive')}>
-                        <div className='flex items-center justify-between w-full'>
-                          <span>Inativo</span>
-                          {filterStatus === 'inactive' && <span className='text-brand-600'>✓</span>}
-                        </div>
-                      </DropdownMenuItem>
+                  <div className='p-2 space-y-2'>
+                    <div>
+                      <Label className='text-xs text-muted-foreground mb-1.5 block'>Status</Label>
+                      <select
+                        className='w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
+                        value={filterStatus}
+                        onChange={(e) => setFilterStatus(e.target.value)}
+                      >
+                        <option value='all'>Todos</option>
+                        <option value='active'>Ativos</option>
+                        <option value='inactive'>Inativos</option>
+                      </select>
                     </div>
-                  </div>
 
-                  <DropdownMenuSeparator />
-
-                  <div className='px-2 py-1.5'>
-                    <p className='text-xs font-medium text-muted-foreground mb-2'>Cargo</p>
-                    <div className='space-y-1'>
-                      <DropdownMenuItem onClick={() => setFilterPosition('all')}>
-                        <div className='flex items-center justify-between w-full'>
-                          <span>Todos</span>
-                          {filterPosition === 'all' && <span className='text-brand-600'>✓</span>}
-                        </div>
-                      </DropdownMenuItem>
-                      {uniquePositions.map(position => (
-                        <DropdownMenuItem key={position} onClick={() => setFilterPosition(position)}>
-                          <div className='flex items-center justify-between w-full'>
-                            <span>{position}</span>
-                            {filterPosition === position && <span className='text-brand-600'>✓</span>}
-                          </div>
-                        </DropdownMenuItem>
-                      ))}
+                    <div>
+                      <Label className='text-xs text-muted-foreground mb-1.5 block'>Cargo</Label>
+                      <select
+                        className='w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
+                        value={filterPosition}
+                        onChange={(e) => setFilterPosition(e.target.value)}
+                      >
+                        <option value='all'>Todos</option>
+                        {uniquePositions.map(position => (
+                          <option key={position} value={position}>{position}</option>
+                        ))}
+                      </select>
                     </div>
-                  </div>
 
-                  <DropdownMenuSeparator />
-
-                  <div className='px-2 py-1.5'>
-                    <p className='text-xs font-medium text-muted-foreground mb-2'>Acesso ao Sistema</p>
-                    <div className='space-y-1'>
-                      <DropdownMenuItem onClick={() => setFilterSystemAccess('all')}>
-                        <div className='flex items-center justify-between w-full'>
-                          <span>Todos</span>
-                          {filterSystemAccess === 'all' && <span className='text-brand-600'>✓</span>}
-                        </div>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setFilterSystemAccess('yes')}>
-                        <div className='flex items-center justify-between w-full'>
-                          <span>Com acesso</span>
-                          {filterSystemAccess === 'yes' && <span className='text-brand-600'>✓</span>}
-                        </div>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setFilterSystemAccess('no')}>
-                        <div className='flex items-center justify-between w-full'>
-                          <span>Sem acesso</span>
-                          {filterSystemAccess === 'no' && <span className='text-brand-600'>✓</span>}
-                        </div>
-                      </DropdownMenuItem>
+                    <div>
+                      <Label className='text-xs text-muted-foreground mb-1.5 block'>Acesso ao Sistema</Label>
+                      <select
+                        className='w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
+                        value={filterSystemAccess}
+                        onChange={(e) => setFilterSystemAccess(e.target.value)}
+                      >
+                        <option value='all'>Todos</option>
+                        <option value='yes'>Com acesso</option>
+                        <option value='no'>Sem acesso</option>
+                      </select>
                     </div>
                   </div>
                 </DropdownMenuContent>
@@ -462,18 +445,18 @@ export default function EmployeesListPage() {
       </Card>
 
       {/* Employees Table */}
-      <Card className='bg-white dark:bg-gray-900/80 backdrop-blur-md border-gray-200 dark:border-gray-800'>
+      <Card>
         <CardContent className='p-0'>
           {isLoading ? (
             <div className='flex items-center justify-center p-8'>
               <div className='flex items-center gap-3'>
-                <div className='w-5 h-5 border-2 border-brand-600 border-t-transparent rounded-full animate-spin' />
-                <p className='text-sm text-gray-600 dark:text-gray-400'>Carregando colaboradores...</p>
+                <div className='w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin' />
+                <p className='text-sm text-muted-foreground'>Carregando colaboradores...</p>
               </div>
             </div>
           ) : error ? (
             <div className='flex items-center justify-center p-8'>
-              <p className='text-sm text-red-600 dark:text-red-400'>
+              <p className='text-sm text-destructive'>
                 Erro ao carregar colaboradores: {error.message}
               </p>
             </div>
@@ -488,12 +471,9 @@ export default function EmployeesListPage() {
               }
               action={
                 !hasActiveFilters && (
-                  <Button 
-                    onClick={() => navigate('/employees/new' as any)}
-                    className='bg-gradient-to-r from-brand-400 to-brand-600 hover:from-brand-500 hover:to-brand-700 text-white'
-                  >
+                  <Button onClick={() => navigate('/employees/new' as any)}>
                     <Plus className='mr-2 h-4 w-4' />
-                    Cadastrar Colaborador
+                    Novo Colaborador
                   </Button>
                 )
               }
@@ -503,26 +483,26 @@ export default function EmployeesListPage() {
               <div className='overflow-x-auto'>
                 <Table>
                   <TableHeader>
-                    <TableRow className='border-gray-200 dark:border-gray-800'>
-                      {visibleColumns.includes('color') && <TableHead className='text-gray-700 dark:text-gray-300'>Cor</TableHead>}
-                      {visibleColumns.includes('name') && <TableHead className='text-gray-700 dark:text-gray-300'>Nome</TableHead>}
-                      {visibleColumns.includes('position') && <TableHead className='text-gray-700 dark:text-gray-300'>Cargo</TableHead>}
-                      {visibleColumns.includes('contact') && <TableHead className='text-gray-700 dark:text-gray-300'>Contato</TableHead>}
-                      {visibleColumns.includes('cpf') && <TableHead className='text-gray-700 dark:text-gray-300'>CPF</TableHead>}
-                      {visibleColumns.includes('birthDate') && <TableHead className='text-gray-700 dark:text-gray-300'>Aniversário</TableHead>}
-                      {visibleColumns.includes('createdAt') && <TableHead className='text-gray-700 dark:text-gray-300'>Cadastro</TableHead>}
-                      {visibleColumns.includes('services') && <TableHead className='text-gray-700 dark:text-gray-300'>Serviços</TableHead>}
-                      {visibleColumns.includes('status') && <TableHead className='text-gray-700 dark:text-gray-300'>Status</TableHead>}
-                      <TableHead className='text-right text-gray-700 dark:text-gray-300'>Ações</TableHead>
+                    <TableRow>
+                      {visibleColumns.includes('color') && <TableHead>Cor</TableHead>}
+                      {visibleColumns.includes('name') && <TableHead>Nome</TableHead>}
+                      {visibleColumns.includes('position') && <TableHead>Cargo</TableHead>}
+                      {visibleColumns.includes('contact') && <TableHead>Contato</TableHead>}
+                      {visibleColumns.includes('cpf') && <TableHead>CPF</TableHead>}
+                      {visibleColumns.includes('birthDate') && <TableHead>Aniversário</TableHead>}
+                      {visibleColumns.includes('createdAt') && <TableHead>Cadastro</TableHead>}
+                      {visibleColumns.includes('services') && <TableHead>Serviços</TableHead>}
+                      {visibleColumns.includes('status') && <TableHead>Status</TableHead>}
+                      <TableHead className='text-right'>Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredAndSortedEmployees.map((employee) => (
-                      <TableRow key={employee.id} className='border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50'>
+                      <TableRow key={employee.id}>
                         {visibleColumns.includes('color') && (
                           <TableCell>
                             <div
-                              className='w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 shadow-sm'
+                              className='w-8 h-8 rounded-full border-2 shadow-sm'
                               style={{ backgroundColor: employee.color || '#999' }}
                               title={employee.color || 'Sem cor'}
                             />
@@ -531,87 +511,63 @@ export default function EmployeesListPage() {
                         {visibleColumns.includes('name') && (
                           <TableCell>
                             <div className='flex flex-col'>
-                              <span className='font-medium text-gray-900 dark:text-white'>
+                              <span className='font-medium'>
                                 {employee.name}
                               </span>
                               {employee.user && (
-                                <span className='text-xs text-brand-600 dark:text-brand-400 flex items-center gap-1 mt-1'>
+                                <span className='text-xs text-muted-foreground flex items-center gap-1 mt-1'>
                                   <Mail className='h-3 w-3' />
-                                  Tem acesso ao sistema
+                                  Acesso ao sistema
                                 </span>
                               )}
                             </div>
                           </TableCell>
                         )}
                         {visibleColumns.includes('position') && (
-                          <TableCell>
-                            <span className='text-gray-900 dark:text-gray-300'>
-                              {employee.position || '-'}
-                            </span>
-                          </TableCell>
+                          <TableCell>{employee.position || '-'}</TableCell>
                         )}
                         {visibleColumns.includes('contact') && (
                           <TableCell>
                             <div className='flex flex-col gap-1 text-sm'>
                               {employee.email && (
-                                <span className='text-gray-700 dark:text-gray-400 flex items-center gap-1'>
+                                <span className='flex items-center gap-1'>
                                   <Mail className='h-3 w-3' />
                                   {employee.email}
                                 </span>
                               )}
                               {employee.phone && (
-                                <span className='text-gray-700 dark:text-gray-400 flex items-center gap-1'>
+                                <span className='flex items-center gap-1'>
                                   <Phone className='h-3 w-3' />
                                   {formatPhone(employee.phone)}
                                 </span>
                               )}
-                              {!employee.email && !employee.phone && (
-                                <span className='text-gray-500 dark:text-gray-500'>-</span>
-                              )}
+                              {!employee.email && !employee.phone && '-'}
                             </div>
                           </TableCell>
                         )}
                         {visibleColumns.includes('cpf') && (
-                          <TableCell>
-                            <span className='text-gray-900 dark:text-gray-300'>
-                              {formatCPF(employee.cpf)}
-                            </span>
-                          </TableCell>
+                          <TableCell>{formatCPF(employee.cpf)}</TableCell>
                         )}
                         {visibleColumns.includes('birthDate') && (
                           <TableCell>
-                            <span className='text-gray-900 dark:text-gray-300'>
-                              {employee.birthDate ? formatDate(new Date(employee.birthDate)) : '-'}
-                            </span>
+                            {employee.birthDate ? formatDate(new Date(employee.birthDate)) : '-'}
                           </TableCell>
                         )}
                         {visibleColumns.includes('createdAt') && (
                           <TableCell>
-                            <span className='text-gray-900 dark:text-gray-300'>
-                              {formatDate(new Date(employee.createdAt))}
-                            </span>
+                            {formatDate(new Date(employee.createdAt))}
                           </TableCell>
                         )}
                         {visibleColumns.includes('services') && (
                           <TableCell>
-                            <Badge 
-                              variant='outline' 
-                              className='bg-brand-50 dark:bg-brand-950/30 text-brand-700 dark:text-brand-400 border-brand-200 dark:border-brand-800'
-                            >
+                            <Badge variant='outline'>
                               {employee._count.serviceAssignments} {employee._count.serviceAssignments === 1 ? 'serviço' : 'serviços'}
                             </Badge>
                           </TableCell>
                         )}
                         {visibleColumns.includes('status') && (
                           <TableCell>
-                            <Badge
-                              variant={employee.isActive ? 'default' : 'secondary'}
-                              className={
-                                employee.isActive
-                                  ? 'bg-green-100 dark:bg-green-950/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800'
-                                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400'
-                              }
-                            >
+                            <Badge variant={employee.isActive ? 'default' : 'secondary'}>
                               {employee.isActive ? 'Ativo' : 'Inativo'}
                             </Badge>
                           </TableCell>
@@ -659,10 +615,10 @@ export default function EmployeesListPage() {
               </div>
 
               {/* Results info */}
-              <div className='border-t border-gray-200 dark:border-gray-800 px-6 py-4'>
-                <p className='text-sm text-gray-600 dark:text-gray-400'>
-                  Mostrando <span className='font-medium text-gray-900 dark:text-white'>{filteredAndSortedEmployees.length}</span> de{' '}
-                  <span className='font-medium text-gray-900 dark:text-white'>{data?.total || 0}</span> colaborador
+              <div className='border-t px-6 py-4'>
+                <p className='text-sm text-muted-foreground'>
+                  Mostrando <span className='font-medium'>{filteredAndSortedEmployees.length}</span> de{' '}
+                  <span className='font-medium'>{data?.total || 0}</span> colaborador
                   {(data?.total || 0) !== 1 && 'es'}
                 </p>
               </div>
