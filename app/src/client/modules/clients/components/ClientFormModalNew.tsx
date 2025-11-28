@@ -141,6 +141,11 @@ export function ClientFormModalNew({
   const [newHashtag, setNewHashtag] = useState('');
   const [dependents, setDependents] = useState<Dependent[]>([]);
   const [showDependentModal, setShowDependentModal] = useState(false);
+  
+  // Estados para a aba Mensagens
+  const [selectedTemplate, setSelectedTemplate] = useState('');
+  const [customMessage, setCustomMessage] = useState('');
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
 
   const {
     register,
@@ -348,7 +353,7 @@ export function ClientFormModalNew({
           </DialogHeader>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-9">
+            <TabsList className="grid w-full grid-cols-5 lg:grid-cols-10">
               <TabsTrigger value="cadastro">Cadastro</TabsTrigger>
               <TabsTrigger value="painel">Painel</TabsTrigger>
               <TabsTrigger value="debitos">Débitos</TabsTrigger>
@@ -356,6 +361,7 @@ export function ClientFormModalNew({
               <TabsTrigger value="pacotes">Pacotes</TabsTrigger>
               <TabsTrigger value="vendas">Vendas</TabsTrigger>
               <TabsTrigger value="agendamentos">Agendamentos</TabsTrigger>
+              <TabsTrigger value="mensagens">Mensagens</TabsTrigger>
               <TabsTrigger value="historico">Histórico</TabsTrigger>
               <TabsTrigger value="anamnese">Anamnese</TabsTrigger>
             </TabsList>
@@ -2074,6 +2080,327 @@ export function ClientFormModalNew({
                             )}
                           </TableBody>
                         </Table>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* ABA 8: MENSAGENS */}
+            <TabsContent value="mensagens" className="space-y-6 mt-6">
+              {!client ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p>Salve o cliente primeiro para enviar mensagens</p>
+                </div>
+              ) : !client.cellPhone ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="p-4 bg-orange-100 rounded-full">
+                      <svg className="h-8 w-8 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                    </div>
+                    <p className="text-sm font-medium">Número de celular não cadastrado</p>
+                    <p className="text-xs text-muted-foreground">Adicione um número de celular na aba Cadastro para enviar mensagens</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Seção de Envio de Mensagens */}
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="p-3 bg-green-100 rounded-lg">
+                          <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold">Enviar Mensagem WhatsApp</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Envie mensagens personalizadas para o cliente
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        {/* Número de Celular */}
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium">Número de Celular</Label>
+                          <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg border">
+                            <svg className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                            <span className="font-mono text-base font-medium">{client.cellPhone}</span>
+                            <Badge variant="default" className="ml-auto bg-green-500">
+                              WhatsApp
+                            </Badge>
+                          </div>
+                        </div>
+
+                        {/* Seleção de Mensagem Pré-definida */}
+                        <div className="space-y-2">
+                          <Label htmlFor="template" className="text-sm font-medium">
+                            Mensagem Pré-definida
+                            <span className="text-xs text-muted-foreground ml-2">(Opcional)</span>
+                          </Label>
+                          <Select
+                            value={selectedTemplate}
+                            onValueChange={(value) => {
+                              setSelectedTemplate(value);
+                              if (value && value !== 'custom') {
+                                // Quando houver integração com o módulo de WhatsApp,
+                                // aqui será carregado o conteúdo do template
+                                const templates: Record<string, string> = {
+                                  'welcome': `Olá ${client.name}! 👋\n\nSeja bem-vindo(a) ao nosso salão! Estamos felizes em tê-lo(a) como nosso cliente.\n\nQualquer dúvida, estamos à disposição!`,
+                                  'appointment': `Olá ${client.name}! 😊\n\nGostaríamos de lembrá-lo(a) sobre seu agendamento.\n\nAguardamos você!`,
+                                  'birthday': `Parabéns ${client.name}! 🎉🎂\n\nDesejamos um feliz aniversário! Preparamos um presente especial para você.\n\nVenha nos visitar!`,
+                                  'promotion': `Olá ${client.name}! ✨\n\nTemos uma promoção especial para você!\n\nNão perca essa oportunidade!`,
+                                  'thanks': `Olá ${client.name}! 💚\n\nObrigado por sua visita! Foi um prazer atendê-lo(a).\n\nEsperamos vê-lo(a) em breve!`,
+                                };
+                                setCustomMessage(templates[value] || '');
+                              } else if (value === 'custom') {
+                                setCustomMessage('');
+                              }
+                            }}
+                          >
+                            <SelectTrigger id="template">
+                              <SelectValue placeholder="Selecione uma mensagem ou crie uma personalizada" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="custom">
+                                <div className="flex items-center gap-2">
+                                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                  </svg>
+                                  <span>Mensagem personalizada</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="welcome">
+                                <div className="flex items-center gap-2">
+                                  <span>👋</span>
+                                  <span>Boas-vindas</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="appointment">
+                                <div className="flex items-center gap-2">
+                                  <span>📅</span>
+                                  <span>Lembrete de agendamento</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="birthday">
+                                <div className="flex items-center gap-2">
+                                  <span>🎂</span>
+                                  <span>Feliz aniversário</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="promotion">
+                                <div className="flex items-center gap-2">
+                                  <span>✨</span>
+                                  <span>Promoção especial</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="thanks">
+                                <div className="flex items-center gap-2">
+                                  <span>💚</span>
+                                  <span>Agradecimento</span>
+                                </div>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Campo de Mensagem Personalizada */}
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <Label htmlFor="message" className="text-sm font-medium">
+                              Mensagem
+                            </Label>
+                            <span className="text-xs text-muted-foreground">
+                              {customMessage.length} caracteres
+                            </span>
+                          </div>
+                          <Textarea
+                            id="message"
+                            placeholder="Digite sua mensagem aqui..."
+                            value={customMessage}
+                            onChange={(e) => setCustomMessage(e.target.value)}
+                            className="min-h-[150px] resize-none"
+                            maxLength={1000}
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Dica: Use emojis para tornar suas mensagens mais amigáveis! 😊
+                          </p>
+                        </div>
+
+                        {/* Botão de Envio */}
+                        <div className="flex items-center justify-between pt-2">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>A mensagem será enviada via WhatsApp</span>
+                          </div>
+                          <Button
+                            type="button"
+                            disabled={!customMessage.trim() || isSendingMessage}
+                            onClick={async () => {
+                              setIsSendingMessage(true);
+                              try {
+                                // Aqui será integrado com a API do WhatsApp
+                                // Por enquanto, apenas simula o envio
+                                await new Promise(resolve => setTimeout(resolve, 1500));
+                                
+                                // Abrir WhatsApp Web com a mensagem
+                                const phoneNumber = client.cellPhone?.replace(/\D/g, '');
+                                const encodedMessage = encodeURIComponent(customMessage);
+                                window.open(`https://wa.me/55${phoneNumber}?text=${encodedMessage}`, '_blank');
+                                
+                                toast({
+                                  title: 'Mensagem preparada!',
+                                  description: 'O WhatsApp foi aberto. Clique em enviar para confirmar.',
+                                });
+                                
+                                // Limpar campos após "envio"
+                                setCustomMessage('');
+                                setSelectedTemplate('');
+                              } catch (error) {
+                                toast({
+                                  title: 'Erro ao enviar mensagem',
+                                  description: 'Tente novamente mais tarde.',
+                                  variant: 'destructive',
+                                });
+                              } finally {
+                                setIsSendingMessage(false);
+                              }
+                            }}
+                            className="bg-green-600 hover:bg-green-700 text-white gap-2"
+                          >
+                            {isSendingMessage ? (
+                              <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Enviando...
+                              </>
+                            ) : (
+                              <>
+                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                </svg>
+                                Enviar no WhatsApp
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Histórico de Mensagens */}
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 bg-blue-100 rounded-lg">
+                            <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-bold">Histórico de Mensagens</h3>
+                            <p className="text-sm text-muted-foreground">
+                              Mensagens enviadas para o cliente
+                            </p>
+                          </div>
+                        </div>
+                        <Button size="sm" variant="outline">
+                          <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                          Atualizar
+                        </Button>
+                      </div>
+
+                      {/* Timeline de Mensagens */}
+                      <div className="space-y-4">
+                        {((client as any)?.messages || []).length > 0 ? (
+                          <div className="space-y-3">
+                            {((client as any).messages || []).map((message: any, index: number) => (
+                              <div key={index} className="flex gap-3 p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
+                                <div className="flex-shrink-0">
+                                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                                    <svg className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                    </svg>
+                                  </div>
+                                </div>
+                                <div className="flex-1 space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-sm font-medium">
+                                        {message.type === 'template' ? message.templateName : 'Mensagem personalizada'}
+                                      </span>
+                                      {message.type === 'template' && (
+                                        <Badge variant="secondary" className="text-xs">
+                                          Template
+                                        </Badge>
+                                      )}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-xs text-muted-foreground">
+                                        {message.date ? new Date(message.date).toLocaleDateString('pt-BR') : '-'}
+                                      </span>
+                                      <span className="text-xs text-muted-foreground">
+                                        {message.time || '-'}
+                                      </span>
+                                      <Badge 
+                                        variant={
+                                          message.status === 'sent' ? 'default' :
+                                          message.status === 'delivered' ? 'default' :
+                                          message.status === 'read' ? 'default' :
+                                          'secondary'
+                                        }
+                                        className={`text-xs ${
+                                          message.status === 'sent' ? 'bg-blue-500' :
+                                          message.status === 'delivered' ? 'bg-green-500' :
+                                          message.status === 'read' ? 'bg-purple-500' :
+                                          ''
+                                        }`}
+                                      >
+                                        {message.status === 'sent' ? 'Enviada' :
+                                         message.status === 'delivered' ? 'Entregue' :
+                                         message.status === 'read' ? 'Lida' :
+                                         'Pendente'}
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                                    {message.content || 'Sem conteúdo'}
+                                  </p>
+                                  {message.sentBy && (
+                                    <p className="text-xs text-muted-foreground">
+                                      Enviada por: {message.sentBy}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center py-12 text-center">
+                            <div className="p-4 bg-muted rounded-full mb-3">
+                              <svg className="h-8 w-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                              </svg>
+                            </div>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">
+                              Nenhuma mensagem enviada ainda
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              As mensagens enviadas aparecerão aqui
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
