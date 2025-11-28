@@ -374,7 +374,7 @@ export function ClientFormModalNew({
           </DialogHeader>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-6 lg:grid-cols-11">
+            <TabsList className="grid w-full grid-cols-5 lg:grid-cols-10">
               <TabsTrigger value="cadastro">Cadastro</TabsTrigger>
               <TabsTrigger value="painel">Painel</TabsTrigger>
               <TabsTrigger value="debitos">Débitos</TabsTrigger>
@@ -384,7 +384,6 @@ export function ClientFormModalNew({
               <TabsTrigger value="agendamentos">Agendamentos</TabsTrigger>
               <TabsTrigger value="mensagens">Mensagens</TabsTrigger>
               <TabsTrigger value="anotacoes">Anotações</TabsTrigger>
-              <TabsTrigger value="historico">Histórico</TabsTrigger>
               <TabsTrigger value="anamnese">Anamnese</TabsTrigger>
             </TabsList>
 
@@ -2694,13 +2693,6 @@ export function ClientFormModalNew({
                   </Card>
                 </div>
               )}
-            </TabsContent>
-
-            {/* Outras abas - Placeholder por enquanto */}
-            <TabsContent value="historico" className="space-y-6 mt-6">
-              <div className="text-center py-12 text-muted-foreground">
-                Aba Histórico - Em desenvolvimento
-              </div>
             </TabsContent>
 
             {/* ABA 10: ANAMNESES */}
