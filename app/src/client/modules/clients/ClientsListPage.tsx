@@ -682,8 +682,7 @@ export default function ClientsListPage() {
               {/* Pagination */}
               <div className='flex items-center justify-between border-t px-6 py-4'>
                 <div className='text-sm text-muted-foreground'>
-                  Mostrando {(page - 1) * perPage + 1} a{' '}
-                  {Math.min(page * perPage, data.total)} de {data.total} clientes
+                  Mostrando {filteredAndSortedClients.length} de {data.total} clientes
                 </div>
                 <div className='flex items-center space-x-2'>
                   <Button

@@ -688,8 +688,7 @@ export default function ServicesListPage() {
                 {/* Pagination */}
                 <div className='flex items-center justify-between border-t px-6 py-4'>
                   <div className='text-sm text-muted-foreground'>
-                    Mostrando {(page - 1) * 20 + 1} a{' '}
-                    {Math.min(page * 20, data.total || 0)} de {data.total || 0} serviços
+                    Mostrando {filteredAndSortedServices.length} de {data.total || 0} serviços
                   </div>
                   <div className='flex items-center space-x-2'>
                     <Button

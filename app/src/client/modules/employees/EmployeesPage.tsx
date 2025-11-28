@@ -506,6 +506,27 @@ export default function EmployeesPage() {
                 <div className='text-sm text-muted-foreground'>
                   Mostrando {filteredAndSortedEmployees.length} de {data.employees.length} colaboradores
                 </div>
+                <div className='flex items-center space-x-2'>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    disabled
+                  >
+                    Anterior
+                  </Button>
+                  <div className='flex items-center gap-1 px-2'>
+                    <span className='text-sm'>
+                      Página 1 de 1
+                    </span>
+                  </div>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    disabled
+                  >
+                    Próxima
+                  </Button>
+                </div>
               </div>
             </>
           )}
