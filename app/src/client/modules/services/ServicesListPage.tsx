@@ -67,6 +67,7 @@ export default function ServicesListPage() {
   const { toast } = useToast();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isColumnsModalOpen, setIsColumnsModalOpen] = useState(false);
@@ -92,7 +93,7 @@ export default function ServicesListPage() {
     salonId: activeSalonId || '',
     search,
     page,
-    perPage: 20,
+    perPage: perPage,
   }, {
     enabled: !!activeSalonId,
   });
@@ -687,8 +688,26 @@ export default function ServicesListPage() {
 
                 {/* Pagination */}
                 <div className='flex items-center justify-between border-t px-6 py-4'>
-                  <div className='text-sm text-muted-foreground'>
-                    Mostrando {filteredAndSortedServices.length} de {data.total || 0} serviços
+                  <div className='flex items-center gap-4'>
+                    <div className='text-sm text-muted-foreground'>
+                      Mostrando {filteredAndSortedServices.length} de {data.total || 0} serviços
+                    </div>
+                    <div className='flex items-center gap-2'>
+                      <span className='text-sm text-muted-foreground'>Itens por página:</span>
+                      <select
+                        value={perPage}
+                        onChange={(e) => {
+                          setPerPage(Number(e.target.value));
+                          setPage(1);
+                        }}
+                        className='h-8 rounded-md border border-input bg-background px-2 text-sm'
+                      >
+                        <option value={10}>10</option>
+                        <option value={25}>25</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                      </select>
+                    </div>
                   </div>
                   <div className='flex items-center space-x-2'>
                     <Button
@@ -701,14 +720,14 @@ export default function ServicesListPage() {
                     </Button>
                     <div className='flex items-center gap-1 px-2'>
                       <span className='text-sm'>
-                        Página {page} de {Math.ceil((data.total || 0) / 20)}
+                        Página {page} de {Math.ceil((data.total || 0) / perPage)}
                       </span>
                     </div>
                     <Button
                       variant='outline'
                       size='sm'
                       onClick={() => setPage(page + 1)}
-                      disabled={!data.total || page * 20 >= data.total}
+                      disabled={!data.total || page * perPage >= data.total}
                     >
                       Próxima
                     </Button>

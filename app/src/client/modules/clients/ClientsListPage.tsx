@@ -66,7 +66,7 @@ export default function ClientsListPage() {
   const { toast } = useToast();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const perPage = 20;
+  const [perPage, setPerPage] = useState(25);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isColumnsModalOpen, setIsColumnsModalOpen] = useState(false);
@@ -681,8 +681,26 @@ export default function ClientsListPage() {
 
               {/* Pagination */}
               <div className='flex items-center justify-between border-t px-6 py-4'>
-                <div className='text-sm text-muted-foreground'>
-                  Mostrando {filteredAndSortedClients.length} de {data.total} clientes
+                <div className='flex items-center gap-4'>
+                  <div className='text-sm text-muted-foreground'>
+                    Mostrando {filteredAndSortedClients.length} de {data.total} clientes
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <span className='text-sm text-muted-foreground'>Itens por página:</span>
+                    <select
+                      value={perPage}
+                      onChange={(e) => {
+                        setPerPage(Number(e.target.value));
+                        setPage(1);
+                      }}
+                      className='h-8 rounded-md border border-input bg-background px-2 text-sm'
+                    >
+                      <option value={10}>10</option>
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                    </select>
+                  </div>
                 </div>
                 <div className='flex items-center space-x-2'>
                   <Button
