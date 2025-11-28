@@ -156,6 +156,15 @@ export function ClientFormModalNew({
     createdAt: string;
     createdBy: string;
   }>>([]);
+  
+  // Estados para a aba Anamneses
+  const [showAnamnesisModal, setShowAnamnesisModal] = useState(false);
+  const [anamnesisTab, setAnamnesisTab] = useState('dados');
+  const [selectedAnamnesisTemplate, setSelectedAnamnesisTemplate] = useState('');
+  const [anamnesisStatus, setAnamnesisStatus] = useState<'OPEN' | 'CLOSED'>('OPEN');
+  const [anamnesisSignature, setAnamnesisSignature] = useState('');
+  const [anamnesisLink, setAnamnesisLink] = useState('');
+  const [isSavingAnamnesis, setIsSavingAnamnesis] = useState(false);
 
   const {
     register,
@@ -2694,10 +2703,215 @@ export function ClientFormModalNew({
               </div>
             </TabsContent>
 
+            {/* ABA 10: ANAMNESES */}
             <TabsContent value="anamnese" className="space-y-6 mt-6">
-              <div className="text-center py-12 text-muted-foreground">
-                Aba Anamnese - Em desenvolvimento
-              </div>
+              {!client ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p>Salve o cliente primeiro para gerenciar anamneses</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Header com botão de nova anamnese */}
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 bg-teal-100 rounded-lg">
+                            <svg className="h-6 w-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-bold">Fichas de Anamnese</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {((client as any)?.anamneses || []).length} ficha{((client as any)?.anamneses || []).length !== 1 ? 's' : ''} cadastrada{((client as any)?.anamneses || []).length !== 1 ? 's' : ''}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          onClick={() => {
+                            setShowAnamnesisModal(true);
+                            setAnamnesisTab('dados');
+                            setSelectedAnamnesisTemplate('');
+                            setAnamnesisStatus('OPEN');
+                            setAnamnesisSignature('');
+                            setAnamnesisLink('');
+                          }}
+                          className="gap-2"
+                        >
+                          <Plus className="h-4 w-4" />
+                          Nova Ficha de Anamnese
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Lista de Anamneses */}
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="space-y-4">
+                        {((client as any)?.anamneses || []).length > 0 ? (
+                          <div className="space-y-3">
+                            {((client as any).anamneses || []).map((anamnesis: any, index: number) => (
+                              <div 
+                                key={anamnesis.id || index}
+                                className="group p-4 rounded-lg border bg-card hover:bg-muted/30 transition-colors"
+                              >
+                                <div className="flex items-start justify-between gap-4">
+                                  {/* Info Principal */}
+                                  <div className="flex-1 space-y-3">
+                                    <div className="flex items-start justify-between">
+                                      <div>
+                                        <div className="flex items-center gap-2 mb-1">
+                                          <h4 className="font-semibold text-base">
+                                            {anamnesis.templateName || 'Anamnese Padrão'}
+                                          </h4>
+                                          <Badge 
+                                            variant={anamnesis.status === 'CLOSED' ? 'default' : 'secondary'}
+                                            className={anamnesis.status === 'CLOSED' ? 'bg-green-500' : ''}
+                                          >
+                                            {anamnesis.status === 'CLOSED' ? 'Fechado' : 'Aberto'}
+                                          </Badge>
+                                        </div>
+                                        <p className="text-sm text-muted-foreground">
+                                          Criado em: {anamnesis.createdAt 
+                                            ? new Date(anamnesis.createdAt).toLocaleDateString('pt-BR', {
+                                                day: '2-digit',
+                                                month: '2-digit',
+                                                year: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                              })
+                                            : '-'}
+                                        </p>
+                                      </div>
+                                    </div>
+
+                                    {/* Detalhes em Grid */}
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t">
+                                      <div>
+                                        <p className="text-xs text-muted-foreground mb-1">Cliente</p>
+                                        <p className="text-sm font-medium">{client.name}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-xs text-muted-foreground mb-1">CPF</p>
+                                        <p className="text-sm font-mono">{(client as any).cpf || '-'}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-xs text-muted-foreground mb-1">Celular</p>
+                                        <p className="text-sm font-mono">{client.cellPhone || '-'}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-xs text-muted-foreground mb-1">Criado por</p>
+                                        <p className="text-sm">{anamnesis.createdBy || 'Sistema'}</p>
+                                      </div>
+                                    </div>
+
+                                    {/* Ações e informações adicionais */}
+                                    <div className="flex items-center justify-between pt-2">
+                                      <div className="flex items-center gap-3">
+                                        {anamnesis.signature && (
+                                          <div className="flex items-center gap-1 text-xs text-green-600">
+                                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span>Assinado</span>
+                                          </div>
+                                        )}
+                                        {anamnesis.link && (
+                                          <div className="flex items-center gap-1 text-xs text-blue-600">
+                                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                            </svg>
+                                            <span>Link disponível</span>
+                                          </div>
+                                        )}
+                                      </div>
+
+                                      {/* Botões de Ação */}
+                                      <div className="flex items-center gap-1">
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          className="h-8"
+                                          onClick={() => {
+                                            toast({
+                                              title: 'Visualização em desenvolvimento',
+                                              description: 'Em breve você poderá visualizar a ficha completa.',
+                                            });
+                                          }}
+                                        >
+                                          <Eye className="h-4 w-4 mr-1" />
+                                          Visualizar
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          className="h-8"
+                                          onClick={() => {
+                                            toast({
+                                              title: 'Edição em desenvolvimento',
+                                              description: 'Em breve você poderá editar a ficha.',
+                                            });
+                                          }}
+                                        >
+                                          <Edit className="h-4 w-4 mr-1" />
+                                          Editar
+                                        </Button>
+                                        {anamnesis.link && (
+                                          <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            className="h-8"
+                                            onClick={() => {
+                                              navigator.clipboard.writeText(anamnesis.link);
+                                              toast({
+                                                title: 'Link copiado!',
+                                                description: 'O link foi copiado para a área de transferência.',
+                                              });
+                                            }}
+                                          >
+                                            <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                            </svg>
+                                            Copiar Link
+                                          </Button>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center py-16 text-center">
+                            <div className="p-4 bg-muted rounded-full mb-4">
+                              <svg className="h-10 w-10 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                            </div>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">
+                              Nenhuma ficha de anamnese cadastrada
+                            </p>
+                            <p className="text-xs text-muted-foreground max-w-sm mb-4">
+                              Crie uma ficha de anamnese para registrar informações detalhadas sobre o cliente
+                            </p>
+                            <Button
+                              onClick={() => setShowAnamnesisModal(true)}
+                              variant="outline"
+                              className="gap-2"
+                            >
+                              <Plus className="h-4 w-4" />
+                              Criar Primeira Ficha
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
 
@@ -2736,6 +2950,439 @@ export function ClientFormModalNew({
         onSelect={addDependent}
         availableClients={availableClients}
       />
+
+      {/* Modal para criar anamnese */}
+      <Dialog open={showAnamnesisModal} onOpenChange={setShowAnamnesisModal}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Nova Ficha de Anamnese</DialogTitle>
+            <DialogDescription>
+              Preencha as informações da ficha de anamnese do cliente
+            </DialogDescription>
+          </DialogHeader>
+
+          <Tabs value={anamnesisTab} onValueChange={setAnamnesisTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="dados">Dados</TabsTrigger>
+              <TabsTrigger value="assinatura">Assinatura Eletrônica</TabsTrigger>
+              <TabsTrigger value="link">Link</TabsTrigger>
+            </TabsList>
+
+            {/* Aba Dados */}
+            <TabsContent value="dados" className="space-y-4 mt-6">
+              <div className="space-y-4">
+                {/* Seleção do Modelo */}
+                <div className="space-y-2">
+                  <Label htmlFor="anamnesis-template" className="text-sm font-medium">
+                    Modelo de Anamnese *
+                  </Label>
+                  <Select
+                    value={selectedAnamnesisTemplate}
+                    onValueChange={setSelectedAnamnesisTemplate}
+                  >
+                    <SelectTrigger id="anamnesis-template">
+                      <SelectValue placeholder="Selecione um modelo de anamnese" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="facial">
+                        <div className="flex items-center gap-2">
+                          <span>✨</span>
+                          <span>Anamnese Facial</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="corporal">
+                        <div className="flex items-center gap-2">
+                          <span>💆</span>
+                          <span>Anamnese Corporal</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="capilar">
+                        <div className="flex items-center gap-2">
+                          <span>💇</span>
+                          <span>Anamnese Capilar</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="estetica">
+                        <div className="flex items-center gap-2">
+                          <span>💅</span>
+                          <span>Anamnese Estética Completa</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="manicure">
+                        <div className="flex items-center gap-2">
+                          <span>💅</span>
+                          <span>Anamnese Manicure/Pedicure</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="massagem">
+                        <div className="flex items-center gap-2">
+                          <span>🙌</span>
+                          <span>Anamnese Massagem</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="custom">
+                        <div className="flex items-center gap-2">
+                          <span>📋</span>
+                          <span>Modelo Personalizado</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Escolha o tipo de anamnese adequado para o atendimento
+                  </p>
+                </div>
+
+                {/* Dados do Cliente (Preenchidos Automaticamente) */}
+                <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg border">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">
+                      Nome do Cliente
+                    </Label>
+                    <div className="flex items-center gap-2 p-2 bg-background rounded border">
+                      <svg className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      <span className="text-sm font-medium">{client?.name || '-'}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">
+                      CPF
+                    </Label>
+                    <div className="flex items-center gap-2 p-2 bg-background rounded border">
+                      <svg className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                      </svg>
+                      <span className="text-sm font-mono">{(client as any)?.cpf || 'Não informado'}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">
+                      Celular
+                    </Label>
+                    <div className="flex items-center gap-2 p-2 bg-background rounded border">
+                      <svg className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                      <span className="text-sm font-mono">{client?.cellPhone || 'Não informado'}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">
+                      Data de Criação
+                    </Label>
+                    <div className="flex items-center gap-2 p-2 bg-background rounded border">
+                      <svg className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <span className="text-sm">
+                        {new Date().toLocaleDateString('pt-BR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Status */}
+                <div className="space-y-2">
+                  <Label htmlFor="anamnesis-status" className="text-sm font-medium">
+                    Status da Ficha *
+                  </Label>
+                  <Select
+                    value={anamnesisStatus}
+                    onValueChange={(value: 'OPEN' | 'CLOSED') => setAnamnesisStatus(value)}
+                  >
+                    <SelectTrigger id="anamnesis-status">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="OPEN">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                          <span>Aberto - Em preenchimento</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="CLOSED">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                          <span>Fechado - Finalizado</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Defina se a ficha está aberta para edição ou já foi finalizada
+                  </p>
+                </div>
+
+                {/* Observações */}
+                <div className="space-y-2">
+                  <Label htmlFor="anamnesis-notes" className="text-sm font-medium">
+                    Observações Gerais
+                    <span className="text-xs text-muted-foreground ml-2">(Opcional)</span>
+                  </Label>
+                  <Textarea
+                    id="anamnesis-notes"
+                    placeholder="Adicione observações importantes sobre esta anamnese..."
+                    className="min-h-[100px] resize-none"
+                    maxLength={500}
+                  />
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Aba Assinatura Eletrônica */}
+            <TabsContent value="assinatura" className="space-y-4 mt-6">
+              <div className="space-y-4">
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <svg className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div className="text-sm text-blue-800">
+                      <p className="font-medium mb-1">Sobre a Assinatura Eletrônica</p>
+                      <p>
+                        A assinatura eletrônica garante a autenticidade e concordância do cliente com as informações da anamnese. 
+                        O cliente poderá assinar digitalmente através de link enviado ou presencialmente em um tablet.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="signature-field" className="text-sm font-medium">
+                    Área de Assinatura
+                  </Label>
+                  <div className="border-2 border-dashed rounded-lg p-8 bg-muted/30 hover:bg-muted/50 transition-colors">
+                    <div className="flex flex-col items-center justify-center text-center space-y-3">
+                      <div className="p-4 bg-background rounded-full">
+                        <svg className="h-8 w-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium mb-1">Funcionalidade em desenvolvimento</p>
+                        <p className="text-xs text-muted-foreground">
+                          Em breve você poderá capturar assinaturas digitais dos clientes
+                        </p>
+                      </div>
+                      <Button variant="outline" disabled>
+                        <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                        Capturar Assinatura
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Status da Assinatura</Label>
+                    <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+                      <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                      <span className="text-sm">Pendente</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Data/Hora da Assinatura</Label>
+                    <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+                      <span className="text-sm text-muted-foreground">Aguardando assinatura</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Aba Link */}
+            <TabsContent value="link" className="space-y-4 mt-6">
+              <div className="space-y-4">
+                <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <svg className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                    <div className="text-sm text-purple-800">
+                      <p className="font-medium mb-1">Compartilhamento via Link</p>
+                      <p>
+                        Gere um link único para compartilhar a anamnese com o cliente. 
+                        O cliente poderá preencher as informações online e assinar digitalmente.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Link da Anamnese</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={anamnesisLink}
+                      readOnly
+                      placeholder="O link será gerado após salvar a ficha"
+                      className="font-mono text-sm"
+                    />
+                    <Button
+                      variant="outline"
+                      disabled={!anamnesisLink}
+                      onClick={() => {
+                        if (anamnesisLink) {
+                          navigator.clipboard.writeText(anamnesisLink);
+                          toast({
+                            title: 'Link copiado!',
+                            description: 'O link foi copiado para a área de transferência.',
+                          });
+                        }
+                      }}
+                    >
+                      <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      Copiar
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Link único e seguro para preenchimento online da anamnese
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium">Opções de Compartilhamento</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button
+                      variant="outline"
+                      disabled={!anamnesisLink}
+                      className="justify-start gap-3 h-auto p-4"
+                      onClick={() => {
+                        if (anamnesisLink && client?.cellPhone) {
+                          const message = `Olá ${client.name}! Acesse o link abaixo para preencher sua ficha de anamnese:\n\n${anamnesisLink}`;
+                          const phoneNumber = client.cellPhone.replace(/\D/g, '');
+                          window.open(`https://wa.me/55${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
+                        }
+                      }}
+                    >
+                      <div className="p-2 bg-green-100 rounded">
+                        <svg className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                      </div>
+                      <div className="text-left">
+                        <p className="font-medium text-sm">WhatsApp</p>
+                        <p className="text-xs text-muted-foreground">Enviar via WhatsApp</p>
+                      </div>
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      disabled={!anamnesisLink}
+                      className="justify-start gap-3 h-auto p-4"
+                      onClick={() => {
+                        if (anamnesisLink && client?.email) {
+                          const subject = 'Ficha de Anamnese - Preenchimento Online';
+                          const body = `Olá ${client.name},\n\nPor favor, acesse o link abaixo para preencher sua ficha de anamnese:\n\n${anamnesisLink}\n\nQualquer dúvida, estamos à disposição.`;
+                          window.open(`mailto:${client.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+                        }
+                      }}
+                    >
+                      <div className="p-2 bg-blue-100 rounded">
+                        <svg className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <div className="text-left">
+                        <p className="font-medium text-sm">E-mail</p>
+                        <p className="text-xs text-muted-foreground">Enviar por e-mail</p>
+                      </div>
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-muted rounded-lg space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Validade do Link</span>
+                    <span className="font-medium">30 dias</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Acessos</span>
+                    <span className="font-medium">0 visualizações</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Status</span>
+                    <Badge variant="secondary">Aguardando preenchimento</Badge>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+
+          {/* Footer do Modal */}
+          <div className="flex justify-end gap-3 pt-6 border-t">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowAnamnesisModal(false)}
+              disabled={isSavingAnamnesis}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              disabled={!selectedAnamnesisTemplate || isSavingAnamnesis}
+              onClick={async () => {
+                setIsSavingAnamnesis(true);
+                try {
+                  await new Promise(resolve => setTimeout(resolve, 1000));
+                  
+                  // Gerar link único
+                  const uniqueId = `anm-${Date.now()}`;
+                  const generatedLink = `${window.location.origin}/anamnese/${uniqueId}`;
+                  setAnamnesisLink(generatedLink);
+                  
+                  toast({
+                    title: 'Anamnese criada com sucesso!',
+                    description: 'A ficha foi criada e está disponível para preenchimento.',
+                  });
+                  
+                  // Aqui seria feita a integração com o backend
+                  // para salvar a anamnese no banco de dados
+                  
+                  setShowAnamnesisModal(false);
+                } catch (error) {
+                  toast({
+                    title: 'Erro ao criar anamnese',
+                    description: 'Tente novamente mais tarde.',
+                    variant: 'destructive',
+                  });
+                } finally {
+                  setIsSavingAnamnesis(false);
+                }
+              }}
+            >
+              {isSavingAnamnesis ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Salvando...
+                </>
+              ) : (
+                <>
+                  <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Salvar Ficha de Anamnese
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
