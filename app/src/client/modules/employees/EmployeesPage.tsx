@@ -500,6 +500,13 @@ export default function EmployeesPage() {
                   </TableBody>
                 </Table>
               </div>
+
+              {/* Pagination */}
+              <div className='flex items-center justify-between border-t px-6 py-4'>
+                <div className='text-sm text-muted-foreground'>
+                  Mostrando {filteredAndSortedEmployees.length} de {data.employees.length} colaboradores
+                </div>
+              </div>
             </>
           )}
         </CardContent>

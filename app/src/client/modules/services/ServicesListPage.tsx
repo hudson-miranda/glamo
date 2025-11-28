@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, listServices, createService, updateService, deleteService, listEmployees, listProducts } from 'wasp/client/operations';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
@@ -45,6 +45,7 @@ import { Plus, Search, Scissors, Edit, Trash2, Eye, Filter, ArrowUpDown, Setting
 import { useSalonContext } from '../../hooks/useSalonContext';
 import { ServiceFormModal } from './components/ServiceFormModal';
 import { useToast } from '../../../components/ui/use-toast';
+import { ServiceStatsCards } from './components/ServiceStatsCards';
 
 // Definição de colunas disponíveis
 const AVAILABLE_COLUMNS = [
@@ -322,6 +323,20 @@ export default function ServicesListPage() {
         })
     : [];
 
+  // Calculate stats from data
+  const stats = useMemo(() => {
+    if (!data?.services) {
+      return { total: 0, active: 0, inactive: 0, favorites: 0 };
+    }
+
+    return {
+      total: data.services.length,
+      active: data.services.filter((s: any) => !s.deletedAt).length,
+      inactive: data.services.filter((s: any) => s.deletedAt).length,
+      favorites: data.services.filter((s: any) => s.isFavorite).length,
+    };
+  }, [data]);
+
   // Obter categorias únicas para filtro
   const categories = Array.from(
     new Set(
@@ -357,6 +372,9 @@ export default function ServicesListPage() {
             Novo Serviço
           </Button>
         </div>
+
+        {/* Stats Cards */}
+        <ServiceStatsCards stats={stats} isLoading={isLoading} />
 
         {/* Search, Filters and Actions */}
         <Card>
@@ -670,7 +688,8 @@ export default function ServicesListPage() {
                 {/* Pagination */}
                 <div className='flex items-center justify-between border-t px-6 py-4'>
                   <div className='text-sm text-muted-foreground'>
-                    Exibindo {filteredAndSortedServices.length} de {data.total} serviços
+                    Mostrando {(page - 1) * 20 + 1} a{' '}
+                    {Math.min(page * 20, data.total || 0)} de {data.total || 0} serviços
                   </div>
                   <div className='flex items-center space-x-2'>
                     <Button
@@ -681,13 +700,16 @@ export default function ServicesListPage() {
                     >
                       Anterior
                     </Button>
+                    <div className='flex items-center gap-1 px-2'>
+                      <span className='text-sm'>
+                        Página {page} de {Math.ceil((data.total || 0) / 20)}
+                      </span>
+                    </div>
                     <Button
                       variant='outline'
                       size='sm'
                       onClick={() => setPage(page + 1)}
-                      disabled={
-                        !data.total || page * data.perPage >= data.total
-                      }
+                      disabled={!data.total || page * 20 >= data.total}
                     >
                       Próxima
                     </Button>
