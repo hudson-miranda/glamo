@@ -44,6 +44,7 @@ import { Plus, Users, Search, Filter, ArrowUpDown, Settings2, X, Eye, Edit, Tras
 import { useSalonContext } from '../../hooks/useSalonContext';
 import { useToast } from '../../../components/ui/use-toast';
 import { EmployeeStatsCards } from './components/EmployeeStatsCards';
+import { EmployeeFormModal } from './components/EmployeeFormModal';
 
 // Definição de colunas disponíveis
 const AVAILABLE_COLUMNS = [
@@ -64,8 +65,10 @@ export default function EmployeesPage() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isColumnsModalOpen, setIsColumnsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewingEmployee, setViewingEmployee] = useState<any>(null);
   const [employeeToDelete, setEmployeeToDelete] = useState<any>(null);
+  const [editingEmployee, setEditingEmployee] = useState<any>(null);
   
   // Filtros
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -206,8 +209,7 @@ export default function EmployeesPage() {
 
     try {
       await deleteEmployee({
-        employeeId: employeeToDelete.id,
-        salonId: activeSalonId,
+        id: employeeToDelete.id,
       });
 
       toast({
@@ -238,7 +240,10 @@ export default function EmployeesPage() {
             Gerencie a equipe do seu salão
           </p>
         </div>
-        <Button onClick={() => navigate('/employees/new')}>
+        <Button onClick={() => {
+          setEditingEmployee(null);
+          setIsModalOpen(true);
+        }}>
           <Plus className='mr-2 h-4 w-4' />
           Novo Colaborador
         </Button>
@@ -414,7 +419,10 @@ export default function EmployeesPage() {
               }
               action={
                 !hasActiveFilters && (
-                  <Button onClick={() => navigate('/employees/new')}>
+                  <Button onClick={() => {
+                    setEditingEmployee(null);
+                    setIsModalOpen(true);
+                  }}>
                     <Plus className='mr-2 h-4 w-4' />
                     Novo Colaborador
                   </Button>
@@ -480,7 +488,10 @@ export default function EmployeesPage() {
                             <Button
                               variant='ghost'
                               size='sm'
-                              onClick={() => navigate(`/employees/${employee.id}/edit`)}
+                              onClick={() => {
+                                setEditingEmployee(employee);
+                                setIsModalOpen(true);
+                              }}
                               title='Editar'
                             >
                               <Edit className='h-4 w-4' />
@@ -638,6 +649,20 @@ export default function EmployeesPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Employee Form Modal */}
+      <EmployeeFormModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingEmployee(null);
+        }}
+        onSuccess={() => {
+          // Recarrega os dados após salvar
+        }}
+        employee={editingEmployee}
+        salonId={activeSalonId || ''}
+      />
     </div>
   );
 }
