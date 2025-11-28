@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery, listClients, createClient, updateClient, deleteClient } from 'wasp/client/operations';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
@@ -120,8 +120,13 @@ export default function ClientsListPage() {
 
   const hasActiveFilters = filterStatus !== 'all' || filterClientType !== 'all' || filterGender !== 'all' || search !== '';
 
+  // Resetar página quando filtros mudarem
+  useEffect(() => {
+    setPage(1);
+  }, [search, filterStatus, filterClientType, filterGender, sortBy, sortOrder]);
+
   // Filtrar e ordenar clientes
-  const filteredAndSortedClients = data?.clients
+  const allFilteredClients = data?.clients
     ? data.clients
         .filter((client: any) => {
           // Filtro por status
@@ -169,6 +174,12 @@ export default function ClientsListPage() {
           return 0;
         })
     : [];
+
+  // Aplicar paginação
+  const totalPages = Math.ceil(allFilteredClients.length / perPage);
+  const startIndex = (page - 1) * perPage;
+  const endIndex = startIndex + perPage;
+  const filteredAndSortedClients = allFilteredClients.slice(startIndex, endIndex);
 
   // Calculate stats from filtered data
   const stats = useMemo(() => {
@@ -683,7 +694,7 @@ export default function ClientsListPage() {
               <div className='flex items-center justify-between border-t px-6 py-4'>
                 <div className='flex items-center gap-4'>
                   <div className='text-sm text-muted-foreground'>
-                    Mostrando {filteredAndSortedClients.length} de {data.total} clientes
+                    Mostrando {startIndex + 1}-{Math.min(endIndex, allFilteredClients.length)} de {allFilteredClients.length} cliente{allFilteredClients.length !== 1 ? 's' : ''}
                   </div>
                   <select
                     value={perPage}
@@ -710,14 +721,14 @@ export default function ClientsListPage() {
                   </Button>
                   <div className='flex items-center gap-1 px-2'>
                     <span className='text-sm'>
-                      Página {page} de {Math.ceil(data.total / perPage)}
+                      Página {page} de {totalPages || 1}
                     </span>
                   </div>
                   <Button
                     variant='outline'
                     size='sm'
                     onClick={() => setPage(page + 1)}
-                    disabled={page * perPage >= data.total}
+                    disabled={page >= totalPages}
                   >
                     Próxima
                   </Button>

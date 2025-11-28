@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery, listServices, createService, updateService, deleteService, listEmployees, listProducts } from 'wasp/client/operations';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
@@ -279,8 +279,13 @@ export default function ServicesListPage() {
 
   const hasActiveFilters = filterCategory !== 'all' || filterStatus !== 'all' || filterPriceType !== 'all' || search !== '';
 
+  // Resetar página quando filtros mudarem
+  useEffect(() => {
+    setPage(1);
+  }, [search, filterCategory, filterStatus, filterPriceType, sortBy, sortOrder]);
+
   // Filtrar e ordenar serviços
-  const filteredAndSortedServices = data?.services
+  const allFilteredServices = data?.services
     ? data.services
         .filter((service: any) => {
           // Filtro por categoria
@@ -323,6 +328,12 @@ export default function ServicesListPage() {
           return 0;
         })
     : [];
+
+  // Aplicar paginação
+  const totalPages = Math.ceil(allFilteredServices.length / perPage);
+  const startIndex = (page - 1) * perPage;
+  const endIndex = startIndex + perPage;
+  const filteredAndSortedServices = allFilteredServices.slice(startIndex, endIndex);
 
   // Calculate stats from data
   const stats = useMemo(() => {
@@ -690,7 +701,7 @@ export default function ServicesListPage() {
                 <div className='flex items-center justify-between border-t px-6 py-4'>
                   <div className='flex items-center gap-4'>
                     <div className='text-sm text-muted-foreground'>
-                      Mostrando {filteredAndSortedServices.length} de {data.total || 0} serviços
+                      Mostrando {startIndex + 1}-{Math.min(endIndex, allFilteredServices.length)} de {allFilteredServices.length} serviço{allFilteredServices.length !== 1 ? 's' : ''}
                     </div>
                     <select
                       value={perPage}
@@ -717,14 +728,14 @@ export default function ServicesListPage() {
                     </Button>
                     <div className='flex items-center gap-1 px-2'>
                       <span className='text-sm'>
-                        Página {page} de {Math.ceil((data.total || 0) / perPage)}
+                        Página {page} de {totalPages || 1}
                       </span>
                     </div>
                     <Button
                       variant='outline'
                       size='sm'
                       onClick={() => setPage(page + 1)}
-                      disabled={!data.total || page * perPage >= data.total}
+                      disabled={page >= totalPages}
                     >
                       Próxima
                     </Button>

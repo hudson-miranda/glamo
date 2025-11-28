@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery, listEmployees, deleteEmployee } from 'wasp/client/operations';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/button';
@@ -79,6 +79,10 @@ export default function EmployeesPage() {
   const [sortBy, setSortBy] = useState<string>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   
+  // Paginação
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
+  
   // Colunas visíveis
   const [visibleColumns, setVisibleColumns] = useState<string[]>(
     AVAILABLE_COLUMNS.filter(col => col.enabled).map(col => col.id)
@@ -109,6 +113,11 @@ export default function EmployeesPage() {
 
   const hasActiveFilters = filterStatus !== 'all' || filterPosition !== 'all' || filterOnlineBooking !== 'all' || search !== '';
 
+  // Resetar página quando filtros mudarem
+  useEffect(() => {
+    setPage(1);
+  }, [search, filterStatus, filterPosition, filterOnlineBooking, sortBy, sortOrder]);
+
   // Obter posições únicas para filtro
   const uniquePositions = Array.from(
     new Set(
@@ -119,7 +128,7 @@ export default function EmployeesPage() {
   );
 
   // Filtrar e ordenar colaboradores
-  const filteredAndSortedEmployees = data?.employees
+  const allFilteredEmployees = data?.employees
     ? data.employees
         .filter((employee: any) => {
           // Filtro por status
@@ -170,6 +179,12 @@ export default function EmployeesPage() {
           return 0;
         })
     : [];
+
+  // Aplicar paginação
+  const totalPages = Math.ceil(allFilteredEmployees.length / perPage);
+  const startIndex = (page - 1) * perPage;
+  const endIndex = startIndex + perPage;
+  const filteredAndSortedEmployees = allFilteredEmployees.slice(startIndex, endIndex);
 
   // Calculate stats from filtered data
   const stats = useMemo(() => {
@@ -516,9 +531,14 @@ export default function EmployeesPage() {
               <div className='flex items-center justify-between border-t px-6 py-4'>
                 <div className='flex items-center gap-4'>
                   <div className='text-sm text-muted-foreground'>
-                    Mostrando {filteredAndSortedEmployees.length} de {data.employees.length} colaboradores
+                    Mostrando {startIndex + 1}-{Math.min(endIndex, allFilteredEmployees.length)} de {allFilteredEmployees.length} colaborador{allFilteredEmployees.length !== 1 ? 'es' : ''}
                   </div>
                   <select
+                    value={perPage}
+                    onChange={(e) => {
+                      setPerPage(Number(e.target.value));
+                      setPage(1);
+                    }}
                     className='h-8 rounded-md border border-input bg-background px-3 pr-8 text-sm'
                   >
                     <option value={10}>10</option>
@@ -531,19 +551,21 @@ export default function EmployeesPage() {
                   <Button
                     variant='outline'
                     size='sm'
-                    disabled
+                    onClick={() => setPage(page - 1)}
+                    disabled={page === 1}
                   >
                     Anterior
                   </Button>
                   <div className='flex items-center gap-1 px-2'>
                     <span className='text-sm'>
-                      Página 1 de 1
+                      Página {page} de {totalPages || 1}
                     </span>
                   </div>
                   <Button
                     variant='outline'
                     size='sm'
-                    disabled
+                    onClick={() => setPage(page + 1)}
+                    disabled={page >= totalPages}
                   >
                     Próxima
                   </Button>
