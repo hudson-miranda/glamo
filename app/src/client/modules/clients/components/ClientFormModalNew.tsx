@@ -348,13 +348,14 @@ export function ClientFormModalNew({
           </DialogHeader>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
+            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-9">
               <TabsTrigger value="cadastro">Cadastro</TabsTrigger>
               <TabsTrigger value="painel">Painel</TabsTrigger>
               <TabsTrigger value="debitos">Débitos</TabsTrigger>
               <TabsTrigger value="creditos">Créditos</TabsTrigger>
               <TabsTrigger value="pacotes">Pacotes</TabsTrigger>
               <TabsTrigger value="vendas">Vendas</TabsTrigger>
+              <TabsTrigger value="agendamentos">Agendamentos</TabsTrigger>
               <TabsTrigger value="historico">Histórico</TabsTrigger>
               <TabsTrigger value="anamnese">Anamnese</TabsTrigger>
             </TabsList>
@@ -1687,6 +1688,399 @@ export function ClientFormModalNew({
               )}
             </TabsContent>
 
+            {/* ABA 5: PACOTES */}
+            <TabsContent value="pacotes" className="space-y-6 mt-6">
+              {!client ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p>Salve o cliente primeiro para visualizar os pacotes</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 bg-purple-100 rounded-lg">
+                            <svg className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </svg>
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-bold">Pacotes</h3>
+                            <p className="text-sm text-muted-foreground">
+                              Pacotes contratados pelo cliente
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Select defaultValue="all-balance">
+                            <SelectTrigger className="w-[160px]">
+                              <SelectValue placeholder="Saldo" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all-balance">Todos</SelectItem>
+                              <SelectItem value="with-balance">Com saldo</SelectItem>
+                              <SelectItem value="no-balance">Sem saldo</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Select defaultValue="all-status">
+                            <SelectTrigger className="w-[160px]">
+                              <SelectValue placeholder="Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all-status">Todos</SelectItem>
+                              <SelectItem value="billed">Faturados</SelectItem>
+                              <SelectItem value="open">Em aberto</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      {/* Tabela de Pacotes */}
+                      <div className="border rounded-lg overflow-hidden">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="bg-muted/50">
+                              <TableHead>Pacote</TableHead>
+                              <TableHead>Data</TableHead>
+                              <TableHead>Descrição</TableHead>
+                              <TableHead className="text-center">Qtde.</TableHead>
+                              <TableHead className="text-center">Saldo</TableHead>
+                              <TableHead className="text-center">Status</TableHead>
+                              <TableHead className="text-center">Disponibilidade</TableHead>
+                              <TableHead className="text-center">Comandas</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {((client as any)?.packages || []).length > 0 ? (
+                              ((client as any).packages || []).map((pkg: any, index: number) => (
+                                <TableRow key={index}>
+                                  <TableCell>
+                                    <div>
+                                      <p className="font-medium">{pkg.name || `Pacote #${index + 1}`}</p>
+                                      <p className="text-xs text-muted-foreground">
+                                        {pkg.code || 'Sem código'}
+                                      </p>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell>
+                                    <div className="text-sm">
+                                      {pkg.date ? new Date(pkg.date).toLocaleDateString('pt-BR') : '-'}
+                                    </div>
+                                  </TableCell>
+                                  <TableCell>
+                                    <div className="text-sm max-w-xs truncate">
+                                      {pkg.description || 'Sem descrição'}
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    <span className="text-sm font-medium">
+                                      {pkg.quantity || 0}
+                                    </span>
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    <span className={`text-sm font-semibold ${(pkg.balance || 0) > 0 ? 'text-green-600' : 'text-gray-400'}`}>
+                                      {pkg.balance || 0}
+                                    </span>
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    <Badge 
+                                      variant={pkg.status === 'billed' ? 'default' : 'secondary'}
+                                      className="text-xs"
+                                    >
+                                      {pkg.status === 'billed' ? 'Faturado' : 'Em aberto'}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    <Badge 
+                                      variant={(pkg.balance || 0) > 0 ? 'default' : 'secondary'}
+                                      className={`text-xs ${(pkg.balance || 0) > 0 ? 'bg-green-500' : ''}`}
+                                    >
+                                      {(pkg.balance || 0) > 0 ? 'Disponível' : 'Esgotado'}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    <Button size="sm" variant="outline">
+                                      <Eye className="h-4 w-4 mr-1" />
+                                      Ver
+                                    </Button>
+                                  </TableCell>
+                                </TableRow>
+                              ))
+                            ) : (
+                              <TableRow>
+                                <TableCell colSpan={8} className="h-32">
+                                  <div className="flex flex-col items-center justify-center text-center">
+                                    <div className="p-4 bg-muted rounded-full mb-3">
+                                      <svg className="h-8 w-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                      </svg>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground">Nenhum item encontrado</p>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            )}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* ABA 6: VENDAS */}
+            <TabsContent value="vendas" className="space-y-6 mt-6">
+              {!client ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p>Salve o cliente primeiro para visualizar as vendas</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 bg-blue-100 rounded-lg">
+                            <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-bold">Vendas</h3>
+                            <p className="text-sm text-muted-foreground">
+                              Histórico de vendas e produtos
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="date"
+                            placeholder="Data inicial"
+                            className="w-[140px]"
+                          />
+                          <span className="text-sm text-muted-foreground">até</span>
+                          <Input
+                            type="date"
+                            placeholder="Data final"
+                            className="w-[140px]"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Tabela de Vendas */}
+                      <div className="border rounded-lg overflow-hidden">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="bg-muted/50">
+                              <TableHead>Comanda</TableHead>
+                              <TableHead>Data</TableHead>
+                              <TableHead>Descrição</TableHead>
+                              <TableHead className="text-right">Valor</TableHead>
+                              <TableHead className="text-center">Profissional</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {((client as any)?.sales || []).length > 0 ? (
+                              ((client as any).sales || []).map((sale: any, index: number) => (
+                                <TableRow key={index}>
+                                  <TableCell>
+                                    <div>
+                                      <p className="font-medium">
+                                        {sale.billNumber ? `#${sale.billNumber}` : '-'}
+                                      </p>
+                                      <p className="text-xs text-muted-foreground">
+                                        {sale.type === 'product' ? 'Produto' : 'Serviço'}
+                                      </p>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell>
+                                    <div className="text-sm">
+                                      {sale.date ? new Date(sale.date).toLocaleDateString('pt-BR') : '-'}
+                                    </div>
+                                  </TableCell>
+                                  <TableCell>
+                                    <div>
+                                      <p className="text-sm font-medium">{sale.description || 'Venda'}</p>
+                                      {sale.quantity && (
+                                        <p className="text-xs text-muted-foreground">
+                                          Qtd: {sale.quantity}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="text-right">
+                                    <span className="font-semibold text-green-600">
+                                      R$ {(sale.amount || 0).toFixed(2)}
+                                    </span>
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    <span className="text-sm">
+                                      {sale.professional || '-'}
+                                    </span>
+                                  </TableCell>
+                                </TableRow>
+                              ))
+                            ) : (
+                              <TableRow>
+                                <TableCell colSpan={5} className="h-32">
+                                  <div className="flex flex-col items-center justify-center text-center">
+                                    <div className="p-4 bg-muted rounded-full mb-3">
+                                      <svg className="h-8 w-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                      </svg>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground">Nenhum item encontrado</p>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            )}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* ABA 7: AGENDAMENTOS - Needs to be added to TabsList */}
+            <TabsContent value="agendamentos" className="space-y-6 mt-6">
+              {!client ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p>Salve o cliente primeiro para visualizar os agendamentos</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 bg-indigo-100 rounded-lg">
+                            <svg className="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-bold">Agendamentos</h3>
+                            <p className="text-sm text-muted-foreground">
+                              Histórico de agendamentos do cliente
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="date"
+                            placeholder="Data inicial"
+                            className="w-[140px]"
+                          />
+                          <span className="text-sm text-muted-foreground">até</span>
+                          <Input
+                            type="date"
+                            placeholder="Data final"
+                            className="w-[140px]"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Tabela de Agendamentos */}
+                      <div className="border rounded-lg overflow-hidden">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="bg-muted/50">
+                              <TableHead>Data</TableHead>
+                              <TableHead>Serviço</TableHead>
+                              <TableHead className="text-center">Status</TableHead>
+                              <TableHead className="text-center">Profissional</TableHead>
+                              <TableHead className="text-center">Comanda</TableHead>
+                              <TableHead className="text-center">Ações</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {((client as any)?.appointments || []).length > 0 ? (
+                              ((client as any).appointments || []).map((appointment: any, index: number) => (
+                                <TableRow key={index}>
+                                  <TableCell>
+                                    <div>
+                                      <p className="text-sm font-medium">
+                                        {appointment.date ? new Date(appointment.date).toLocaleDateString('pt-BR') : '-'}
+                                      </p>
+                                      <p className="text-xs text-muted-foreground">
+                                        {appointment.time || '-'}
+                                      </p>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell>
+                                    <div>
+                                      <p className="text-sm font-medium">{appointment.service || 'Serviço'}</p>
+                                      <p className="text-xs text-muted-foreground">
+                                        {appointment.duration ? `${appointment.duration} min` : '-'}
+                                      </p>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    <Badge 
+                                      variant={
+                                        appointment.status === 'completed' ? 'default' :
+                                        appointment.status === 'confirmed' ? 'default' :
+                                        appointment.status === 'cancelled' ? 'destructive' :
+                                        'secondary'
+                                      }
+                                      className={
+                                        appointment.status === 'completed' ? 'bg-green-500' :
+                                        appointment.status === 'confirmed' ? 'bg-blue-500' :
+                                        appointment.status === 'cancelled' ? '' :
+                                        ''
+                                      }
+                                    >
+                                      {appointment.status === 'completed' ? 'Concluído' :
+                                       appointment.status === 'confirmed' ? 'Confirmado' :
+                                       appointment.status === 'cancelled' ? 'Cancelado' :
+                                       'Pendente'}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    <span className="text-sm">
+                                      {appointment.professional || '-'}
+                                    </span>
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    <span className="text-sm">
+                                      {appointment.billNumber ? `#${appointment.billNumber}` : '-'}
+                                    </span>
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    <Button size="sm" variant="outline">
+                                      <Eye className="h-4 w-4 mr-1" />
+                                      Ver
+                                    </Button>
+                                  </TableCell>
+                                </TableRow>
+                              ))
+                            ) : (
+                              <TableRow>
+                                <TableCell colSpan={6} className="h-32">
+                                  <div className="flex flex-col items-center justify-center text-center">
+                                    <div className="p-4 bg-muted rounded-full mb-3">
+                                      <svg className="h-8 w-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                      </svg>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground">Nenhum item encontrado</p>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            )}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+            </TabsContent>
+
             {/* Outras abas - Placeholder por enquanto */}
             <TabsContent value="historico" className="space-y-6 mt-6">
               <div className="text-center py-12 text-muted-foreground">
@@ -1694,33 +2088,9 @@ export function ClientFormModalNew({
               </div>
             </TabsContent>
 
-            <TabsContent value="pacotes" className="space-y-6 mt-6">
-              <div className="text-center py-12 text-muted-foreground">
-                Aba Pacotes - Em desenvolvimento
-              </div>
-            </TabsContent>
-
-            <TabsContent value="vendas" className="space-y-6 mt-6">
-              <div className="text-center py-12 text-muted-foreground">
-                Aba Créditos - Em desenvolvimento
-              </div>
-            </TabsContent>
-
-            <TabsContent value="vendas" className="space-y-6 mt-6">
-              <div className="text-center py-12 text-muted-foreground">
-                Aba Vendas - Em desenvolvimento
-              </div>
-            </TabsContent>
-
             <TabsContent value="anamnese" className="space-y-6 mt-6">
               <div className="text-center py-12 text-muted-foreground">
                 Aba Anamnese - Em desenvolvimento
-              </div>
-            </TabsContent>
-
-            <TabsContent value="avaliacoes" className="space-y-6 mt-6">
-              <div className="text-center py-12 text-muted-foreground">
-                Aba Avaliações - Em desenvolvimento
               </div>
             </TabsContent>
           </Tabs>
