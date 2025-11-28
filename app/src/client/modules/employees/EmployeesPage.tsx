@@ -507,15 +507,12 @@ export default function EmployeesPage() {
                   <div className='text-sm text-muted-foreground'>
                     Mostrando {filteredAndSortedEmployees.length} de {data.employees.length} colaboradores
                   </div>
-                  <div className='flex items-center gap-2'>
-                    <span className='text-sm text-muted-foreground'>Itens por página:</span>
-                    <select
-                      disabled
-                      className='h-8 rounded-md border border-input bg-background px-2 text-sm opacity-50 cursor-not-allowed'
-                    >
-                      <option value={25}>25</option>
-                    </select>
-                  </div>
+                  <select
+                    disabled
+                    className='h-8 rounded-md border border-input bg-background px-3 pr-8 text-sm opacity-50 cursor-not-allowed'
+                  >
+                    <option value={25}>25</option>
+                  </select>
                 </div>
                 <div className='flex items-center space-x-2'>
                   <Button

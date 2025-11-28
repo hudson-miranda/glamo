@@ -692,22 +692,19 @@ export default function ServicesListPage() {
                     <div className='text-sm text-muted-foreground'>
                       Mostrando {filteredAndSortedServices.length} de {data.total || 0} serviços
                     </div>
-                    <div className='flex items-center gap-2'>
-                      <span className='text-sm text-muted-foreground'>Itens por página:</span>
-                      <select
-                        value={perPage}
-                        onChange={(e) => {
-                          setPerPage(Number(e.target.value));
-                          setPage(1);
-                        }}
-                        className='h-8 rounded-md border border-input bg-background px-2 text-sm'
-                      >
-                        <option value={10}>10</option>
-                        <option value={25}>25</option>
-                        <option value={50}>50</option>
-                        <option value={100}>100</option>
-                      </select>
-                    </div>
+                    <select
+                      value={perPage}
+                      onChange={(e) => {
+                        setPerPage(Number(e.target.value));
+                        setPage(1);
+                      }}
+                      className='h-8 rounded-md border border-input bg-background px-3 pr-8 text-sm'
+                    >
+                      <option value={10}>10</option>
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                    </select>
                   </div>
                   <div className='flex items-center space-x-2'>
                     <Button
