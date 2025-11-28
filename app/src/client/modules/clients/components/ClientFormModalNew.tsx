@@ -146,6 +146,16 @@ export function ClientFormModalNew({
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [customMessage, setCustomMessage] = useState('');
   const [isSendingMessage, setIsSendingMessage] = useState(false);
+  
+  // Estados para a aba Anotações
+  const [newNote, setNewNote] = useState('');
+  const [isSavingNote, setIsSavingNote] = useState(false);
+  const [notesList, setNotesList] = useState<Array<{
+    id: string;
+    content: string;
+    createdAt: string;
+    createdBy: string;
+  }>>([]);
 
   const {
     register,
@@ -226,6 +236,7 @@ export function ClientFormModalNew({
         });
         setHashtags((client as any).hashtags || []);
         setDependents((client as any).dependents || []);
+        setNotesList((client as any).notes_list || []);
       } else {
         reset({
           photoPath: '',
@@ -260,6 +271,7 @@ export function ClientFormModalNew({
         });
         setHashtags([]);
         setDependents([]);
+        setNotesList([]);
       }
       setActiveTab('cadastro');
     }
@@ -353,7 +365,7 @@ export function ClientFormModalNew({
           </DialogHeader>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-5 lg:grid-cols-10">
+            <TabsList className="grid w-full grid-cols-6 lg:grid-cols-11">
               <TabsTrigger value="cadastro">Cadastro</TabsTrigger>
               <TabsTrigger value="painel">Painel</TabsTrigger>
               <TabsTrigger value="debitos">Débitos</TabsTrigger>
@@ -362,6 +374,7 @@ export function ClientFormModalNew({
               <TabsTrigger value="vendas">Vendas</TabsTrigger>
               <TabsTrigger value="agendamentos">Agendamentos</TabsTrigger>
               <TabsTrigger value="mensagens">Mensagens</TabsTrigger>
+              <TabsTrigger value="anotacoes">Anotações</TabsTrigger>
               <TabsTrigger value="historico">Histórico</TabsTrigger>
               <TabsTrigger value="anamnese">Anamnese</TabsTrigger>
             </TabsList>
@@ -2398,6 +2411,272 @@ export function ClientFormModalNew({
                             </p>
                             <p className="text-xs text-muted-foreground">
                               As mensagens enviadas aparecerão aqui
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* ABA 9: ANOTAÇÕES */}
+            <TabsContent value="anotacoes" className="space-y-6 mt-6">
+              {!client ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p>Salve o cliente primeiro para adicionar anotações</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Seção de Nova Anotação */}
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="p-3 bg-amber-100 rounded-lg">
+                          <svg className="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold">Nova Anotação</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Adicione observações importantes sobre o cliente
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        {/* Campo de Nova Anotação */}
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <Label htmlFor="new-note" className="text-sm font-medium">
+                              Conteúdo da Anotação
+                            </Label>
+                            <span className="text-xs text-muted-foreground">
+                              {newNote.length} / 2000 caracteres
+                            </span>
+                          </div>
+                          <Textarea
+                            id="new-note"
+                            placeholder="Digite aqui suas observações sobre o cliente...&#10;&#10;Exemplos:&#10;• Preferências de serviços&#10;• Alergias ou restrições&#10;• Feedback de atendimentos anteriores&#10;• Lembretes importantes"
+                            value={newNote}
+                            onChange={(e) => setNewNote(e.target.value)}
+                            className="min-h-[180px] resize-none"
+                            maxLength={2000}
+                          />
+                          <div className="flex items-start gap-2 text-xs text-muted-foreground">
+                            <svg className="h-4 w-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>
+                              As anotações são privadas e visíveis apenas para a equipe do salão. 
+                              Use este espaço para registrar informações relevantes que ajudem a melhorar o atendimento.
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Botão de Salvar */}
+                        <div className="flex justify-end">
+                          <Button
+                            type="button"
+                            disabled={!newNote.trim() || isSavingNote}
+                            onClick={async () => {
+                              setIsSavingNote(true);
+                              try {
+                                // Simula salvamento
+                                await new Promise(resolve => setTimeout(resolve, 800));
+                                
+                                // Adiciona a nova anotação ao histórico
+                                const newNoteItem = {
+                                  id: `note-${Date.now()}`,
+                                  content: newNote,
+                                  createdAt: new Date().toISOString(),
+                                  createdBy: 'Usuário Atual', // Substituir pelo nome do usuário logado
+                                };
+                                
+                                setNotesList([newNoteItem, ...notesList]);
+                                
+                                toast({
+                                  title: 'Anotação salva!',
+                                  description: 'A anotação foi adicionada com sucesso.',
+                                });
+                                
+                                // Limpar campo
+                                setNewNote('');
+                              } catch (error) {
+                                toast({
+                                  title: 'Erro ao salvar anotação',
+                                  description: 'Tente novamente mais tarde.',
+                                  variant: 'destructive',
+                                });
+                              } finally {
+                                setIsSavingNote(false);
+                              }
+                            }}
+                            className="gap-2"
+                          >
+                            {isSavingNote ? (
+                              <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Salvando...
+                              </>
+                            ) : (
+                              <>
+                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                Salvar Anotação
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Histórico de Anotações */}
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 bg-slate-100 rounded-lg">
+                            <svg className="h-6 w-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-bold">Histórico de Anotações</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {notesList.length > 0 
+                                ? `${notesList.length} anotaç${notesList.length === 1 ? 'ão' : 'ões'} registrada${notesList.length === 1 ? '' : 's'}`
+                                : 'Nenhuma anotação ainda'}
+                            </p>
+                          </div>
+                        </div>
+                        {notesList.length > 0 && (
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => {
+                              // Aqui poderia ter uma função de exportar ou filtrar
+                              toast({
+                                title: 'Em desenvolvimento',
+                                description: 'Funcionalidade de filtros em breve.',
+                              });
+                            }}
+                          >
+                            <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                            </svg>
+                            Filtrar
+                          </Button>
+                        )}
+                      </div>
+
+                      {/* Lista de Anotações */}
+                      <div className="space-y-4">
+                        {/* Combina anotações do cliente existente com as novas */}
+                        {[...notesList, ...((client as any)?.notes_list || [])].length > 0 ? (
+                          <div className="space-y-3">
+                            {[...notesList, ...((client as any)?.notes_list || [])].map((note: any, index: number) => (
+                              <div 
+                                key={note.id || index} 
+                                className="group relative p-4 rounded-lg border bg-card hover:bg-muted/30 transition-colors"
+                              >
+                                {/* Header da Anotação */}
+                                <div className="flex items-start justify-between gap-3 mb-3">
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                                      <svg className="h-4 w-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                      </svg>
+                                    </div>
+                                    <div>
+                                      <p className="text-sm font-medium">{note.createdBy || 'Usuário'}</p>
+                                      <p className="text-xs text-muted-foreground">
+                                        {note.createdAt 
+                                          ? new Date(note.createdAt).toLocaleDateString('pt-BR', {
+                                              day: '2-digit',
+                                              month: '2-digit',
+                                              year: 'numeric',
+                                              hour: '2-digit',
+                                              minute: '2-digit'
+                                            })
+                                          : '-'}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Ações */}
+                                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => {
+                                        setNewNote(note.content);
+                                        toast({
+                                          title: 'Anotação copiada',
+                                          description: 'O conteúdo foi copiado para edição.',
+                                        });
+                                      }}
+                                    >
+                                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                      </svg>
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                      onClick={() => {
+                                        if (confirm('Deseja realmente excluir esta anotação?')) {
+                                          setNotesList(notesList.filter(n => n.id !== note.id));
+                                          toast({
+                                            title: 'Anotação excluída',
+                                            description: 'A anotação foi removida com sucesso.',
+                                          });
+                                        }
+                                      }}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </div>
+
+                                {/* Conteúdo da Anotação */}
+                                <div className="pl-10">
+                                  <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
+                                    {note.content}
+                                  </p>
+                                </div>
+
+                                {/* Tags/Categorias (futuro) */}
+                                {note.tags && note.tags.length > 0 && (
+                                  <div className="pl-10 mt-3 flex flex-wrap gap-1">
+                                    {note.tags.map((tag: string, tagIndex: number) => (
+                                      <Badge key={tagIndex} variant="secondary" className="text-xs">
+                                        {tag}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center py-16 text-center">
+                            <div className="p-4 bg-muted rounded-full mb-4">
+                              <svg className="h-10 w-10 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                            </div>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">
+                              Nenhuma anotação registrada ainda
+                            </p>
+                            <p className="text-xs text-muted-foreground max-w-sm">
+                              Comece adicionando observações importantes sobre este cliente no campo acima
                             </p>
                           </div>
                         )}
