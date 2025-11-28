@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery, listCategories, createCategory, updateCategory, deleteCategory } from 'wasp/client/operations';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
@@ -119,6 +119,11 @@ export default function CategoriesListPage() {
     setIsViewModalOpen(false);
   };
 
+  // Resetar página quando filtros mudarem
+  useEffect(() => {
+    setPage(1);
+  }, [search, filterStatus, filterServices, sortBy, sortOrder]);
+
   const handleToggleColumn = (columnId: string) => {
     setVisibleColumns(prev => 
       prev.includes(columnId) 
@@ -238,7 +243,7 @@ export default function CategoriesListPage() {
   }, [categories]);
 
   // Filtrar e ordenar categorias
-  const filteredAndSortedCategories = (categories || [])
+  const allFilteredCategories = (categories || [])
     .filter((category: any) => {
       // Filtro por status
       if (filterStatus === 'active' && !category.active) return false;
@@ -271,6 +276,12 @@ export default function CategoriesListPage() {
       if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
       return 0;
     });
+
+  // Aplicar paginação
+  const totalPages = Math.ceil(allFilteredCategories.length / perPage);
+  const startIndex = (page - 1) * perPage;
+  const endIndex = startIndex + perPage;
+  const filteredAndSortedCategories = allFilteredCategories.slice(startIndex, endIndex);
 
   return (
     <div className='space-y-6'>
@@ -558,7 +569,7 @@ export default function CategoriesListPage() {
               <div className='flex items-center justify-between border-t px-6 py-4'>
                 <div className='flex items-center gap-4'>
                   <div className='text-sm text-muted-foreground'>
-                    Mostrando {filteredAndSortedCategories.length} de {categories?.length || 0} categorias
+                    Mostrando {startIndex + 1}-{Math.min(endIndex, allFilteredCategories.length)} de {allFilteredCategories.length} categoria{allFilteredCategories.length !== 1 ? 's' : ''}
                   </div>
                   <select
                     value={perPage}
@@ -585,14 +596,14 @@ export default function CategoriesListPage() {
                   </Button>
                   <div className='flex items-center gap-1 px-2'>
                     <span className='text-sm'>
-                      Página {page} de {Math.ceil((categories?.length || 0) / perPage)}
+                      Página {page} de {totalPages || 1}
                     </span>
                   </div>
                   <Button
                     variant='outline'
                     size='sm'
                     onClick={() => setPage(page + 1)}
-                    disabled={!categories || page * perPage >= categories.length}
+                    disabled={page >= totalPages}
                   >
                     Próxima
                   </Button>
