@@ -98,6 +98,12 @@ const navSections: NavSection[] = [
         permission: 'can_view_services',
       },
       {
+        title: 'Produtos',
+        href: '/products',
+        icon: Package,
+        permission: 'can_view_products',
+      },
+      {
         title: 'Estoque',
         href: '/inventory',
         icon: Package,

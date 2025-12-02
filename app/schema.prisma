@@ -1183,15 +1183,26 @@ model Product {
   name                String
   costPrice           Float
   salePrice           Float
+  professionalPrice   Float?
   stockQuantity       Int       @default(0)
   initialStock        Int       @default(0)
   minimumStock        Int       @default(0)
   saleCommissionValue Float     @default(0)
   saleCommissionType  ValueType @default(FIXED)
+  additionalCostValue Float     @default(0)
+  additionalCostType  ValueType @default(FIXED)
   unitOfMeasure       String?
   quantityPerPackage  Int       @default(1)
   barcode             String?
   sku                 String?
+  expirationDate      DateTime?
+  notes               String?
+  isActive            Boolean   @default(true)
+  isFavorite          Boolean   @default(false)
+  controlStock        Boolean   @default(true)
+  cashbackActive      Boolean   @default(false)
+  cashbackValue       Float     @default(0)
+  cashbackType        ValueType @default(FIXED)
   deletedAt           DateTime?
 
   salon                   Salon                       @relation(fields: [salonId], references: [id], onDelete: Restrict)

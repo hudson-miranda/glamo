@@ -60,14 +60,25 @@ type CreateProductInput = {
   name: string;
   costPrice: number;
   salePrice: number;
+  professionalPrice?: number;
   initialStock?: number;
   minimumStock?: number;
   saleCommissionValue?: number;
   saleCommissionType?: 'FIXED' | 'PERCENT';
+  additionalCostValue?: number;
+  additionalCostType?: 'FIXED' | 'PERCENT';
   unitOfMeasure?: string;
   quantityPerPackage?: number;
   barcode?: string;
   sku?: string;
+  expirationDate?: Date;
+  notes?: string;
+  isActive?: boolean;
+  isFavorite?: boolean;
+  controlStock?: boolean;
+  cashbackActive?: boolean;
+  cashbackValue?: number;
+  cashbackType?: 'FIXED' | 'PERCENT';
 };
 
 type UpdateProductInput = {
@@ -79,13 +90,24 @@ type UpdateProductInput = {
   name?: string;
   costPrice?: number;
   salePrice?: number;
+  professionalPrice?: number;
   minimumStock?: number;
   saleCommissionValue?: number;
   saleCommissionType?: 'FIXED' | 'PERCENT';
+  additionalCostValue?: number;
+  additionalCostType?: 'FIXED' | 'PERCENT';
   unitOfMeasure?: string;
   quantityPerPackage?: number;
   barcode?: string;
   sku?: string;
+  expirationDate?: Date;
+  notes?: string;
+  isActive?: boolean;
+  isFavorite?: boolean;
+  controlStock?: boolean;
+  cashbackActive?: boolean;
+  cashbackValue?: number;
+  cashbackType?: 'FIXED' | 'PERCENT';
 };
 
 type DeleteProductInput = {
@@ -436,8 +458,10 @@ export const getLowStockProducts: GetLowStockProducts<GetLowStockProductsInput, 
  * Permission required: can_create_products
  */
 export const createProduct: CreateProduct<CreateProductInput, any> = async (
-  { salonId, categoryId, brandId, supplierId, name, costPrice, salePrice, initialStock = 0, minimumStock = 0, 
-    saleCommissionValue = 0, saleCommissionType = 'FIXED', unitOfMeasure, quantityPerPackage = 1, barcode, sku },
+  { salonId, categoryId, brandId, supplierId, name, costPrice, salePrice, professionalPrice, initialStock = 0, minimumStock = 0, 
+    saleCommissionValue = 0, saleCommissionType = 'FIXED', additionalCostValue = 0, additionalCostType = 'FIXED',
+    unitOfMeasure, quantityPerPackage = 1, barcode, sku, expirationDate, notes, 
+    isActive = true, isFavorite = false, controlStock = true, cashbackActive = false, cashbackValue = 0, cashbackType = 'FIXED' },
   context
 ) => {
   if (!context.user) {
@@ -499,15 +523,26 @@ export const createProduct: CreateProduct<CreateProductInput, any> = async (
       name,
       costPrice,
       salePrice,
+      professionalPrice,
       stockQuantity: initialStock,
       initialStock,
       minimumStock,
       saleCommissionValue,
       saleCommissionType,
+      additionalCostValue,
+      additionalCostType,
       unitOfMeasure,
       quantityPerPackage,
       barcode,
       sku,
+      expirationDate,
+      notes,
+      isActive,
+      isFavorite,
+      controlStock,
+      cashbackActive,
+      cashbackValue,
+      cashbackType,
     },
     include: {
       category: true,
