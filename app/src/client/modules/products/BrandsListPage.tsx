@@ -245,8 +245,8 @@ export default function BrandsListPage() {
 
     return {
       total: brands.length,
-      withProducts: brands.filter((b) => (b._count?.products || 0) > 0).length,
-      withoutProducts: brands.filter((b) => (b._count?.products || 0) === 0).length,
+      withProducts: brands.filter((b: any) => (b._count?.products || 0) > 0).length,
+      withoutProducts: brands.filter((b: any) => (b._count?.products || 0) === 0).length,
     };
   }, [brands]);
 
