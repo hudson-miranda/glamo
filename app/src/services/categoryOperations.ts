@@ -29,6 +29,7 @@ type CreateCategoryInput = {
   name: string;
   description?: string;
   active?: boolean;
+  type?: 'SERVICE' | 'PRODUCT' | 'BOTH';
 };
 
 type UpdateCategoryInput = {
@@ -37,6 +38,7 @@ type UpdateCategoryInput = {
   name?: string;
   description?: string;
   active?: boolean;
+  type?: 'SERVICE' | 'PRODUCT' | 'BOTH';
 };
 
 type DeleteCategoryInput = {
@@ -79,12 +81,9 @@ export const listCategories: ListCategories<ListCategoriesInput, any> = async (
     ];
   }
 
-  // Get categories
+  // Get categories (show all types since user can manage them)
   const categories = await context.entities.Category.findMany({
-    where: {
-      ...where,
-      type: { in: ['SERVICE', 'BOTH'] },
-    },
+    where,
     orderBy: [
       { active: 'desc' },
       { name: 'asc' },
@@ -164,7 +163,7 @@ export const getCategory: GetCategory<GetCategoryInput, any> = async (
  * Permission required: can_create_services
  */
 export const createCategory: CreateCategory<CreateCategoryInput, any> = async (
-  { salonId, name, description, active = true },
+  { salonId, name, description, active = true, type = 'BOTH' },
   context
 ) => {
   if (!context.user) {
@@ -195,7 +194,6 @@ export const createCategory: CreateCategory<CreateCategoryInput, any> = async (
         equals: name.trim(),
         mode: 'insensitive',
       },
-      type: { in: ['SERVICE', 'BOTH'] },
       deletedAt: null,
     },
   });
@@ -211,7 +209,7 @@ export const createCategory: CreateCategory<CreateCategoryInput, any> = async (
       name: name.trim(),
       description: description?.trim(),
       active,
-      type: 'SERVICE',
+      type: type || 'BOTH',
     },
     include: {
       _count: {
@@ -246,7 +244,7 @@ export const createCategory: CreateCategory<CreateCategoryInput, any> = async (
  * Permission required: can_edit_services
  */
 export const updateCategory: UpdateCategory<UpdateCategoryInput, any> = async (
-  { categoryId, salonId, name, description, active },
+  { categoryId, salonId, name, description, active, type },
   context
 ) => {
   if (!context.user) {
@@ -311,6 +309,7 @@ export const updateCategory: UpdateCategory<UpdateCategoryInput, any> = async (
   if (name !== undefined) updateData.name = name.trim();
   if (description !== undefined) updateData.description = description?.trim();
   if (active !== undefined) updateData.active = active;
+  if (type !== undefined) updateData.type = type;
 
   // Update the category
   const category = await context.entities.Category.update({

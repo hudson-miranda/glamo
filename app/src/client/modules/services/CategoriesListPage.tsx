@@ -56,6 +56,7 @@ import {
 // Definição de colunas disponíveis
 const AVAILABLE_COLUMNS = [
   { id: 'name', label: 'Nome', enabled: true },
+  { id: 'type', label: 'Tipo', enabled: true },
   { id: 'description', label: 'Descrição', enabled: true },
   { id: 'services', label: 'Serviços', enabled: true },
   { id: 'status', label: 'Status', enabled: true },
@@ -78,6 +79,7 @@ export default function CategoriesListPage() {
   // Filtros
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterServices, setFilterServices] = useState<string>('all');
+  const [filterType, setFilterType] = useState<string>('all');
   
   // Ordenação
   const [sortBy, setSortBy] = useState<string>('name');
@@ -135,10 +137,11 @@ export default function CategoriesListPage() {
   const handleClearFilters = () => {
     setFilterStatus('all');
     setFilterServices('all');
+    setFilterType('all');
     setSearch('');
   };
 
-  const hasActiveFilters = filterStatus !== 'all' || filterServices !== 'all' || search !== '';
+  const hasActiveFilters = filterStatus !== 'all' || filterServices !== 'all' || filterType !== 'all' || search !== '';
 
   const handleSubmitCategory = async (formData: any) => {
     if (!activeSalonId) {
@@ -154,6 +157,7 @@ export default function CategoriesListPage() {
           name: formData.name,
           description: formData.description || undefined,
           active: formData.active,
+          type: formData.type,
         });
 
         toast({
@@ -167,6 +171,7 @@ export default function CategoriesListPage() {
           name: formData.name,
           description: formData.description || undefined,
           active: formData.active,
+          type: formData.type,
         });
 
         toast({
@@ -252,6 +257,8 @@ export default function CategoriesListPage() {
       const servicesCount = category._count?.services || 0;
       if (filterServices === 'with' && servicesCount === 0) return false;
       if (filterServices === 'without' && servicesCount > 0) return false;
+      // Filtro por tipo
+      if (filterType !== 'all' && category.type !== filterType) return false;
       return true;
     })
     .sort((a: any, b: any) => {
@@ -340,7 +347,7 @@ export default function CategoriesListPage() {
                     Filtros
                     {hasActiveFilters && (
                       <Badge variant='secondary' className='ml-1 px-1.5 py-0.5 text-xs'>
-                        {[filterStatus !== 'all', filterServices !== 'all'].filter(Boolean).length}
+                        {[filterStatus !== 'all', filterServices !== 'all', filterType !== 'all'].filter(Boolean).length}
                       </Badge>
                     )}
                   </Button>
@@ -373,6 +380,20 @@ export default function CategoriesListPage() {
                         <option value='all'>Todos</option>
                         <option value='with'>Com serviços</option>
                         <option value='without'>Sem serviços</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <Label className='text-xs text-muted-foreground mb-1.5 block'>Tipo</Label>
+                      <select
+                        className='w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
+                        value={filterType}
+                        onChange={(e) => setFilterType(e.target.value)}
+                      >
+                        <option value='all'>Todos os Tipos</option>
+                        <option value='SERVICE'>Apenas Serviços</option>
+                        <option value='PRODUCT'>Apenas Produtos</option>
+                        <option value='BOTH'>Ambos</option>
                       </select>
                     </div>
                   </div>
@@ -483,6 +504,7 @@ export default function CategoriesListPage() {
               <TableHeader>
                 <TableRow>
                   {visibleColumns.includes('name') && <TableHead>Nome</TableHead>}
+                  {visibleColumns.includes('type') && <TableHead className='text-center'>Tipo</TableHead>}
                   {visibleColumns.includes('description') && <TableHead>Descrição</TableHead>}
                   {visibleColumns.includes('services') && <TableHead className='text-center'>Serviços</TableHead>}
                   {visibleColumns.includes('status') && <TableHead className='text-center'>Status</TableHead>}
@@ -494,6 +516,21 @@ export default function CategoriesListPage() {
                   <TableRow key={category.id}>
                     {visibleColumns.includes('name') && (
                       <TableCell className='font-medium'>{category.name}</TableCell>
+                    )}
+                    {visibleColumns.includes('type') && (
+                      <TableCell className='text-center'>
+                        <Badge 
+                          variant={
+                            category.type === 'SERVICE' ? 'default' :
+                            category.type === 'PRODUCT' ? 'secondary' :
+                            'outline'
+                          }
+                        >
+                          {category.type === 'SERVICE' && 'Serviço'}
+                          {category.type === 'PRODUCT' && 'Produto'}
+                          {category.type === 'BOTH' && 'Ambos'}
+                        </Badge>
+                      </TableCell>
                     )}
                     {visibleColumns.includes('description') && (
                       <TableCell className='max-w-xs'>

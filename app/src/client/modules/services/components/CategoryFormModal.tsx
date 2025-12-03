@@ -15,12 +15,20 @@ import { Input } from '../../../../components/ui/input';
 import { Label } from '../../../../components/ui/label';
 import { Textarea } from '../../../../components/ui/textarea';
 import { Switch } from '../../../../components/ui/switch';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../../components/ui/select';
 import { Loader2 } from 'lucide-react';
 
 const categorySchema = z.object({
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres').max(100),
   description: z.string().max(500).optional(),
   active: z.boolean(),
+  type: z.enum(['SERVICE', 'PRODUCT', 'BOTH']),
 });
 
 type CategoryFormData = z.infer<typeof categorySchema>;
@@ -30,6 +38,7 @@ interface Category {
   name: string;
   description?: string | null;
   active: boolean;
+  type: 'SERVICE' | 'PRODUCT' | 'BOTH';
 }
 
 interface CategoryFormModalProps {
@@ -60,6 +69,7 @@ export function CategoryFormModal({
       name: '',
       description: '',
       active: true,
+      type: 'BOTH' as const,
     },
   });
 
@@ -71,12 +81,14 @@ export function CategoryFormModal({
           name: category.name,
           description: category.description || '',
           active: category.active,
+          type: category.type || 'BOTH',
         });
       } else {
         reset({
           name: '',
           description: '',
           active: true,
+          type: 'BOTH',
         });
       }
     }
@@ -135,6 +147,46 @@ export function CategoryFormModal({
               />
               <p className="text-xs text-muted-foreground mt-1 text-right">
                 {watch('description')?.length || 0}/500 caracteres
+              </p>
+            </div>
+
+            {/* Tipo */}
+            <div>
+              <Label htmlFor="type">
+                Tipo de Categoria <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={watch('type')}
+                onValueChange={(value) => setValue('type', value as 'SERVICE' | 'PRODUCT' | 'BOTH')}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="BOTH">
+                    <div className="flex flex-col">
+                      <span className="font-medium">Ambos</span>
+                      <span className="text-xs text-muted-foreground">Pode ser usada em serviços e produtos</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="SERVICE">
+                    <div className="flex flex-col">
+                      <span className="font-medium">Apenas Serviços</span>
+                      <span className="text-xs text-muted-foreground">Aparece somente em serviços</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="PRODUCT">
+                    <div className="flex flex-col">
+                      <span className="font-medium">Apenas Produtos</span>
+                      <span className="text-xs text-muted-foreground">Aparece somente em produtos</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground mt-1">
+                {watch('type') === 'BOTH' && 'Esta categoria estará disponível tanto para produtos quanto para serviços'}
+                {watch('type') === 'SERVICE' && 'Esta categoria estará disponível apenas para serviços'}
+                {watch('type') === 'PRODUCT' && 'Esta categoria estará disponível apenas para produtos'}
               </p>
             </div>
 
