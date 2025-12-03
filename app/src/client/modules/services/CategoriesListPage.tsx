@@ -59,6 +59,7 @@ const AVAILABLE_COLUMNS = [
   { id: 'type', label: 'Tipo', enabled: true },
   { id: 'description', label: 'Descrição', enabled: true },
   { id: 'services', label: 'Serviços', enabled: true },
+  { id: 'products', label: 'Produtos', enabled: true },
   { id: 'status', label: 'Status', enabled: true },
 ];
 
@@ -236,7 +237,7 @@ export default function CategoriesListPage() {
   // Calculate stats from data
   const stats = useMemo(() => {
     if (!categories) {
-      return { total: 0, active: 0, inactive: 0, withServices: 0 };
+      return { total: 0, active: 0, inactive: 0, withServices: 0, withProducts: 0 };
     }
 
     return {
@@ -244,6 +245,7 @@ export default function CategoriesListPage() {
       active: categories.filter((c: any) => c.active).length,
       inactive: categories.filter((c: any) => !c.active).length,
       withServices: categories.filter((c: any) => (c._count?.services || 0) > 0).length,
+      withProducts: categories.filter((c: any) => (c._count?.products || 0) > 0).length,
     };
   }, [categories]);
 
@@ -507,6 +509,7 @@ export default function CategoriesListPage() {
                   {visibleColumns.includes('type') && <TableHead className='text-center'>Tipo</TableHead>}
                   {visibleColumns.includes('description') && <TableHead>Descrição</TableHead>}
                   {visibleColumns.includes('services') && <TableHead className='text-center'>Serviços</TableHead>}
+                  {visibleColumns.includes('products') && <TableHead className='text-center'>Produtos</TableHead>}
                   {visibleColumns.includes('status') && <TableHead className='text-center'>Status</TableHead>}
                   <TableHead className='text-right'>Ações</TableHead>
                 </TableRow>
@@ -558,6 +561,13 @@ export default function CategoriesListPage() {
                       <TableCell className='text-center'>
                         <Badge variant='secondary'>
                           {category._count?.services || 0}
+                        </Badge>
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes('products') && (
+                      <TableCell className='text-center'>
+                        <Badge variant='outline'>
+                          {category._count?.products || 0}
                         </Badge>
                       </TableCell>
                     )}

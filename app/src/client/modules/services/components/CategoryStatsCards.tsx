@@ -6,6 +6,7 @@ type CategoryStats = {
   active: number;
   inactive: number;
   withServices: number;
+  withProducts: number;
 };
 
 type CategoryStatsCardsProps = {
@@ -43,11 +44,18 @@ export function CategoryStatsCards({ stats, isLoading = false }: CategoryStatsCa
       color: 'text-purple-600',
       bgColor: 'bg-purple-50',
     },
+    {
+      title: 'Com Produtos',
+      value: stats.withProducts,
+      icon: Layers,
+      color: 'text-indigo-600',
+      bgColor: 'bg-indigo-50',
+    },
   ];
 
   if (isLoading) {
     return (
-      <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+      <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-5'>
         {cards.map((_, index) => (
           <Card key={index}>
             <CardContent className='pt-6'>
@@ -64,7 +72,7 @@ export function CategoryStatsCards({ stats, isLoading = false }: CategoryStatsCa
   }
 
   return (
-    <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+    <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-5'>
       {cards.map((card) => {
         const Icon = card.icon;
         return (
