@@ -240,7 +240,6 @@ model Salon {
   serviceRooms       ServiceRoom[]
   clientCredits      ClientCredit[]
   cashSessions       CashRegisterSession[]
-  productCategories  ProductCategory[]
   productBrands      ProductBrand[]
   suppliers          Supplier[]
   invitesSent        SalonInvite[]         @relation("InvitesSent")
@@ -745,6 +744,12 @@ enum ValueType {
   PERCENT
 }
 
+enum CategoryType {
+  SERVICE
+  PRODUCT
+  BOTH
+}
+
 model Service {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
@@ -839,18 +844,20 @@ model ServiceCategory {
 }
 
 model Category {
-  id          String    @id @default(uuid())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id          String       @id @default(uuid())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   
   salonId     String
   name        String
   description String?
-  active      Boolean   @default(true)
+  type        CategoryType @default(BOTH)
+  active      Boolean      @default(true)
   deletedAt   DateTime?
 
   salon    Salon     @relation(fields: [salonId], references: [id], onDelete: Restrict)
   services Service[]
+  products Product[]
 }
 
 model ServiceCareMessage {
@@ -1113,19 +1120,20 @@ model AppointmentStatusLog {
 // Product & Inventory Models
 // ============================================================================
 
-model ProductCategory {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  salonId     String
-  name        String
-  description String?
-  deletedAt   DateTime?
-
-  salon    Salon     @relation(fields: [salonId], references: [id], onDelete: Restrict)
-  products Product[]
-}
+// DEPRECATED: ProductCategory unificado com Category
+// model ProductCategory {
+//   id        String   @id @default(uuid())
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//
+//   salonId     String
+//   name        String
+//   description String?
+//   deletedAt   DateTime?
+//
+//   salon    Salon     @relation(fields: [salonId], references: [id], onDelete: Restrict)
+//   products Product[]
+// }
 
 model ProductBrand {
   id        String   @id @default(uuid())
@@ -1206,7 +1214,7 @@ model Product {
   deletedAt           DateTime?
 
   salon                   Salon                       @relation(fields: [salonId], references: [id], onDelete: Restrict)
-  category                ProductCategory?            @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  category                Category?                   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   brand                   ProductBrand?               @relation(fields: [brandId], references: [id], onDelete: SetNull)
   supplier                Supplier?                   @relation(fields: [supplierId], references: [id], onDelete: SetNull)
   createdBy               User                        @relation("ProductCreatedBy", fields: [createdByUserId], references: [id], onDelete: Restrict)

@@ -911,22 +911,22 @@ action addClientCredit {
 //#region Glamo - Inventory Module
 query listProducts {
   fn: import { listProducts } from "@src/inventory/operations",
-  entities: [User, Product, ProductCategory, ProductBrand, Supplier, UserSalon, Log]
+  entities: [User, Product, Category, ProductBrand, Supplier, UserSalon, Log]
 }
 
 query getProduct {
   fn: import { getProduct } from "@src/inventory/operations",
-  entities: [User, Product, Salon, ProductCategory, ProductBrand, Supplier, StockRecord, UserSalon, Log]
+  entities: [User, Product, Salon, Category, ProductBrand, Supplier, StockRecord, UserSalon, Log]
 }
 
 query getLowStockProducts {
   fn: import { getLowStockProducts } from "@src/inventory/operations",
-  entities: [User, Product, ProductCategory, ProductBrand, UserSalon]
+  entities: [User, Product, Category, ProductBrand, UserSalon]
 }
 
 query listProductCategories {
   fn: import { listProductCategories } from "@src/inventory/operations",
-  entities: [User, ProductCategory, Product, UserSalon]
+  entities: [User, Category, Product, UserSalon]
 }
 
 query listProductBrands {
@@ -941,12 +941,12 @@ query listSuppliers {
 
 action createProduct {
   fn: import { createProduct } from "@src/inventory/operations",
-  entities: [User, Product, ProductCategory, ProductBrand, Supplier, StockRecord, Notification, UserSalon, Log]
+  entities: [User, Product, Category, ProductBrand, Supplier, StockRecord, Notification, UserSalon, Log]
 }
 
 action updateProduct {
   fn: import { updateProduct } from "@src/inventory/operations",
-  entities: [User, Product, ProductCategory, ProductBrand, Supplier, UserSalon, Log]
+  entities: [User, Product, Category, ProductBrand, Supplier, UserSalon, Log]
 }
 
 action deleteProduct {
@@ -961,17 +961,17 @@ action recordStockMovement {
 
 action createProductCategory {
   fn: import { createProductCategory } from "@src/inventory/operations",
-  entities: [User, ProductCategory, UserSalon, Log]
+  entities: [User, Category, UserSalon, Log]
 }
 
 action updateProductCategory {
   fn: import { updateProductCategory } from "@src/inventory/operations",
-  entities: [User, ProductCategory, UserSalon, Log]
+  entities: [User, Category, UserSalon, Log]
 }
 
 action deleteProductCategory {
   fn: import { deleteProductCategory } from "@src/inventory/operations",
-  entities: [User, ProductCategory, Product, UserSalon, Log]
+  entities: [User, Category, Product, UserSalon, Log]
 }
 
 action createProductBrand {

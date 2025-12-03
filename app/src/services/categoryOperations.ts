@@ -81,7 +81,10 @@ export const listCategories: ListCategories<ListCategoriesInput, any> = async (
 
   // Get categories
   const categories = await context.entities.Category.findMany({
-    where,
+    where: {
+      ...where,
+      type: { in: ['SERVICE', 'BOTH'] },
+    },
     orderBy: [
       { active: 'desc' },
       { name: 'asc' },
@@ -192,6 +195,7 @@ export const createCategory: CreateCategory<CreateCategoryInput, any> = async (
         equals: name.trim(),
         mode: 'insensitive',
       },
+      type: { in: ['SERVICE', 'BOTH'] },
       deletedAt: null,
     },
   });
@@ -207,6 +211,7 @@ export const createCategory: CreateCategory<CreateCategoryInput, any> = async (
       name: name.trim(),
       description: description?.trim(),
       active,
+      type: 'SERVICE',
     },
     include: {
       _count: {

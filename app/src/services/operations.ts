@@ -366,7 +366,7 @@ export const createService: CreateService<CreateServiceInput, any> = async (
       where: { id: categoryId },
     });
 
-    if (!category || category.salonId !== salonId || category.deletedAt) {
+    if (!category || category.salonId !== salonId || category.deletedAt || !['SERVICE', 'BOTH'].includes(category.type)) {
       throw new HttpError(400, 'Invalid category');
     }
   }
@@ -567,7 +567,7 @@ export const updateService: UpdateService<UpdateServiceInput, any> = async (
       where: { id: categoryId },
     });
 
-    if (!category || category.salonId !== salonId || category.deletedAt) {
+    if (!category || category.salonId !== salonId || category.deletedAt || !['SERVICE', 'BOTH'].includes(category.type)) {
       throw new HttpError(400, 'Invalid category');
     }
   }

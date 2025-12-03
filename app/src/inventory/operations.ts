@@ -481,11 +481,11 @@ export const createProduct: CreateProduct<CreateProductInput, any> = async (
 
   // Validate category if provided
   if (categoryId) {
-    const category = await context.entities.ProductCategory.findUnique({
+    const category = await context.entities.Category.findUnique({
       where: { id: categoryId },
     });
 
-    if (!category || category.salonId !== salonId || category.deletedAt) {
+    if (!category || category.salonId !== salonId || category.deletedAt || !['PRODUCT', 'BOTH'].includes(category.type)) {
       throw new HttpError(400, 'Product category not found');
     }
   }
@@ -624,11 +624,11 @@ export const updateProduct: UpdateProduct<UpdateProductInput, any> = async (
 
   // Validate category if provided
   if (updates.categoryId) {
-    const category = await context.entities.ProductCategory.findUnique({
+    const category = await context.entities.Category.findUnique({
       where: { id: updates.categoryId },
     });
 
-    if (!category || category.salonId !== salonId || category.deletedAt) {
+    if (!category || category.salonId !== salonId || category.deletedAt || !['PRODUCT', 'BOTH'].includes(category.type)) {
       throw new HttpError(400, 'Product category not found');
     }
   }
@@ -877,8 +877,11 @@ export const listProductCategories: ListProductCategories<ListProductCategoriesI
     where.deletedAt = null;
   }
 
-  const categories = await context.entities.ProductCategory.findMany({
-    where,
+  const categories = await context.entities.Category.findMany({
+    where: {
+      ...where,
+      type: { in: ['PRODUCT', 'BOTH'] },
+    },
     orderBy: { name: 'asc' },
     include: {
       _count: {
@@ -906,22 +909,23 @@ export const createProductCategory: CreateProductCategory<CreateProductCategoryI
 
   await requirePermission(context.user, salonId, 'can_create_products', context.entities);
 
-  const category = await context.entities.ProductCategory.create({
+  const category = await context.entities.Category.create({
     data: {
       salonId,
       name,
       description,
+      type: 'PRODUCT',
     },
   });
 
   await context.entities.Log.create({
     data: {
       userId: context.user.id,
-      entity: 'ProductCategory',
+      entity: 'Category',
       entityId: category.id,
       action: 'CREATE',
       before: Prisma.DbNull,
-      after: { name },
+      after: { name, type: 'PRODUCT' },
     },
   });
 
@@ -938,7 +942,7 @@ export const updateProductCategory: UpdateProductCategory<UpdateProductCategoryI
 
   await requirePermission(context.user, salonId, 'can_update_products', context.entities);
 
-  const category = await context.entities.ProductCategory.findUnique({
+  const category = await context.entities.Category.findUnique({
     where: { id: categoryId },
   });
 
@@ -946,7 +950,7 @@ export const updateProductCategory: UpdateProductCategory<UpdateProductCategoryI
     throw new HttpError(404, 'Category not found');
   }
 
-  const updatedCategory = await context.entities.ProductCategory.update({
+  const updatedCategory = await context.entities.Category.update({
     where: { id: categoryId },
     data: updates,
   });
@@ -954,7 +958,7 @@ export const updateProductCategory: UpdateProductCategory<UpdateProductCategoryI
   await context.entities.Log.create({
     data: {
       userId: context.user.id,
-      entity: 'ProductCategory',
+      entity: 'Category',
       entityId: categoryId,
       action: 'UPDATE',
       before: { name: category.name },
@@ -975,7 +979,7 @@ export const deleteProductCategory: DeleteProductCategory<DeleteProductCategoryI
 
   await requirePermission(context.user, salonId, 'can_delete_products', context.entities);
 
-  const category = await context.entities.ProductCategory.findUnique({
+  const category = await context.entities.Category.findUnique({
     where: { id: categoryId },
     include: {
       products: {
@@ -992,7 +996,7 @@ export const deleteProductCategory: DeleteProductCategory<DeleteProductCategoryI
     throw new HttpError(400, 'Cannot delete category with products');
   }
 
-  const deletedCategory = await context.entities.ProductCategory.update({
+  const deletedCategory = await context.entities.Category.update({
     where: { id: categoryId },
     data: {
       deletedAt: new Date(),
@@ -1002,7 +1006,7 @@ export const deleteProductCategory: DeleteProductCategory<DeleteProductCategoryI
   await context.entities.Log.create({
     data: {
       userId: context.user.id,
-      entity: 'ProductCategory',
+      entity: 'Category',
       entityId: categoryId,
       action: 'DELETE',
       before: { name: category.name },
