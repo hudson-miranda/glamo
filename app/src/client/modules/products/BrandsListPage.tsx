@@ -205,7 +205,7 @@ export default function BrandsListPage() {
     try {
       await deleteProductBrand({
         brandId: brandToDelete.id,
-        salonId: activeSalonId,
+        salonId: activeSalonId!,
       });
       toast({
         title: 'Sucesso',
@@ -610,8 +610,8 @@ export default function BrandsListPage() {
           setIsViewModalOpen(false);
           setBrandToView(null);
         }}
-        brandId={brandToView}
-        salonId={activeSalonId}
+        brandId={brandToView || ''}
+        salonId={activeSalonId || ''}
       />
 
       {/* Delete Dialog */}
