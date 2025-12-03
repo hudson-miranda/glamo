@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery, listProductBrands, createProductBrand, updateProductBrand, deleteProductBrand } from 'wasp/client/operations';
-import { Button } from '../../../components/ui/Button';
-import { Input } from '../../../components/ui/Input';
+import { Button } from '../../../components/ui/button';
+import { Input } from '../../../components/ui/input';
 import {
   Table,
   TableBody,
@@ -9,10 +9,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../../../components/ui/Table';
-import { Badge } from '../../../components/ui/Badge';
-import { EmptyState } from '../../../components/ui/EmptyState';
-import { Card, CardContent } from '../../../components/ui/Card';
+} from '../../../components/ui/table';
+import { Badge } from '../../../components/ui/badge';
+import { EmptyState } from '../../../components/ui/empty-state';
+import { Card, CardContent } from '../../../components/ui/card';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,14 +22,14 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '../../../components/ui/AlertDialog';
+} from '../../../components/ui/alert-dialog';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '../../../components/ui/Dialog';
+} from '../../../components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,9 +37,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../../../components/ui/DropdownMenu';
-import { Label } from '../../../components/ui/Label';
-import { Checkbox } from '../../../components/ui/Checkbox';
+} from '../../../components/ui/dropdown-menu';
+import { Label } from '../../../components/ui/label';
+import { Checkbox } from '../../../components/ui/checkbox';
 import { Plus, Search, Edit, Trash2, Tag, Eye, Filter, ArrowUpDown, Settings2, X, MoreHorizontal } from 'lucide-react';
 import { useSalonContext } from '../../hooks/useSalonContext';
 import { BrandFormModal } from './components/BrandFormModal';
@@ -51,7 +51,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '../../../components/ui/Tooltip';
+} from '../../../components/ui/tooltip';
 
 // Definição de colunas disponíveis
 const AVAILABLE_COLUMNS = [
@@ -557,7 +557,7 @@ export default function BrandsListPage() {
                               </span>,
                               <Button
                                 key={p}
-                                variant={page === p ? 'primary-glow' : 'outline'}
+                                variant={page === p ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={() => setPage(p)}
                               >
@@ -568,7 +568,7 @@ export default function BrandsListPage() {
                           return (
                             <Button
                               key={p}
-                              variant={page === p ? 'primary-glow' : 'outline'}
+                              variant={page === p ? 'default' : 'outline'}
                               size="sm"
                               onClick={() => setPage(p)}
                             >

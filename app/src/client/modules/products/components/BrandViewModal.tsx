@@ -5,9 +5,9 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '../../../../components/ui/Dialog';
-import { Badge } from '../../../../components/ui/Badge';
-import { Separator } from '../../../../components/ui/Separator';
+} from '../../../../components/ui/dialog';
+import { Badge } from '../../../../components/ui/badge';
+import { Separator } from '../../../../components/ui/separator';
 import { Tag, Package, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
