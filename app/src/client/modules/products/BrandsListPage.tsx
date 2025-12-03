@@ -40,7 +40,7 @@ import {
 } from '../../../components/ui/dropdown-menu';
 import { Label } from '../../../components/ui/label';
 import { Checkbox } from '../../../components/ui/checkbox';
-import { Plus, Search, Edit, Trash2, Tag, Eye, Filter, ArrowUpDown, Settings2, X, MoreHorizontal } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Tag, Eye, Filter, ArrowUpDown, Settings2, X } from 'lucide-react';
 import { useSalonContext } from '../../hooks/useSalonContext';
 import { BrandFormModal } from './components/BrandFormModal';
 import { BrandViewModal } from './components/BrandViewModal';
@@ -223,15 +223,6 @@ export default function BrandsListPage() {
     }
   };
 
-  const handleSort = (column: string) => {
-    if (sortBy === column) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(column);
-      setSortOrder('asc');
-    }
-  };
-
   const toggleColumn = (columnId: string) => {
     setVisibleColumns((prev) =>
       prev.includes(columnId)
@@ -287,105 +278,114 @@ export default function BrandsListPage() {
       {/* Stats Cards */}
       <BrandStatsCards stats={stats} isLoading={isLoading} />
 
-      {/* Filters and Search */}
+      {/* Search, Filters and Actions */}
       <Card>
-        <CardContent className="p-6">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Buscar marcas..."
-                    value={search}
-                    onChange={(e) => {
-                      setSearch(e.target.value);
-                      setPage(1);
-                    }}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
+        <CardContent className='pt-6'>
+          <div className='flex flex-col gap-4'>
+            {/* Busca */}
+            <div className='relative flex-1'>
+              <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+              <Input
+                placeholder='Buscar marcas...'
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
+                className='pl-10'
+              />
+            </div>
 
-              {/* Filtro de produtos */}
+            {/* Barra de Ações */}
+            <div className='flex items-center gap-2 flex-wrap'>
+              {/* Filtros */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="gap-2">
-                    <Filter className="h-4 w-4" />
+                  <Button variant='outline' size='sm' className='gap-2'>
+                    <Filter className='h-4 w-4' />
                     Filtros
                     {filterProducts !== 'all' && (
-                      <Badge variant="outline" className="ml-1">
+                      <Badge variant='secondary' className='ml-1 px-1.5 py-0.5 text-xs'>
                         1
                       </Badge>
                     )}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>Produtos</DropdownMenuLabel>
+                <DropdownMenuContent align='start' className='w-56'>
+                  <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setFilterProducts('all')}>
-                    <div className="flex items-center gap-2">
-                      {filterProducts === 'all' && <div className="h-2 w-2 rounded-full bg-primary" />}
-                      Todas
+                  
+                  <div className='p-2 space-y-2'>
+                    <div>
+                      <Label className='text-xs text-muted-foreground mb-1.5 block'>Produtos</Label>
+                      <select
+                        className='w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
+                        value={filterProducts}
+                        onChange={(e) => setFilterProducts(e.target.value)}
+                      >
+                        <option value='all'>Todas</option>
+                        <option value='with-products'>Com Produtos</option>
+                        <option value='without-products'>Sem Produtos</option>
+                      </select>
                     </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setFilterProducts('with-products')}>
-                    <div className="flex items-center gap-2">
-                      {filterProducts === 'with-products' && <div className="h-2 w-2 rounded-full bg-primary" />}
-                      Com Produtos
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setFilterProducts('without-products')}>
-                    <div className="flex items-center gap-2">
-                      {filterProducts === 'without-products' && <div className="h-2 w-2 rounded-full bg-primary" />}
-                      Sem Produtos
-                    </div>
-                  </DropdownMenuItem>
+                  </div>
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Configuração de colunas */}
+              {/* Ordenação */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Settings2 className="h-4 w-4" />
+                  <Button variant='outline' size='sm' className='gap-2'>
+                    <ArrowUpDown className='h-4 w-4' />
+                    Ordenar
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>Colunas Visíveis</DropdownMenuLabel>
+                <DropdownMenuContent align='start'>
+                  <DropdownMenuLabel>Ordenar por</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  {AVAILABLE_COLUMNS.map((column) => (
-                    <DropdownMenuItem
-                      key={column.id}
-                      onClick={() => toggleColumn(column.id)}
-                      className="gap-2"
-                    >
-                      <Checkbox
-                        checked={visibleColumns.includes(column.id)}
-                        onCheckedChange={() => toggleColumn(column.id)}
-                      />
-                      {column.label}
-                    </DropdownMenuItem>
-                  ))}
+                  <DropdownMenuItem onClick={() => { setSortBy('name'); setSortOrder('asc'); }}>
+                    Nome (A-Z)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { setSortBy('name'); setSortOrder('desc'); }}>
+                    Nome (Z-A)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { setSortBy('products'); setSortOrder('desc'); }}>
+                    Mais Produtos
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { setSortBy('products'); setSortOrder('asc'); }}>
+                    Menos Produtos
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </div>
 
-            {/* Filtros ativos */}
-            {filterProducts !== 'all' && (
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm text-muted-foreground">Filtros ativos:</span>
-                {filterProducts !== 'all' && (
-                  <Badge variant="outline" className="gap-1">
-                    {filterProducts === 'with-products' ? 'Com Produtos' : 'Sem Produtos'}
-                    <X
-                      className="h-3 w-3 cursor-pointer"
-                      onClick={() => setFilterProducts('all')}
-                    />
-                  </Badge>
-                )}
+              {/* Customizar Colunas */}
+              <Button 
+                variant='outline' 
+                size='sm' 
+                className='gap-2'
+                onClick={() => setIsColumnsModalOpen(true)}
+              >
+                <Settings2 className='h-4 w-4' />
+                Colunas
+              </Button>
+
+              {/* Limpar Filtros */}
+              {filterProducts !== 'all' && (
+                <Button 
+                  variant='ghost' 
+                  size='sm' 
+                  className='gap-2'
+                  onClick={() => setFilterProducts('all')}
+                >
+                  <X className='h-4 w-4' />
+                  Limpar filtros
+                </Button>
+              )}
+
+              <div className='ml-auto text-sm text-muted-foreground'>
+                {allFilteredBrands.length} {allFilteredBrands.length === 1 ? 'marca' : 'marcas'}
               </div>
-            )}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -428,34 +428,10 @@ export default function BrandsListPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      {visibleColumns.includes('name') && (
-                        <TableHead>
-                          <Button
-                            variant="ghost"
-                            onClick={() => handleSort('name')}
-                            className="gap-2 hover:bg-transparent p-0 h-auto font-semibold"
-                          >
-                            Nome
-                            <ArrowUpDown className="h-4 w-4" />
-                          </Button>
-                        </TableHead>
-                      )}
-                      {visibleColumns.includes('description') && (
-                        <TableHead>Descrição</TableHead>
-                      )}
-                      {visibleColumns.includes('products') && (
-                        <TableHead>
-                          <Button
-                            variant="ghost"
-                            onClick={() => handleSort('products')}
-                            className="gap-2 hover:bg-transparent p-0 h-auto font-semibold"
-                          >
-                            Produtos
-                            <ArrowUpDown className="h-4 w-4" />
-                          </Button>
-                        </TableHead>
-                      )}
-                      <TableHead className="w-[100px]">Ações</TableHead>
+                      {visibleColumns.includes('name') && <TableHead>Nome</TableHead>}
+                      {visibleColumns.includes('description') && <TableHead>Descrição</TableHead>}
+                      {visibleColumns.includes('products') && <TableHead className='text-center'>Produtos</TableHead>}
+                      <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -465,58 +441,70 @@ export default function BrandsListPage() {
                           <TableCell className="font-medium">{brand.name}</TableCell>
                         )}
                         {visibleColumns.includes('description') && (
-                          <TableCell>
-                            <div className="max-w-md truncate text-muted-foreground">
-                              {brand.description || '-'}
-                            </div>
+                          <TableCell className='max-w-xs'>
+                            {brand.description ? (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <span className='text-sm text-muted-foreground line-clamp-2 cursor-help'>
+                                      {brand.description}
+                                    </span>
+                                  </TooltipTrigger>
+                                  <TooltipContent className='max-w-md'>
+                                    <p className='whitespace-pre-wrap'>{brand.description}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            ) : (
+                              <span className='text-sm text-muted-foreground italic'>
+                                Sem descrição
+                              </span>
+                            )}
                           </TableCell>
                         )}
                         {visibleColumns.includes('products') && (
-                          <TableCell>
-                            <Badge variant="outline">
+                          <TableCell className='text-center'>
+                            <Badge variant='secondary'>
                               {brand._count?.products || 0}
                             </Badge>
                           </TableCell>
                         )}
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setBrandToView(brand.id);
-                                  setIsViewModalOpen(true);
-                                }}
-                              >
-                                <Eye className="h-4 w-4 mr-2" />
-                                Visualizar
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setSelectedBrand(brand);
-                                  setIsModalOpen(true);
-                                }}
-                              >
-                                <Edit className="h-4 w-4 mr-2" />
-                                Editar
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setBrandToDelete(brand);
-                                  setIsDeleteDialogOpen(true);
-                                }}
-                                className="text-destructive"
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Excluir
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                        <TableCell className='text-right'>
+                          <div className='flex justify-end gap-2'>
+                            <Button
+                              variant='ghost'
+                              size='sm'
+                              onClick={() => {
+                                setBrandToView(brand.id);
+                                setIsViewModalOpen(true);
+                              }}
+                              title='Visualizar marca'
+                            >
+                              <Eye className='h-4 w-4' />
+                            </Button>
+                            <Button
+                              variant='ghost'
+                              size='sm'
+                              onClick={() => {
+                                setSelectedBrand(brand);
+                                setIsModalOpen(true);
+                              }}
+                              title='Editar marca'
+                            >
+                              <Edit className='h-4 w-4' />
+                            </Button>
+                            <Button
+                              variant='ghost'
+                              size='sm'
+                              onClick={() => {
+                                setBrandToDelete(brand);
+                                setIsDeleteDialogOpen(true);
+                              }}
+                              title='Excluir marca'
+                            >
+                              <Trash2 className='h-4 w-4' />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -525,69 +513,49 @@ export default function BrandsListPage() {
               </div>
 
               {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-between px-6 py-4 border-t">
-                  <p className="text-sm text-muted-foreground">
-                    Mostrando {(page - 1) * perPage + 1} a{' '}
-                    {Math.min(page * perPage, allFilteredBrands.length)} de{' '}
-                    {allFilteredBrands.length} marcas
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setPage(page - 1)}
-                      disabled={page === 1}
-                    >
-                      Anterior
-                    </Button>
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: totalPages }, (_, i) => i + 1)
-                        .filter((p) => {
-                          if (totalPages <= 7) return true;
-                          if (p === 1 || p === totalPages) return true;
-                          if (p >= page - 1 && p <= page + 1) return true;
-                          return false;
-                        })
-                        .map((p, i, arr) => {
-                          if (i > 0 && p - arr[i - 1] > 1) {
-                            return [
-                              <span key={`ellipsis-${p}`} className="px-2">
-                                ...
-                              </span>,
-                              <Button
-                                key={p}
-                                variant={page === p ? 'default' : 'outline'}
-                                size="sm"
-                                onClick={() => setPage(p)}
-                              >
-                                {p}
-                              </Button>,
-                            ];
-                          }
-                          return (
-                            <Button
-                              key={p}
-                              variant={page === p ? 'default' : 'outline'}
-                              size="sm"
-                              onClick={() => setPage(p)}
-                            >
-                              {p}
-                            </Button>
-                          );
-                        })}
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setPage(page + 1)}
-                      disabled={page === totalPages}
-                    >
-                      Próxima
-                    </Button>
+              <div className='flex items-center justify-between border-t px-6 py-4'>
+                <div className='flex items-center gap-4'>
+                  <div className='text-sm text-muted-foreground'>
+                    Mostrando {(page - 1) * perPage + 1}-{Math.min(page * perPage, allFilteredBrands.length)} de {allFilteredBrands.length} marca{allFilteredBrands.length !== 1 ? 's' : ''}
                   </div>
+                  <select
+                    value={perPage}
+                    onChange={(e) => {
+                      setPerPage(Number(e.target.value));
+                      setPage(1);
+                    }}
+                    className='h-8 rounded-md border border-input bg-background px-3 pr-8 text-sm'
+                  >
+                    <option value={10}>10</option>
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </select>
                 </div>
-              )}
+                <div className='flex items-center space-x-2'>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => setPage(page - 1)}
+                    disabled={page === 1}
+                  >
+                    Anterior
+                  </Button>
+                  <div className='flex items-center gap-1 px-2'>
+                    <span className='text-sm'>
+                      Página {page} de {totalPages || 1}
+                    </span>
+                  </div>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => setPage(page + 1)}
+                    disabled={page >= totalPages}
+                  >
+                    Próxima
+                  </Button>
+                </div>
+              </div>
             </>
           )}
         </CardContent>
@@ -641,6 +609,50 @@ export default function BrandsListPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Modal de Customização de Colunas */}
+      <Dialog open={isColumnsModalOpen} onOpenChange={setIsColumnsModalOpen}>
+        <DialogContent className='max-w-md'>
+          <DialogHeader>
+            <DialogTitle>Customizar Colunas</DialogTitle>
+            <DialogDescription>
+              Selecione quais colunas deseja visualizar na tabela
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className='space-y-4 py-4'>
+            {AVAILABLE_COLUMNS.map((column) => (
+              <div key={column.id} className='flex items-center space-x-2'>
+                <Checkbox
+                  id={column.id}
+                  checked={visibleColumns.includes(column.id)}
+                  onCheckedChange={() => toggleColumn(column.id)}
+                />
+                <Label
+                  htmlFor={column.id}
+                  className='text-sm font-normal cursor-pointer flex-1'
+                >
+                  {column.label}
+                </Label>
+              </div>
+            ))}
+          </div>
+
+          <div className='flex justify-between gap-2 pt-4'>
+            <Button 
+              variant='outline' 
+              onClick={() => {
+                setVisibleColumns(AVAILABLE_COLUMNS.map(col => col.id));
+              }}
+            >
+              Selecionar Todas
+            </Button>
+            <Button onClick={() => setIsColumnsModalOpen(false)}>
+              Aplicar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
