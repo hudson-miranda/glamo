@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from '../../../../components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../../components/ui/tabs';
-import { Loader2, Plus, Calendar } from 'lucide-react';
+import { Loader2, Plus } from 'lucide-react';
 import { BrandFormModal } from './BrandFormModal';
 import { ProductCategoryFormModal } from './ProductCategoryFormModal';
 import { SupplierFormModal } from './SupplierFormModal';
@@ -429,53 +429,53 @@ export function ProductFormModal({
                     </div>
                   </div>
 
-                  {/* Validade */}
-                  <div>
-                    <Label htmlFor="expirationDate">Validade</Label>
-                    <div className='relative'>
+                  {/* Validade, Preço de Venda e Custo de Compra */}
+                  <div className='col-span-2 grid grid-cols-12 gap-4'>
+                    {/* Validade */}
+                    <div className='col-span-3'>
+                      <Label htmlFor="expirationDate">Validade</Label>
                       <Input
                         id="expirationDate"
                         type="date"
                         {...register('expirationDate')}
                       />
-                      <Calendar className='absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none' />
                     </div>
-                  </div>
 
-                  {/* Preço de venda */}
-                  <div>
-                    <Label htmlFor="salePrice">
-                      Preço de Venda <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="salePrice"
-                      type="number"
-                      step="0.01"
-                      {...register('salePrice')}
-                      placeholder="0.00"
-                      className={errors.salePrice ? 'border-red-500' : ''}
-                    />
-                    {errors.salePrice && (
-                      <p className="text-sm text-red-500 mt-1">{errors.salePrice.message}</p>
-                    )}
-                  </div>
+                    {/* Preço de venda */}
+                    <div className='col-span-4'>
+                      <Label htmlFor="salePrice">
+                        Preço de Venda <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="salePrice"
+                        type="number"
+                        step="0.01"
+                        {...register('salePrice')}
+                        placeholder="0.00"
+                        className={errors.salePrice ? 'border-red-500' : ''}
+                      />
+                      {errors.salePrice && (
+                        <p className="text-sm text-red-500 mt-1">{errors.salePrice.message}</p>
+                      )}
+                    </div>
 
-                  {/* Custo de compra */}
-                  <div>
-                    <Label htmlFor="costPrice">
-                      Custo de Compra <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="costPrice"
-                      type="number"
-                      step="0.01"
-                      {...register('costPrice')}
-                      placeholder="0.00"
-                      className={errors.costPrice ? 'border-red-500' : ''}
-                    />
-                    {errors.costPrice && (
-                      <p className="text-sm text-red-500 mt-1">{errors.costPrice.message}</p>
-                    )}
+                    {/* Custo de compra */}
+                    <div className='col-span-5'>
+                      <Label htmlFor="costPrice">
+                        Custo de Compra <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="costPrice"
+                        type="number"
+                        step="0.01"
+                        {...register('costPrice')}
+                        placeholder="0.00"
+                        className={errors.costPrice ? 'border-red-500' : ''}
+                      />
+                      {errors.costPrice && (
+                        <p className="text-sm text-red-500 mt-1">{errors.costPrice.message}</p>
+                      )}
+                    </div>
                   </div>
 
                   {/* Registro de saída */}
