@@ -1,4 +1,4 @@
-import { Card, CardContent } from '../../../components/ui/card';
+import { Card, CardContent } from '../../../../components/ui/Card';
 import { Tag, Package, AlertCircle } from 'lucide-react';
 
 type BrandStats = {

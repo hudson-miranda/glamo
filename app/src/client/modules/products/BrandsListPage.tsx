@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery, listProductBrands, createProductBrand, updateProductBrand, deleteProductBrand } from 'wasp/client/operations';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
+import { Button } from '../../../components/ui/Button';
+import { Input } from '../../../components/ui/Input';
 import {
   Table,
   TableBody,
@@ -9,10 +9,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../../components/ui/table';
-import { Badge } from '../../components/ui/badge';
-import { EmptyState } from '../../components/ui/empty-state';
-import { Card, CardContent } from '../../components/ui/card';
+} from '../../../components/ui/Table';
+import { Badge } from '../../../components/ui/Badge';
+import { EmptyState } from '../../../components/ui/EmptyState';
+import { Card, CardContent } from '../../../components/ui/Card';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,14 +22,14 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '../../components/ui/alert-dialog';
+} from '../../../components/ui/AlertDialog';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '../../components/ui/dialog';
+} from '../../../components/ui/Dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,21 +37,21 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../../components/ui/dropdown-menu';
-import { Label } from '../../components/ui/label';
-import { Checkbox } from '../../components/ui/checkbox';
+} from '../../../components/ui/DropdownMenu';
+import { Label } from '../../../components/ui/Label';
+import { Checkbox } from '../../../components/ui/Checkbox';
 import { Plus, Search, Edit, Trash2, Tag, Eye, Filter, ArrowUpDown, Settings2, X, MoreHorizontal } from 'lucide-react';
-import { useSalonContext } from '../hooks/useSalonContext';
+import { useSalonContext } from '../../hooks/useSalonContext';
 import { BrandFormModal } from './components/BrandFormModal';
 import { BrandViewModal } from './components/BrandViewModal';
-import { useToast } from '../../components/ui/use-toast';
+import { useToast } from '../../../components/ui/use-toast';
 import { BrandStatsCards } from './components/BrandStatsCards';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '../../components/ui/tooltip';
+} from '../../../components/ui/Tooltip';
 
 // Definição de colunas disponíveis
 const AVAILABLE_COLUMNS = [
@@ -314,7 +314,7 @@ export default function BrandsListPage() {
                     <Filter className="h-4 w-4" />
                     Filtros
                     {filterProducts !== 'all' && (
-                      <Badge variant="secondary" className="ml-1">
+                      <Badge variant="outline" className="ml-1">
                         1
                       </Badge>
                     )}
@@ -347,7 +347,7 @@ export default function BrandsListPage() {
               {/* Configuração de colunas */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon">
+                  <Button variant="outline" size="sm">
                     <Settings2 className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -376,7 +376,7 @@ export default function BrandsListPage() {
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-sm text-muted-foreground">Filtros ativos:</span>
                 {filterProducts !== 'all' && (
-                  <Badge variant="secondary" className="gap-1">
+                  <Badge variant="outline" className="gap-1">
                     {filterProducts === 'with-products' ? 'Com Produtos' : 'Sem Produtos'}
                     <X
                       className="h-3 w-3 cursor-pointer"
@@ -481,7 +481,7 @@ export default function BrandsListPage() {
                         <TableCell>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
+                              <Button variant="ghost" size="sm">
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
@@ -557,7 +557,7 @@ export default function BrandsListPage() {
                               </span>,
                               <Button
                                 key={p}
-                                variant={page === p ? 'default' : 'outline'}
+                                variant={page === p ? 'primary-glow' : 'outline'}
                                 size="sm"
                                 onClick={() => setPage(p)}
                               >
@@ -568,7 +568,7 @@ export default function BrandsListPage() {
                           return (
                             <Button
                               key={p}
-                              variant={page === p ? 'default' : 'outline'}
+                              variant={page === p ? 'primary-glow' : 'outline'}
                               size="sm"
                               onClick={() => setPage(p)}
                             >
