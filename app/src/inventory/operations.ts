@@ -140,6 +140,7 @@ type CreateProductCategoryInput = {
   salonId: string;
   name: string;
   description?: string;
+  type?: 'SERVICE' | 'PRODUCT' | 'BOTH';
 };
 
 type UpdateProductCategoryInput = {
@@ -900,7 +901,7 @@ export const listProductCategories: ListProductCategories<ListProductCategoriesI
 // ============================================================================
 
 export const createProductCategory: CreateProductCategory<CreateProductCategoryInput, any> = async (
-  { salonId, name, description },
+  { salonId, name, description, type },
   context
 ) => {
   if (!context.user) {
@@ -914,7 +915,7 @@ export const createProductCategory: CreateProductCategory<CreateProductCategoryI
       salonId,
       name,
       description,
-      type: 'PRODUCT',
+      type: type || 'PRODUCT',
     },
   });
 
@@ -925,7 +926,7 @@ export const createProductCategory: CreateProductCategory<CreateProductCategoryI
       entityId: category.id,
       action: 'CREATE',
       before: Prisma.DbNull,
-      after: { name, type: 'PRODUCT' },
+      after: { name, type: type || 'PRODUCT' },
     },
   });
 
