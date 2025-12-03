@@ -124,9 +124,9 @@ export default function ProductsListPage() {
     enabled: !!activeSalonId,
   });
 
-  const brands = brandsData?.brands || [];
-  const categories = categoriesData?.categories || [];
-  const suppliers = suppliersData?.suppliers || [];
+  const brands = brandsData || [];
+  const categories = categoriesData || [];
+  const suppliers = suppliersData || [];
 
   const handleOpenModal = (product: any = null) => {
     setSelectedProduct(product);

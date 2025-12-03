@@ -142,9 +142,9 @@ export function ProductFormModal({
   const { data: categoriesData, refetch: refetchCategories } = useQuery(listProductCategories, { salonId });
   const { data: suppliersData, refetch: refetchSuppliers } = useQuery(listSuppliers, { salonId });
 
-  const brands = brandsData?.brands || [];
-  const categories = categoriesData?.categories || [];
-  const suppliers = suppliersData?.suppliers || [];
+  const brands = brandsData || [];
+  const categories = categoriesData || [];
+  const suppliers = suppliersData || [];
 
   const {
     register,
