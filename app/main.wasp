@@ -1050,7 +1050,7 @@ query getCommissionsReport {
 
 query getInventoryReport {
   fn: import { getInventoryReport } from "@src/reports/operations",
-  entities: [User, Product, ProductCategory, ProductBrand, StockRecord, UserSalon, Log]
+  entities: [User, Product, Category, ProductBrand, StockRecord, UserSalon, Log]
 }
 
 query getAppointmentReport {
