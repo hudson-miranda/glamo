@@ -1150,6 +1150,12 @@ page ProductsListPage {
   component: import ProductsListPage from "@src/client/modules/products/pages/ProductsListPage"
 }
 
+route BrandsListRoute { path: "/brands", to: BrandsListPage }
+page BrandsListPage {
+  authRequired: true,
+  component: import BrandsListPage from "@src/client/modules/products/BrandsListPage"
+}
+
 route AppointmentsListRoute { path: "/appointments", to: AppointmentsListPage }
 page AppointmentsListPage {
   authRequired: true,

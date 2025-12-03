@@ -29,6 +29,7 @@ import {
   ChevronDown,
   ChevronUp,
   Tag,
+  Bookmark,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Button } from '../../components/ui/button';
@@ -101,6 +102,12 @@ const navSections: NavSection[] = [
         title: 'Produtos',
         href: '/products',
         icon: Package,
+        permission: 'can_view_products',
+      },
+      {
+        title: 'Marcas',
+        href: '/brands',
+        icon: Bookmark,
         permission: 'can_view_products',
       },
       {
