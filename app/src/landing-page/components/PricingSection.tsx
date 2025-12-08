@@ -6,6 +6,7 @@ import { Badge } from '../../client/components/ui/Badge';
 import { Button } from '../../client/components/ui/Button';
 import { GlowEffect } from '../../client/components/ui/GlowEffect';
 import { useRef, useState, useEffect } from 'react';
+import { FaBoltLightning, FaStar, FaLock } from "react-icons/fa6";
 
 interface PricingPlan {
   name: string;
@@ -140,20 +141,19 @@ export default function PricingSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.8 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto"
+          className="grid grid-cols-3 md:grid-cols-3 gap-3 max-w-4xl mx-auto"
         >
           {[
-            { icon: '✅', label: '14-day free trial' },
-            { icon: '🔒', label: 'Secure payments' },
-            { icon: '🚫', label: 'No credit card' },
-            { icon: '⚡', label: 'Cancel anytime' },
+            { icon: <FaStar />, label: '14 dias grátis' },
+            { icon: <FaLock />, label: 'Pagamento seguro' },
+            { icon: <FaBoltLightning />, label: 'Cancelamento a qualquer hora' },
           ].map((item, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, scale: 0.5 }}
               animate={inView ? { opacity: 1, scale: 1 } : {}}
               transition={{ duration: 0.5, delay: 1 + index * 0.1 }}
-              className="flex flex-col items-center text-center"
+              className="flex flex-col items-center text-center text-brand-500"
             >
               <div className="text-3xl mb-2">{item.icon}</div>
               <div className="text-sm text-gray-600 dark:text-zinc-400">{item.label}</div>

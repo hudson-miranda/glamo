@@ -100,9 +100,6 @@ export default function Hero() {
               </Button>
             </motion.div>
 
-            <p className="text-sm text-gray-600 dark:text-zinc-400 mt-6">
-              ✨ 14 dias grátis • Sem cartão de crédito • Cancele quando quiser
-            </p>
           </motion.div>
 
           {/* Right side - Dashboard Mockup */}

@@ -1090,6 +1090,18 @@ page WaitingInvitePage {
   component: import WaitingInvitePage from "@src/client/modules/onboarding/WaitingInvitePage"
 }
 
+route AcceptInviteRoute { path: "/invite/accept/:inviteId", to: AcceptInvitePage }
+page AcceptInvitePage {
+  authRequired: false,
+  component: import AcceptInvitePage from "@src/client/modules/invites/AcceptInvitePage"
+}
+
+route RejectInviteRoute { path: "/invite/reject/:inviteId", to: RejectInvitePage }
+page RejectInvitePage {
+  authRequired: false,
+  component: import RejectInvitePage from "@src/client/modules/invites/RejectInvitePage"
+}
+
 route ClientsListRoute { path: "/clients", to: ClientsListPage }
 page ClientsListPage {
   authRequired: true,

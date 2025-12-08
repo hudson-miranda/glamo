@@ -4,21 +4,23 @@ import { Card } from '../../client/components/ui/Card';
 import { GradientText } from '../../client/components/ui/GradientText';
 import { Badge } from '../../client/components/ui/Badge';
 import { GlowEffect } from '../../client/components/ui/GlowEffect';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, ReactNode } from 'react';
+import { FaStripeS, FaWhatsapp  } from "react-icons/fa";
+import { SiPagseguro, SiMercadopago, SiGooglecalendar, SiOpenai    } from "react-icons/si";
 
 interface Integration {
   name: string;
-  icon: string;
+  icon: ReactNode;
   color: string;
 }
 
 const integrations: Integration[] = [
-  { name: 'Mercado Pago', icon: '💳', color: 'from-blue-500 to-cyan-500' },
-  { name: 'PagSeguro', icon: '💰', color: 'from-green-500 to-emerald-500' },
-  { name: 'Stripe', icon: '�', color: 'from-brand-500 to-indigo-500' },
-  { name: 'WhatsApp', icon: '💬', color: 'from-green-400 to-green-600' },
-  { name: 'Google Cal', icon: '📅', color: 'from-red-500 to-yellow-500' },
-  { name: 'OpenAI', icon: '🤖', color: 'from-emerald-400 to-cyan-500' },
+  { name: 'Mercado Pago', icon: <SiMercadopago className="text-white"/>, color: 'from-brand-400 to-brand-600' },
+  { name: 'PagSeguro', icon: <SiPagseguro className="text-white"/>, color: 'from-brand-400 to-brand-600' },
+  { name: 'Stripe', icon: <FaStripeS className="text-white"/>, color: 'from-brand-400 to-brand-600' },
+  { name: 'WhatsApp', icon: <FaWhatsapp className="text-white"/>, color: 'from-brand-400 to-brand-600' },
+  { name: 'Google Cal', icon: <SiGooglecalendar className="text-white"/>, color: 'from-brand-400 to-brand-600' },
+  { name: 'OpenAI', icon: <SiOpenai className="text-white"/>, color: 'from-brand-400 to-brand-600' },
 ];
 
 export default function IntegrationsSection() {

@@ -1,27 +1,59 @@
-# Node
+# Wasp build outputs
+app/.wasp/
+app/node_modules/
+app/dist/
+app/build/
+
+# Node modules
 node_modules/
-npm-debug.log
+**/node_modules/
+
+# Environment files
 .env
-.env.*
+.env.local
+.env.*.local
+production.env
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+server.log
+
+# OS files
 .DS_Store
+Thumbs.db
 
-# Wasp
-.wasp/out/
-app/.wasp/out/
-.wasp/build/
-wasp-lock.yaml
-
-# Prisma
-prisma/dev.db
-prisma/migrations/
-
-# IDEs
+# IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
-# Environment files (NEVER COMMIT THESE)
-app/.env.server
-app/.env.client
-*.env.local
-*.env.development
-*.env.production
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Temporary files
+*.tmp
+*.temp
+
+# Symbolic links
+app/node
+app/npm
+app/tsc
+app/vite
+app/nodemon
+app/OpenSaaS@0.0.0
+app/server@0.0.0
+app/wasp@1.0.0
+
+# Test files
+coverage/
+.nyc_output/
+
+# Misc
+public/test-react.html

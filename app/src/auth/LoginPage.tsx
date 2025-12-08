@@ -8,6 +8,7 @@ import { PasswordInput } from './components/PasswordInput';
 import { LoadingButton } from './components/LoadingButton';
 import { GoogleButton } from './components/GoogleButton';
 import { motion } from 'framer-motion';
+import { FaBoltLightning, FaStar, FaLock } from "react-icons/fa6";
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -167,9 +168,9 @@ export default function LoginPage() {
         {/* Trust indicators */}
         <div className="grid grid-cols-3 gap-4 pt-6">
           {[
-            { icon: '🔒', text: 'Seguro' },
-            { icon: '⚡', text: 'Rápido' },
-            { icon: '✨', text: 'Grátis' }
+            { icon: <FaLock />, text: 'Seguro' },
+            { icon: <FaBoltLightning />, text: 'Rápido' },
+            { icon: <FaStar />, text: 'Grátis' }
           ].map((item, index) => (
             <div key={index} className="text-center">
               <div className="text-2xl mb-1">{item.icon}</div>
@@ -183,4 +184,3 @@ export default function LoginPage() {
     </AuthPageLayout>
   );
 }
-

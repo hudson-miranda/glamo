@@ -18,9 +18,9 @@
     "strict": true,
     "esModuleInterop": true,
     "isolatedModules": true,
+    "skipLibCheck": true,
     "moduleDetection": "force",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "skipLibCheck": true,
     "allowJs": true,
     "outDir": ".wasp/out/user"
   },

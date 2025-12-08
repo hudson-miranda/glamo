@@ -17,37 +17,37 @@ interface Feature {
 
 const features: Feature[] = [
   {
-    icon: <FaCalendarAlt />,
+    icon: <FaCalendarAlt className="text-white"/>,
     title: 'Agendamento 24/7',
     description: 'Seus clientes agendam a qualquer hora com confirmação automática',
     color: 'from-brand-400 to-brand-600',
   },
   {
-    icon: <FaUsers />,
+    icon: <FaUsers className="text-white"/>,
     title: 'CRM Completo',
     description: 'Gestão completa de clientes com histórico e fidelidade',
     color: 'from-brand-400 to-brand-600',
   },
   {
-    icon: <FaDollarSign />,
+    icon: <FaDollarSign className="text-white"/>,
     title: 'Controle Financeiro',
     description: 'Caixa, vendas e comissões com Mercado Pago e Stripe',
     color: 'from-brand-400 to-brand-600',
   },
   {
-    icon: <FaBox />,
+    icon: <FaBox className="text-white"/>,
     title: 'Gestão de Estoque',
     description: 'Controle de produtos com alertas inteligentes',
     color: 'from-brand-400 to-brand-600',
   },
   {
-    icon: <FaChartBar />,
+    icon: <FaChartBar className="text-white"/>,
     title: 'Relatórios em Tempo Real',
     description: 'Dashboards automáticos com métricas do negócio',
     color: 'from-brand-400 to-brand-600',
   },
   {
-    icon: <FaRobot />,
+    icon: <FaRobot className="text-white"/>,
     title: 'Assistente com IA',
     description: 'Agente inteligente OpenAI para insights automáticos',
     color: 'from-brand-400 to-brand-600',

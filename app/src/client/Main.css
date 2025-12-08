@@ -170,6 +170,15 @@
       rgba(var(--brand-rgb), 0.18) 360deg
     );
   }
+
+  /* Icon color responsive to theme */
+  .icon-theme-responsive {
+    color: #ffffff; /* light mode (tema claro) */
+  }
+
+  .dark .icon-theme-responsive {
+    color: #000000; /* dark mode (tema escuro) */
+  }
 }
 
 /* Custom font */

@@ -13,6 +13,13 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../components/ui/select';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '../../components/ui/use-toast';
 
@@ -26,6 +33,7 @@ interface CategoryModalProps {
 interface CategoryFormData {
   name: string;
   description?: string;
+  type: 'SERVICE' | 'PRODUCT' | 'BOTH';
 }
 
 export function CategoryModal({ 
@@ -36,13 +44,18 @@ export function CategoryModal({
 }: CategoryModalProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedType, setSelectedType] = useState<'SERVICE' | 'PRODUCT' | 'BOTH'>('BOTH');
   
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<CategoryFormData>();
+  } = useForm<CategoryFormData>({
+    defaultValues: {
+      type: 'BOTH'
+    }
+  });
 
   const onSubmit = async (data: CategoryFormData) => {
     setIsSubmitting(true);
@@ -51,6 +64,7 @@ export function CategoryModal({
         salonId,
         name: data.name.trim(),
         description: data.description?.trim() || undefined,
+        type: selectedType,
       });
 
       toast({
@@ -74,6 +88,7 @@ export function CategoryModal({
   const handleClose = () => {
     if (!isSubmitting) {
       reset();
+      setSelectedType('BOTH');
       onClose();
     }
   };
@@ -154,6 +169,46 @@ export function CategoryModal({
             {errors.description && (
               <p className="text-sm text-red-500">{errors.description.message}</p>
             )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="type">
+              Tipo de Categoria <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              value={selectedType}
+              onValueChange={(value) => setSelectedType(value as 'SERVICE' | 'PRODUCT' | 'BOTH')}
+              disabled={isSubmitting}
+            >
+              <SelectTrigger id="type">
+                <SelectValue placeholder="Selecione o tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="BOTH">
+                  <div className="flex flex-col">
+                    <span className="font-medium">Ambos</span>
+                    <span className="text-xs text-muted-foreground">Pode ser usada em serviços e produtos</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="SERVICE">
+                  <div className="flex flex-col">
+                    <span className="font-medium">Apenas Serviços</span>
+                    <span className="text-xs text-muted-foreground">Aparece somente em serviços</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="PRODUCT">
+                  <div className="flex flex-col">
+                    <span className="font-medium">Apenas Produtos</span>
+                    <span className="text-xs text-muted-foreground">Aparece somente em produtos</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              {selectedType === 'BOTH' && 'Esta categoria estará disponível tanto para produtos quanto para serviços'}
+              {selectedType === 'SERVICE' && 'Esta categoria estará disponível apenas para serviços'}
+              {selectedType === 'PRODUCT' && 'Esta categoria estará disponível apenas para produtos'}
+            </p>
           </div>
 
           <DialogFooter>
