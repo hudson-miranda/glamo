@@ -30,6 +30,7 @@ import {
   ChevronUp,
   Tag,
   Bookmark,
+  Building2,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Button } from '../../components/ui/button';
@@ -108,6 +109,12 @@ const navSections: NavSection[] = [
         title: 'Marcas',
         href: '/brands',
         icon: Bookmark,
+        permission: 'can_view_products',
+      },
+      {
+        title: 'Fornecedores',
+        href: '/suppliers',
+        icon: Building2,
         permission: 'can_view_products',
       },
       {
@@ -212,7 +219,12 @@ const navSections: NavSection[] = [
   },
 ];
 
-export function Sidebar({ className }: { className?: string }) {
+interface SidebarProps {
+  className?: string;
+  onClose?: () => void;
+}
+
+export function Sidebar({ className, onClose }: SidebarProps) {
   const { data: user } = useAuth();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -230,6 +242,13 @@ export function Sidebar({ className }: { className?: string }) {
       ...prev,
       [sectionTitle]: !prev[sectionTitle]
     }));
+  };
+
+  const handleLinkClick = () => {
+    // Close mobile sidebar when link is clicked
+    if (onClose) {
+      onClose();
+    }
   };
 
   return (
@@ -291,6 +310,7 @@ export function Sidebar({ className }: { className?: string }) {
                       <Link
                         key={item.href}
                         to={item.href as any}
+                        onClick={handleLinkClick}
                         className={cn(
                           'flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200',
                           isCollapsed ? 'justify-center' : 'space-x-3',
@@ -323,6 +343,7 @@ export function Sidebar({ className }: { className?: string }) {
       <div className='border-t p-2 space-y-2'>
         <Link
           to='/notifications'
+          onClick={handleLinkClick}
           className={cn(
             'flex items-center rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground',
             isCollapsed ? 'justify-center' : 'space-x-3',
@@ -336,6 +357,7 @@ export function Sidebar({ className }: { className?: string }) {
         
         <Link
           to='/account'
+          onClick={handleLinkClick}
           className={cn(
             'flex items-center rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground',
             isCollapsed ? 'justify-center' : 'space-x-3',
@@ -347,11 +369,12 @@ export function Sidebar({ className }: { className?: string }) {
           {!isCollapsed && <span>Configurações</span>}
         </Link>
         
+        {/* Hide collapse button on mobile since we use overlay */}
         <Button
           variant='ghost'
           size='sm'
           className={cn(
-            'w-full',
+            'w-full hidden lg:flex',
             isCollapsed ? 'px-0' : ''
           )}
           onClick={() => setIsCollapsed(!isCollapsed)}
