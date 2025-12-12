@@ -60,7 +60,7 @@ const navSections: NavSection[] = [
       },
       {
         title: 'Agenda',
-        href: '/agenda',
+        href: '/calendar',
         icon: Calendar,
         permission: 'can_view_appointments',
       },
