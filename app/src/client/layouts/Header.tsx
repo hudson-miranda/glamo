@@ -1,7 +1,7 @@
 import { useAuth } from 'wasp/client/auth';
 import { logout } from 'wasp/client/auth';
 import { useQuery, getUserSalons, switchActiveSalon } from 'wasp/client/operations';
-import { Bell, ChevronDown, Building2, LogOut, User, Plus } from 'lucide-react';
+import { Bell, ChevronDown, Building2, LogOut, User, Plus, Menu } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +18,11 @@ import DarkModeSwitcher from '../components/DarkModeSwitcher';
 import { useToast } from '../hooks/useToast';
 import { useState } from 'react';
 
-export function Header() {
+interface HeaderProps {
+  onMenuClick?: () => void;
+}
+
+export function Header({ onMenuClick }: HeaderProps) {
   const { data: user } = useAuth();
   const { activeSalonId, setActiveSalonId, setUserSalons } = useSalonContext();
   const { toast } = useToast();
@@ -64,23 +68,33 @@ export function Header() {
   };
 
   return (
-    <header className='flex h-16 items-center justify-between border-b bg-background px-6'>
-      <div className='flex items-center space-x-4'>
+    <header className='flex h-16 items-center justify-between border-b bg-background px-3 sm:px-4 md:px-6'>
+      <div className='flex items-center space-x-2 sm:space-x-4'>
+        {/* Mobile Menu Button */}
+        <Button 
+          variant='ghost' 
+          size='icon'
+          className='lg:hidden'
+          onClick={onMenuClick}
+        >
+          <Menu className='h-5 w-5' />
+        </Button>
+
         {/* Salon Switcher */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button 
               variant='outline' 
-              className='min-w-[200px] justify-between'
+              className='min-w-[120px] sm:min-w-[180px] md:min-w-[200px] justify-between text-xs sm:text-sm'
               disabled={isSwitching || isLoading}
             >
-              <div className='flex items-center space-x-2'>
-                <Building2 className='h-4 w-4' />
-                <span className='text-sm'>
+              <div className='flex items-center space-x-2 truncate'>
+                <Building2 className='h-4 w-4 flex-shrink-0' />
+                <span className='truncate'>
                   {isSwitching ? 'Switching...' : activeSalonName}
                 </span>
               </div>
-              <ChevronDown className='h-4 w-4 opacity-50' />
+              <ChevronDown className='h-4 w-4 opacity-50 flex-shrink-0' />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='start' className='w-[220px]'>
@@ -121,11 +135,11 @@ export function Header() {
         </DropdownMenu>
       </div>
 
-      <div className='flex items-center space-x-4'>
+      <div className='flex items-center space-x-1 sm:space-x-2 md:space-x-4'>
         {/* Notifications */}
         <Link to='/notifications'>
-          <Button variant='ghost' size='icon' className='relative'>
-            <Bell className='h-5 w-5' />
+          <Button variant='ghost' size='icon' className='relative h-9 w-9'>
+            <Bell className='h-4 w-4 sm:h-5 sm:w-5' />
             {/* Notification badge */}
             <span className='absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] text-destructive-foreground'>
               3
@@ -139,12 +153,12 @@ export function Header() {
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant='ghost' className='flex items-center space-x-2'>
-              <Avatar className='h-8 w-8'>
+            <Button variant='ghost' className='flex items-center space-x-1 sm:space-x-2 h-9 px-2 sm:px-3'>
+              <Avatar className='h-7 w-7 sm:h-8 sm:w-8'>
                 <AvatarFallback>{initials}</AvatarFallback>
               </Avatar>
-              <span className='text-sm font-medium'>{user?.email}</span>
-              <ChevronDown className='h-4 w-4 opacity-50' />
+              <span className='hidden sm:inline text-sm font-medium max-w-[100px] md:max-w-[150px] truncate'>{user?.email}</span>
+              <ChevronDown className='h-3 w-3 sm:h-4 sm:w-4 opacity-50' />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>

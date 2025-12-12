@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>React Test</title>
+</head>
+<body>
+    <div id="test"></div>
+    <script type="module">
+        import React from '/node_modules/.vite/deps/react.js';
+        import ReactDOM from '/node_modules/.vite/deps/react-dom_client.js';
+        
+        console.log('React version:', React.version);
+        console.log('React:', React);
+        console.log('ReactDOM:', ReactDOM);
+        
+        document.getElementById('test').innerHTML = 'React version: ' + React.version;
+    </script>
+</body>
+</html>
