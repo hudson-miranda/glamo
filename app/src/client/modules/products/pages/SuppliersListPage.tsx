@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery, listSuppliers, createSupplier, updateSupplier, deleteSupplier } from 'wasp/client/operations';
 import { useSalonContext } from '../../../hooks/useSalonContext';
 import { Card, CardContent } from '../../../../components/ui/card';
@@ -12,7 +12,15 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
 } from '../../../../components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '../../../../components/ui/dialog';
 import {
   Table,
   TableBody,
@@ -44,9 +52,25 @@ import {
   Mail,
   MapPin,
   FileText,
+  Filter,
+  X,
+  ArrowUpDown,
+  Settings2,
 } from 'lucide-react';
 import { useToast } from '../../../../components/ui/use-toast';
 import { SupplierFormModal } from '../components/SupplierFormModal';
+import { Checkbox } from '../../../../components/ui/checkbox';
+
+// Definição de colunas disponíveis
+const AVAILABLE_COLUMNS = [
+  { id: 'name', label: 'Nome', enabled: true },
+  { id: 'contact', label: 'Contato', enabled: true },
+  { id: 'email', label: 'Email', enabled: true },
+  { id: 'cnpj', label: 'CNPJ', enabled: true },
+  { id: 'address', label: 'Endereço', enabled: false },
+  { id: 'city', label: 'Cidade', enabled: false },
+  { id: 'products', label: 'Produtos', enabled: true },
+];
 
 interface Supplier {
   id: string;
@@ -75,12 +99,29 @@ export default function SuppliersListPage() {
   const { toast } = useToast();
   
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isColumnsModalOpen, setIsColumnsModalOpen] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [supplierToDelete, setSupplierToDelete] = useState<Supplier | null>(null);
   const [isDeletingSupplier, setIsDeletingSupplier] = useState(false);
+
+  // Filtros
+  const [filterHasProducts, setFilterHasProducts] = useState<string>('all');
+  const [filterHasEmail, setFilterHasEmail] = useState(false);
+  const [filterHasPhone, setFilterHasPhone] = useState(false);
+  
+  // Ordenação
+  const [sortBy, setSortBy] = useState<string>('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  
+  // Colunas visíveis
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(
+    AVAILABLE_COLUMNS.filter(col => col.enabled).map(col => col.id)
+  );
 
   const { data, isLoading, error, refetch } = useQuery(listSuppliers, {
     salonId: activeSalonId!,
@@ -90,7 +131,7 @@ export default function SuppliersListPage() {
   const suppliers = data || [];
 
   // Filter and sort suppliers
-  const filteredSuppliers = useMemo(() => {
+  const allFilteredSuppliers = useMemo(() => {
     let filtered = [...suppliers];
 
     // Search filter
@@ -105,11 +146,55 @@ export default function SuppliersListPage() {
       );
     }
 
-    // Sort by name
-    filtered.sort((a, b) => a.name.localeCompare(b.name));
+    // Filtro de produtos
+    if (filterHasProducts === 'with') {
+      filtered = filtered.filter(s => s._count && s._count.products > 0);
+    } else if (filterHasProducts === 'without') {
+      filtered = filtered.filter(s => !s._count || s._count.products === 0);
+    }
+
+    // Filtro de email
+    if (filterHasEmail) {
+      filtered = filtered.filter(s => s.email);
+    }
+
+    // Filtro de telefone
+    if (filterHasPhone) {
+      filtered = filtered.filter(s => s.phone);
+    }
+
+    // Sort
+    filtered.sort((a, b) => {
+      let aValue, bValue;
+      switch (sortBy) {
+        case 'name':
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case 'email':
+          aValue = a.email?.toLowerCase() || '';
+          bValue = b.email?.toLowerCase() || '';
+          break;
+        case 'products':
+          aValue = a._count?.products || 0;
+          bValue = b._count?.products || 0;
+          break;
+        default:
+          return 0;
+      }
+      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
 
     return filtered;
-  }, [suppliers, search]);
+  }, [suppliers, search, filterHasProducts, filterHasEmail, filterHasPhone, sortBy, sortOrder]);
+
+  // Paginação
+  const totalPages = Math.ceil(allFilteredSuppliers.length / perPage);
+  const startIndex = (page - 1) * perPage;
+  const endIndex = startIndex + perPage;
+  const filteredSuppliers = allFilteredSuppliers.slice(startIndex, endIndex);
 
   const handleOpenModal = (supplier?: Supplier) => {
     setEditingSupplier(supplier || null);
@@ -193,9 +278,26 @@ export default function SuppliersListPage() {
 
   const handleClearFilters = () => {
     setSearch('');
+    setFilterHasProducts('all');
+    setFilterHasEmail(false);
+    setFilterHasPhone(false);
   };
 
-  const hasActiveFilters = search !== '';
+  // Resetar página quando filtros mudarem
+  useEffect(() => {
+    setPage(1);
+  }, [search, filterHasProducts, filterHasEmail, filterHasPhone]);
+
+  const hasActiveFilters = search !== '' || filterHasProducts !== 'all' || 
+    filterHasEmail || filterHasPhone;
+
+  const toggleColumn = (columnId: string) => {
+    setVisibleColumns(prev =>
+      prev.includes(columnId)
+        ? prev.filter(id => id !== columnId)
+        : [...prev, columnId]
+    );
+  };
 
   if (!activeSalonId) {
     return (
@@ -286,153 +388,295 @@ export default function SuppliersListPage() {
         </Card>
       </div>
 
-      {/* Filters */}
+      {/* Search, Filters and Actions */}
       <Card>
-        <CardContent className="p-4 md:p-6">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="flex-1 max-w-md">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar por nome, email, telefone, CNPJ..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+        <CardContent className='pt-6'>
+          <div className='flex flex-col gap-4'>
+            {/* Busca */}
+            <div className='relative flex-1'>
+              <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+              <Input
+                placeholder='Buscar por nome, email, telefone, CNPJ...'
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className='pl-10'
+              />
             </div>
-            
-            {hasActiveFilters && (
+
+            {/* Barra de Ações */}
+            <div className='flex items-center gap-2 flex-wrap'>
+              {/* Filtros */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant='outline' size='sm' className='gap-2'>
+                    <Filter className='h-4 w-4' />
+                    Filtros
+                    {hasActiveFilters && (
+                      <Badge variant='secondary' className='ml-1 px-1.5 py-0.5 text-xs'>
+                        {[filterHasProducts !== 'all', filterHasEmail, filterHasPhone].filter(Boolean).length}
+                      </Badge>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='start' className='w-56'>
+                  <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  
+                  <div className='p-2 space-y-2'>
+                    <div>
+                      <Label className='text-xs text-muted-foreground mb-1.5 block'>Produtos</Label>
+                      <select
+                        className='w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
+                        value={filterHasProducts}
+                        onChange={(e) => setFilterHasProducts(e.target.value)}
+                      >
+                        <option value='all'>Todos</option>
+                        <option value='with'>Com produtos</option>
+                        <option value='without'>Sem produtos</option>
+                      </select>
+                    </div>
+
+                    <div className='flex items-center space-x-2 pt-2'>
+                      <Checkbox
+                        id='hasEmail'
+                        checked={filterHasEmail}
+                        onCheckedChange={(checked) => setFilterHasEmail(checked as boolean)}
+                      />
+                      <label
+                        htmlFor='hasEmail'
+                        className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+                      >
+                        Apenas com email
+                      </label>
+                    </div>
+
+                    <div className='flex items-center space-x-2'>
+                      <Checkbox
+                        id='hasPhone'
+                        checked={filterHasPhone}
+                        onCheckedChange={(checked) => setFilterHasPhone(checked as boolean)}
+                      />
+                      <label
+                        htmlFor='hasPhone'
+                        className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+                      >
+                        Apenas com telefone
+                      </label>
+                    </div>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Ordenação */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant='outline' size='sm' className='gap-2'>
+                    <ArrowUpDown className='h-4 w-4' />
+                    Ordenar
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='start'>
+                  <DropdownMenuLabel>Ordenar por</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => { setSortBy('name'); setSortOrder('asc'); }}>
+                    Nome (A-Z)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { setSortBy('name'); setSortOrder('desc'); }}>
+                    Nome (Z-A)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { setSortBy('email'); setSortOrder('asc'); }}>
+                    Email (A-Z)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { setSortBy('products'); setSortOrder('desc'); }}>
+                    Mais Produtos
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { setSortBy('products'); setSortOrder('asc'); }}>
+                    Menos Produtos
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Customizar Colunas */}
               <Button 
-                variant="outline" 
-                onClick={handleClearFilters}
-                className="w-full md:w-auto"
+                variant='outline' 
+                size='sm' 
+                className='gap-2'
+                onClick={() => setIsColumnsModalOpen(true)}
               >
-                Limpar Filtros
+                <Settings2 className='h-4 w-4' />
+                Colunas
               </Button>
-            )}
+
+              {/* Limpar Filtros */}
+              {hasActiveFilters && (
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  onClick={handleClearFilters}
+                  className='gap-2'
+                >
+                  <X className='h-4 w-4' />
+                  Limpar Filtros
+                </Button>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Table */}
       <Card>
-        <CardContent className="p-0">
+        <CardContent className='p-0'>
           {isLoading ? (
-            <div className="flex items-center justify-center h-64">
-              <p className="text-muted-foreground">Carregando...</p>
+            <div className='flex items-center justify-center p-8'>
+              <p className='text-sm text-muted-foreground'>Carregando fornecedores...</p>
             </div>
           ) : error ? (
-            <div className="flex items-center justify-center h-64">
-              <p className="text-destructive">Erro ao carregar fornecedores</p>
+            <div className='flex items-center justify-center p-8'>
+              <p className='text-sm text-destructive'>
+                Erro ao carregar fornecedores: {error.message}
+              </p>
             </div>
-          ) : filteredSuppliers.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-64 gap-2">
-              <Building2 className="h-12 w-12 text-muted-foreground/50" />
-              <p className="text-muted-foreground">
-                {hasActiveFilters 
-                  ? 'Nenhum fornecedor encontrado com os filtros aplicados'
-                  : 'Nenhum fornecedor cadastrado'}
+          ) : allFilteredSuppliers.length === 0 ? (
+            <div className='flex flex-col items-center justify-center p-12 text-center'>
+              <Building2 className='h-12 w-12 text-muted-foreground mb-4' />
+              <h3 className='text-lg font-semibold mb-2'>
+                {hasActiveFilters ? 'Nenhum fornecedor encontrado' : 'Nenhum fornecedor cadastrado'}
+              </h3>
+              <p className='text-sm text-muted-foreground mb-4'>
+                {hasActiveFilters
+                  ? 'Tente ajustar os filtros de busca'
+                  : 'Comece adicionando o primeiro fornecedor'}
               </p>
               {!hasActiveFilters && (
-                <Button onClick={() => handleOpenModal()} variant="outline" className="mt-2">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Cadastrar Primeiro Fornecedor
+                <Button onClick={() => handleOpenModal()}>
+                  <Plus className='mr-2 h-4 w-4' />
+                  Adicionar Fornecedor
                 </Button>
               )}
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className='overflow-x-auto'>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="min-w-[200px]">Nome</TableHead>
-                    <TableHead className="hidden md:table-cell">Contato</TableHead>
-                    <TableHead className="hidden lg:table-cell">Email</TableHead>
-                    <TableHead className="hidden xl:table-cell">CNPJ</TableHead>
-                    <TableHead className="text-center">Produtos</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
+                    {visibleColumns.includes('name') && <TableHead>Nome</TableHead>}
+                    {visibleColumns.includes('contact') && <TableHead className='hidden md:table-cell'>Contato</TableHead>}
+                    {visibleColumns.includes('email') && <TableHead className='hidden lg:table-cell'>Email</TableHead>}
+                    {visibleColumns.includes('cnpj') && <TableHead className='hidden xl:table-cell'>CNPJ</TableHead>}
+                    {visibleColumns.includes('address') && <TableHead className='hidden xl:table-cell'>Endereço</TableHead>}
+                    {visibleColumns.includes('city') && <TableHead className='hidden xl:table-cell'>Cidade</TableHead>}
+                    {visibleColumns.includes('products') && <TableHead className='text-center'>Produtos</TableHead>}
+                    <TableHead className='text-right'>Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredSuppliers.map((supplier) => (
                     <TableRow key={supplier.id}>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{supplier.name}</span>
-                          {supplier.contactName && (
-                            <span className="text-xs text-muted-foreground">
-                              Contato: {supplier.contactName}
-                            </span>
+                      {visibleColumns.includes('name') && (
+                        <TableCell>
+                          <div className='flex flex-col'>
+                            <span className='font-medium'>{supplier.name}</span>
+                            {supplier.contactName && (
+                              <span className='text-xs text-muted-foreground'>
+                                Contato: {supplier.contactName}
+                              </span>
+                            )}
+                            {/* Show on mobile */}
+                            <div className='md:hidden mt-1 space-y-0.5'>
+                              {supplier.phone && (
+                                <div className='flex items-center gap-1 text-xs text-muted-foreground'>
+                                  <Phone className='h-3 w-3' />
+                                  {supplier.phone}
+                                </div>
+                              )}
+                              {supplier.email && (
+                                <div className='flex items-center gap-1 text-xs text-muted-foreground'>
+                                  <Mail className='h-3 w-3' />
+                                  {supplier.email}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </TableCell>
+                      )}
+                      {visibleColumns.includes('contact') && (
+                        <TableCell className='hidden md:table-cell'>
+                          {supplier.phone ? (
+                            <div className='flex items-center gap-2'>
+                              <Phone className='h-4 w-4 text-muted-foreground' />
+                              <span className='text-sm'>{supplier.phone}</span>
+                            </div>
+                          ) : (
+                            <span className='text-sm text-muted-foreground'>-</span>
                           )}
-                          {/* Show on mobile */}
-                          <div className="md:hidden mt-1 space-y-0.5">
-                            {supplier.phone && (
-                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                <Phone className="h-3 w-3" />
-                                {supplier.phone}
-                              </div>
-                            )}
-                            {supplier.email && (
-                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                <Mail className="h-3 w-3" />
-                                {supplier.email}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        {supplier.phone ? (
-                          <div className="flex items-center gap-2">
-                            <Phone className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm">{supplier.phone}</span>
-                          </div>
-                        ) : (
-                          <span className="text-sm text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="hidden lg:table-cell">
-                        {supplier.email ? (
-                          <div className="flex items-center gap-2">
-                            <Mail className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm">{supplier.email}</span>
-                          </div>
-                        ) : (
-                          <span className="text-sm text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="hidden xl:table-cell">
-                        {supplier.cnpj ? (
-                          <span className="text-sm">{supplier.cnpj}</span>
-                        ) : (
-                          <span className="text-sm text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Badge variant="secondary">
-                          {supplier._count?.products || 0}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
+                        </TableCell>
+                      )}
+                      {visibleColumns.includes('email') && (
+                        <TableCell className='hidden lg:table-cell'>
+                          {supplier.email ? (
+                            <div className='flex items-center gap-2'>
+                              <Mail className='h-4 w-4 text-muted-foreground' />
+                              <span className='text-sm'>{supplier.email}</span>
+                            </div>
+                          ) : (
+                            <span className='text-sm text-muted-foreground'>-</span>
+                          )}
+                        </TableCell>
+                      )}
+                      {visibleColumns.includes('cnpj') && (
+                        <TableCell className='hidden xl:table-cell'>
+                          {supplier.cnpj ? (
+                            <span className='text-sm'>{supplier.cnpj}</span>
+                          ) : (
+                            <span className='text-sm text-muted-foreground'>-</span>
+                          )}
+                        </TableCell>
+                      )}
+                      {visibleColumns.includes('address') && (
+                        <TableCell className='hidden xl:table-cell'>
+                          {supplier.address ? (
+                            <span className='text-sm'>{supplier.address}{supplier.addressNumber ? `, ${supplier.addressNumber}` : ''}</span>
+                          ) : (
+                            <span className='text-sm text-muted-foreground'>-</span>
+                          )}
+                        </TableCell>
+                      )}
+                      {visibleColumns.includes('city') && (
+                        <TableCell className='hidden xl:table-cell'>
+                          {supplier.city ? (
+                            <span className='text-sm'>{supplier.city}{supplier.state ? ` - ${supplier.state}` : ''}</span>
+                          ) : (
+                            <span className='text-sm text-muted-foreground'>-</span>
+                          )}
+                        </TableCell>
+                      )}
+                      {visibleColumns.includes('products') && (
+                        <TableCell className='text-center'>
+                          <Badge variant='secondary'>
+                            {supplier._count?.products || 0}
+                          </Badge>
+                        </TableCell>
+                      )}
+                      <TableCell className='text-right'>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="h-4 w-4" />
+                            <Button variant='ghost' size='icon'>
+                              <MoreVertical className='h-4 w-4' />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
+                          <DropdownMenuContent align='end'>
                             <DropdownMenuLabel>Ações</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={() => handleOpenModal(supplier)}>
-                              <Edit className="mr-2 h-4 w-4" />
+                              <Edit className='mr-2 h-4 w-4' />
                               Editar
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                               onClick={() => handleDeleteClick(supplier)}
-                              className="text-destructive"
+                              className='text-destructive'
                             >
-                              <Trash2 className="mr-2 h-4 w-4" />
+                              <Trash2 className='mr-2 h-4 w-4' />
                               Excluir
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -442,6 +686,53 @@ export default function SuppliersListPage() {
                   ))}
                 </TableBody>
               </Table>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {!isLoading && !error && allFilteredSuppliers.length > 0 && (
+            <div className='flex items-center justify-between border-t px-6 py-4'>
+              <div className='flex items-center gap-4'>
+                <div className='text-sm text-muted-foreground'>
+                  Mostrando {startIndex + 1}-{Math.min(endIndex, allFilteredSuppliers.length)} de {allFilteredSuppliers.length} fornecedor{allFilteredSuppliers.length !== 1 ? 'es' : ''}
+                </div>
+                <select
+                  value={perPage}
+                  onChange={(e) => {
+                    setPerPage(Number(e.target.value));
+                    setPage(1);
+                  }}
+                  className='h-8 rounded-md border border-input bg-background px-3 pr-8 text-sm'
+                >
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+              </div>
+              <div className='flex items-center space-x-2'>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={() => setPage(page - 1)}
+                  disabled={page === 1}
+                >
+                  Anterior
+                </Button>
+                <div className='flex items-center gap-1 px-2'>
+                  <span className='text-sm'>
+                    Página {page} de {totalPages || 1}
+                  </span>
+                </div>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={() => setPage(page + 1)}
+                  disabled={page >= totalPages}
+                >
+                  Próxima
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>
@@ -455,6 +746,35 @@ export default function SuppliersListPage() {
         supplier={editingSupplier}
         isLoading={isSubmitting}
       />
+
+      {/* Columns Modal */}
+      <Dialog open={isColumnsModalOpen} onOpenChange={setIsColumnsModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Customizar Colunas</DialogTitle>
+            <DialogDescription>
+              Selecione as colunas que deseja exibir na tabela
+            </DialogDescription>
+          </DialogHeader>
+          <div className='space-y-4 py-4'>
+            {AVAILABLE_COLUMNS.map((column) => (
+              <div key={column.id} className='flex items-center space-x-2'>
+                <Checkbox
+                  id={column.id}
+                  checked={visibleColumns.includes(column.id)}
+                  onCheckedChange={() => toggleColumn(column.id)}
+                />
+                <label
+                  htmlFor={column.id}
+                  className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+                >
+                  {column.label}
+                </label>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
