@@ -59,6 +59,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '../../../../components/ui/use-toast';
 import { SupplierFormModal } from '../components/SupplierFormModal';
+import { SupplierStatsCards } from '../components/SupplierStatsCards';
 import { Checkbox } from '../../../../components/ui/checkbox';
 
 // Definição de colunas disponíveis
@@ -324,69 +325,15 @@ export default function SuppliersListPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary/10 rounded-lg">
-                <Building2 className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Total</p>
-                <p className="text-2xl font-bold">{suppliers.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-500/10 rounded-lg">
-                <Package className="h-6 w-6 text-blue-500" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Com Produtos</p>
-                <p className="text-2xl font-bold">
-                  {suppliers.filter((s: Supplier) => s._count && s._count.products > 0).length}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-500/10 rounded-lg">
-                <Mail className="h-6 w-6 text-green-500" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Com Email</p>
-                <p className="text-2xl font-bold">
-                  {suppliers.filter((s: Supplier) => s.email).length}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-orange-500/10 rounded-lg">
-                <Phone className="h-6 w-6 text-orange-500" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Com Telefone</p>
-                <p className="text-2xl font-bold">
-                  {suppliers.filter((s: Supplier) => s.phone).length}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <SupplierStatsCards
+        stats={{
+          total: suppliers.length,
+          withProducts: suppliers.filter((s: Supplier) => s._count && s._count.products > 0).length,
+          withEmail: suppliers.filter((s: Supplier) => s.email).length,
+          withPhone: suppliers.filter((s: Supplier) => s.phone).length,
+        }}
+        isLoading={isLoading}
+      />
 
       {/* Search, Filters and Actions */}
       <Card>
