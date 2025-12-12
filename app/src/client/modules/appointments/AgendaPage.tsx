@@ -205,9 +205,14 @@ export default function AgendaPage() {
   const professionalColors = useMemo(() => {
     const colorMap: Record<string, string> = {};
     employees.forEach((emp: any, idx) => {
-      // Usa a cor do banco ou cor padrão
-      colorMap[emp.userId] = emp.color || DEFAULT_COLORS[idx % DEFAULT_COLORS.length];
+      // Só mapeia se o employee tiver userId (ou seja, está vinculado a um User)
+      if (emp.userId) {
+        // Usa a cor do banco ou cor padrão
+        colorMap[emp.userId] = emp.color || DEFAULT_COLORS[idx % DEFAULT_COLORS.length];
+      }
     });
+    console.log('Professional Colors Map:', colorMap);
+    console.log('Employees:', employees.map((e: any) => ({ id: e.id, userId: e.userId, name: e.name, color: e.color })));
     return colorMap;
   }, [employees]);
 
