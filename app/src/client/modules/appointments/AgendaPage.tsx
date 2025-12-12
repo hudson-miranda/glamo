@@ -98,8 +98,8 @@ const BUSINESS_HOURS = {
 };
 
 // Gerar slots de 30 minutos
-const generateTimeSlots = () => {
-  const slots = [];
+const generateTimeSlots = (): { hour: number; minute: number }[] => {
+  const slots: { hour: number; minute: number }[] = [];
   for (let hour = BUSINESS_HOURS.start; hour < BUSINESS_HOURS.end; hour++) {
     slots.push({ hour, minute: 0 });
     slots.push({ hour, minute: 30 });
@@ -107,7 +107,7 @@ const generateTimeSlots = () => {
   return slots;
 };
 
-const TIME_SLOTS = generateTimeSlots();
+const TIME_SLOTS: { hour: number; minute: number }[] = generateTimeSlots();
 
 // Cores para diferentes profissionais (palette moderna)
 const PROFESSIONAL_COLORS = [
@@ -849,7 +849,7 @@ export default function AgendaPage() {
                                       isToday(day) ? 'bg-primary/5' : ''
                                     }`}
                                     onClick={() => {
-                                      if (!hasAppointments && visibleProfessionals.length > 0) {
+                                      if (!hasAppointments && visibleProfessionals.length > 0 && visibleProfessionals[0].userId) {
                                         handleSlotClick(day, slot, visibleProfessionals[0].userId);
                                       }
                                     }}
@@ -936,7 +936,7 @@ export default function AgendaPage() {
                         <div
                           key={idx}
                           onClick={() => {
-                            if (visibleProfessionals.length > 0) {
+                            if (visibleProfessionals.length > 0 && visibleProfessionals[0].userId) {
                               handleSlotClick(
                                 day,
                                 { hour: 9, minute: 0 },
@@ -1004,15 +1004,6 @@ export default function AgendaPage() {
         open={isAppointmentModalOpen}
         onOpenChange={setIsAppointmentModalOpen}
         onSuccess={() => refetch()}
-        initialData={
-          selectedSlot
-            ? {
-                date: selectedSlot.date,
-                time: selectedSlot.time,
-                professionalId: selectedSlot.professionalId,
-              }
-            : undefined
-        }
       />
 
       {/* Details Modal */}
