@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery, listProducts, deleteProduct, listProductBrands, listProductCategories, listSuppliers } from 'wasp/client/operations';
 import { useSalonContext } from '../../../hooks/useSalonContext';
 import { Card, CardContent } from '../../../../components/ui/card';
@@ -77,6 +77,8 @@ export default function ProductsListPage() {
   const { activeSalonId } = useSalonContext();
   const { toast } = useToast();
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isColumnsModalOpen, setIsColumnsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -196,6 +198,11 @@ export default function ProductsListPage() {
     setSearch('');
   };
 
+  // Resetar página quando filtros mudarem
+  useEffect(() => {
+    setPage(1);
+  }, [search, filterCategory, filterBrand, filterSupplier, filterLowStock, filterStatus]);
+
   const hasActiveFilters = filterCategory !== 'all' || filterBrand !== 'all' || 
     filterSupplier !== 'all' || filterLowStock || filterStatus !== 'all' || search !== '';
 
@@ -222,7 +229,7 @@ export default function ProductsListPage() {
   }, [data]);
 
   // Filter and sort products
-  const filteredAndSortedProducts = useMemo(() => {
+  const allFilteredProducts = useMemo(() => {
     if (!data?.products) return [];
 
     return data.products
@@ -297,6 +304,12 @@ export default function ProductsListPage() {
         return 0;
       });
   }, [data, search, filterCategory, filterBrand, filterSupplier, filterStatus, filterLowStock, sortBy, sortOrder]);
+
+  // Paginação
+  const totalPages = Math.ceil(allFilteredProducts.length / perPage);
+  const startIndex = (page - 1) * perPage;
+  const endIndex = startIndex + perPage;
+  const filteredAndSortedProducts = allFilteredProducts.slice(startIndex, endIndex);
 
   return (
     <div className='space-y-6'>
@@ -633,6 +646,51 @@ export default function ProductsListPage() {
                   ))}
                 </TableBody>
               </Table>
+            </div>
+
+            {/* Pagination */}
+            <div className='flex items-center justify-between border-t px-6 py-4'>
+              <div className='flex items-center gap-4'>
+                <div className='text-sm text-muted-foreground'>
+                  Mostrando {startIndex + 1}-{Math.min(endIndex, allFilteredProducts.length)} de {allFilteredProducts.length} produto{allFilteredProducts.length !== 1 ? 's' : ''}
+                </div>
+                <select
+                  value={perPage}
+                  onChange={(e) => {
+                    setPerPage(Number(e.target.value));
+                    setPage(1);
+                  }}
+                  className='h-8 rounded-md border border-input bg-background px-3 pr-8 text-sm'
+                >
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+              </div>
+              <div className='flex items-center space-x-2'>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={() => setPage(page - 1)}
+                  disabled={page === 1}
+                >
+                  Anterior
+                </Button>
+                <div className='flex items-center gap-1 px-2'>
+                  <span className='text-sm'>
+                    Página {page} de {totalPages || 1}
+                  </span>
+                </div>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={() => setPage(page + 1)}
+                  disabled={page >= totalPages}
+                >
+                  Próxima
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>
