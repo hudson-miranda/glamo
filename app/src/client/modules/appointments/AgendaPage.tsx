@@ -487,7 +487,7 @@ export default function AgendaPage() {
       </div>
 
       {/* Stats Cards */}
-      <AppointmentStatsCards stats={stats} isLoading={isLoadingAppointments} />
+      <AppointmentStatsCards stats={stats} isLoading={isLoading} />
 
       {/* View Mode Selector & Filters */}
       <Card>
