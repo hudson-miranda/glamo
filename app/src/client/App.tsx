@@ -54,6 +54,7 @@ export default function App() {
            location.pathname.startsWith('/products') ||
            location.pathname.startsWith('/brands') ||
            location.pathname.startsWith('/suppliers') ||
+           location.pathname.startsWith('/agenda') ||
            location.pathname.startsWith('/appointments') ||
            location.pathname.startsWith('/sales') ||
            location.pathname.startsWith('/inventory') ||

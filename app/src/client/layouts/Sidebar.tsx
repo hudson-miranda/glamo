@@ -59,8 +59,8 @@ const navSections: NavSection[] = [
         icon: Home,
       },
       {
-        title: 'Agendamentos',
-        href: '/appointments',
+        title: 'Agenda',
+        href: '/agenda',
         icon: Calendar,
         permission: 'can_view_appointments',
       },

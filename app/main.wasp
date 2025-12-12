@@ -1174,11 +1174,14 @@ page SuppliersListPage {
   component: import SuppliersListPage from "@src/client/modules/products/pages/SuppliersListPage"
 }
 
-route AppointmentsListRoute { path: "/appointments", to: AppointmentsListPage }
-page AppointmentsListPage {
+route AgendaRoute { path: "/agenda", to: AgendaPage }
+page AgendaPage {
   authRequired: true,
-  component: import AppointmentsListPage from "@src/client/modules/appointments/AppointmentsListPage"
+  component: import AgendaPage from "@src/client/modules/appointments/AgendaPage"
 }
+
+// Legacy route redirect (keeping for backwards compatibility)
+route AppointmentsListRoute { path: "/appointments", to: AgendaPage }
 
 route SalesListRoute { path: "/sales", to: SalesListPage }
 page SalesListPage {
