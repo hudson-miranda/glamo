@@ -117,12 +117,6 @@ const navSections: NavSection[] = [
         icon: Building2,
         permission: 'can_view_products',
       },
-      {
-        title: 'Estoque',
-        href: '/inventory',
-        icon: Package,
-        permission: 'can_view_products',
-      },
     ],
   },
   {
