@@ -201,18 +201,41 @@ export default function AgendaPage() {
   const employees = employeesData?.employees || [];
   const clients = clientsData?.clients || [];
 
+  // Debug: verificar dados dos employees
+  useEffect(() => {
+    if (employees.length > 0) {
+      console.log('=== EMPLOYEES DATA ===');
+      employees.forEach((emp: any) => {
+        console.log({
+          id: emp.id,
+          name: emp.name,
+          userId: emp.userId,
+          color: emp.color,
+          userName: emp.user?.name,
+        });
+      });
+    }
+  }, [employees]);
+
   // Map de cores dos profissionais (usando a cor do banco de dados)
   const professionalColors = useMemo(() => {
     const colorMap: Record<string, string> = {};
-    employees.forEach((emp: any, idx) => {
+    let colorIndex = 0;
+    
+    employees.forEach((emp: any) => {
       // Só mapeia se o employee tiver userId (ou seja, está vinculado a um User)
       if (emp.userId) {
-        // Usa a cor do banco ou cor padrão
-        colorMap[emp.userId] = emp.color || DEFAULT_COLORS[idx % DEFAULT_COLORS.length];
+        // Usa a cor do banco ou cor padrão baseado no índice único
+        const color = emp.color || DEFAULT_COLORS[colorIndex % DEFAULT_COLORS.length];
+        colorMap[emp.userId] = color;
+        console.log(`Mapping userId ${emp.userId} (${emp.name || emp.user?.name}) to color: ${color}`);
+        colorIndex++;
+      } else {
+        console.warn(`Employee ${emp.id} (${emp.name}) has no userId - skipping color mapping`);
       }
     });
-    console.log('Professional Colors Map:', colorMap);
-    console.log('Employees:', employees.map((e: any) => ({ id: e.id, userId: e.userId, name: e.name, color: e.color })));
+    
+    console.log('=== FINAL COLOR MAP ===', colorMap);
     return colorMap;
   }, [employees]);
 
