@@ -12,6 +12,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
 } from '../../../components/ui/dropdown-menu';
 import {
   Dialog,
@@ -37,6 +38,7 @@ import {
   MoreVertical,
   CalendarDays,
   CalendarRange,
+  Users,
 } from 'lucide-react';
 import { useToast } from '../../../components/ui/use-toast';
 import AppointmentModal from './components/AppointmentModal';
@@ -97,6 +99,18 @@ const BUSINESS_HOURS = {
   end: 20,
 };
 
+// Cores padrão caso o colaborador não tenha cor definida
+const DEFAULT_COLORS = [
+  '#3B82F6', // blue
+  '#10B981', // green
+  '#8B5CF6', // purple
+  '#EC4899', // pink
+  '#F59E0B', // orange
+  '#06B6D4', // cyan
+  '#6366F1', // indigo
+  '#14B8A6', // teal
+];
+
 // Gerar slots de 30 minutos
 const generateTimeSlots = (): { hour: number; minute: number }[] => {
   const slots: { hour: number; minute: number }[] = [];
@@ -108,18 +122,6 @@ const generateTimeSlots = (): { hour: number; minute: number }[] => {
 };
 
 const TIME_SLOTS: { hour: number; minute: number }[] = generateTimeSlots();
-
-// Cores para diferentes profissionais (palette moderna)
-const PROFESSIONAL_COLORS = [
-  'bg-blue-500',
-  'bg-green-500',
-  'bg-purple-500',
-  'bg-pink-500',
-  'bg-orange-500',
-  'bg-cyan-500',
-  'bg-indigo-500',
-  'bg-teal-500',
-];
 
 export default function AgendaPage() {
   const { activeSalonId } = useSalonContext();
@@ -137,7 +139,7 @@ export default function AgendaPage() {
   // Estados de filtros
   const [search, setSearch] = useState('');
   const [filterProfessionals, setFilterProfessionals] = useState<string[]>([]);
-  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState<string[]>([]);
 
   // Estados de modais
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
@@ -172,7 +174,7 @@ export default function AgendaPage() {
     listAppointments,
     {
       salonId: activeSalonId || '',
-      status: filterStatus !== 'all' ? (filterStatus as any) : undefined,
+      status: filterStatus.length > 0 ? (filterStatus[0] as any) : undefined,
       startDate,
       endDate,
       page: 1,
@@ -198,6 +200,16 @@ export default function AgendaPage() {
   const appointments = appointmentsData?.appointments || [];
   const employees = employeesData?.employees || [];
   const clients = clientsData?.clients || [];
+
+  // Map de cores dos profissionais (usando a cor do banco de dados)
+  const professionalColors = useMemo(() => {
+    const colorMap: Record<string, string> = {};
+    employees.forEach((emp: any, idx) => {
+      // Usa a cor do banco ou cor padrão
+      colorMap[emp.userId] = emp.color || DEFAULT_COLORS[idx % DEFAULT_COLORS.length];
+    });
+    return colorMap;
+  }, [employees]);
 
   // Profissionais filtrados
   const visibleProfessionals = useMemo(() => {
@@ -225,16 +237,20 @@ export default function AgendaPage() {
       filtered = filtered.filter((appt) => filterProfessionals.includes(appt.professionalId));
     }
 
+    if (filterStatus.length > 0) {
+      filtered = filtered.filter((appt) => filterStatus.includes(appt.status));
+    }
+
     return filtered;
-  }, [appointments, search, filterProfessionals]);
+  }, [appointments, search, filterProfessionals, filterStatus]);
 
   const hasActiveFilters =
-    search !== '' || filterProfessionals.length > 0 || filterStatus !== 'all';
+    search !== '' || filterProfessionals.length > 0 || filterStatus.length > 0;
 
   const handleClearFilters = () => {
     setSearch('');
     setFilterProfessionals([]);
-    setFilterStatus('all');
+    setFilterStatus([]);
   };
 
   // Navegação
@@ -364,6 +380,7 @@ export default function AgendaPage() {
       });
 
       refetch();
+      setIsDetailsModalOpen(false);
     } catch (error: any) {
       toast({
         title: 'Erro',
@@ -378,6 +395,14 @@ export default function AgendaPage() {
       prev.includes(professionalId)
         ? prev.filter((id) => id !== professionalId)
         : [...prev, professionalId]
+    );
+  };
+
+  const toggleStatusFilter = (status: string) => {
+    setFilterStatus((prev) =>
+      prev.includes(status)
+        ? prev.filter((s) => s !== status)
+        : [...prev, status]
     );
   };
 
@@ -413,6 +438,14 @@ export default function AgendaPage() {
     }
   };
 
+  // Converter cor hex para classes de background e texto
+  const getColorClasses = (hexColor: string) => {
+    return {
+      background: hexColor,
+      text: '#ffffff', // Sempre branco para contraste
+    };
+  };
+
   if (!activeSalonId) {
     return (
       <div className='flex items-center justify-center h-96'>
@@ -429,7 +462,11 @@ export default function AgendaPage() {
           <h1 className='text-3xl font-bold tracking-tight'>Agenda</h1>
           <p className='text-muted-foreground'>Gerencie os agendamentos do seu salão</p>
         </div>
-        <Button onClick={() => setIsAppointmentModalOpen(true)}>
+        <Button onClick={() => {
+          setSelectedSlot(null);
+          setSelectedAppointment(null);
+          setIsAppointmentModalOpen(true);
+        }}>
           <Plus className='mr-2 h-4 w-4' />
           Novo Agendamento
         </Button>
@@ -588,24 +625,21 @@ export default function AgendaPage() {
                     <DropdownMenuLabel>Selecionar profissionais</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     {employees.map((emp: any) => (
-                      <DropdownMenuItem
+                      <DropdownMenuCheckboxItem
                         key={emp.userId}
-                        onClick={() => toggleProfessionalFilter(emp.userId)}
-                        className='flex items-center gap-2'
+                        checked={filterProfessionals.includes(emp.userId)}
+                        onCheckedChange={() => toggleProfessionalFilter(emp.userId)}
                       >
-                        <div
-                          className={`w-4 h-4 rounded border ${
-                            filterProfessionals.includes(emp.userId)
-                              ? 'bg-primary border-primary'
-                              : 'border-input'
-                          }`}
-                        >
-                          {filterProfessionals.includes(emp.userId) && (
-                            <CheckCircle className='h-3 w-3 text-primary-foreground' />
-                          )}
+                        <div className='flex items-center gap-2'>
+                          <div
+                            className='w-3 h-3 rounded-full'
+                            style={{
+                              backgroundColor: professionalColors[emp.userId],
+                            }}
+                          />
+                          {emp.user?.name || emp.name}
                         </div>
-                        {emp.user?.name || emp.name}
-                      </DropdownMenuItem>
+                      </DropdownMenuCheckboxItem>
                     ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -616,32 +650,46 @@ export default function AgendaPage() {
                     <Button variant='outline' size='sm' className='gap-2'>
                       <Filter className='h-4 w-4' />
                       Status
-                      {filterStatus !== 'all' && (
+                      {filterStatus.length > 0 && (
                         <Badge variant='secondary' className='ml-1 px-1.5 py-0.5 text-xs'>
-                          1
+                          {filterStatus.length}
                         </Badge>
                       )}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align='start'>
-                    <DropdownMenuItem onClick={() => setFilterStatus('all')}>
-                      Todos
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterStatus('PENDING')}>
+                    <DropdownMenuLabel>Selecionar status</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuCheckboxItem
+                      checked={filterStatus.includes('PENDING')}
+                      onCheckedChange={() => toggleStatusFilter('PENDING')}
+                    >
                       Pendente
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterStatus('CONFIRMED')}>
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={filterStatus.includes('CONFIRMED')}
+                      onCheckedChange={() => toggleStatusFilter('CONFIRMED')}
+                    >
                       Confirmado
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterStatus('IN_SERVICE')}>
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={filterStatus.includes('IN_SERVICE')}
+                      onCheckedChange={() => toggleStatusFilter('IN_SERVICE')}
+                    >
                       Em Atendimento
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterStatus('DONE')}>
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={filterStatus.includes('DONE')}
+                      onCheckedChange={() => toggleStatusFilter('DONE')}
+                    >
                       Concluído
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterStatus('CANCELLED')}>
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={filterStatus.includes('CANCELLED')}
+                      onCheckedChange={() => toggleStatusFilter('CANCELLED')}
+                    >
                       Cancelado
-                    </DropdownMenuItem>
+                    </DropdownMenuCheckboxItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
 
@@ -657,6 +705,27 @@ export default function AgendaPage() {
                   </Button>
                 )}
               </div>
+
+              {/* Legenda de Cores dos Profissionais */}
+              {visibleProfessionals.length > 0 && (
+                <div className='flex items-center gap-4 flex-wrap p-3 bg-muted/30 rounded-lg'>
+                  <span className='text-sm font-medium text-muted-foreground flex items-center gap-2'>
+                    <Users className='h-4 w-4' />
+                    Legenda:
+                  </span>
+                  {visibleProfessionals.map((emp: any) => (
+                    <div key={emp.userId} className='flex items-center gap-2'>
+                      <div
+                        className='w-3 h-3 rounded-full'
+                        style={{
+                          backgroundColor: professionalColors[emp.userId],
+                        }}
+                      />
+                      <span className='text-sm'>{emp.user?.name || emp.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
@@ -681,87 +750,65 @@ export default function AgendaPage() {
         <Card>
           <CardContent className='flex flex-col items-center justify-center p-12 text-center'>
             <User className='h-12 w-12 text-muted-foreground mb-4' />
-            <h3 className='text-lg font-semibold mb-2'>Nenhum profissional selecionado</h3>
+            <h3 className='text-lg font-semibold mb-2'>Nenhum profissional encontrado</h3>
             <p className='text-sm text-muted-foreground mb-4'>
-              Selecione pelo menos um profissional para visualizar a agenda
+              {filterProfessionals.length > 0
+                ? 'Nenhum profissional selecionado. Ajuste os filtros para visualizar.'
+                : 'Cadastre profissionais para começar a usar a agenda.'}
             </p>
           </CardContent>
         </Card>
       ) : (
         <>
-          {/* Day & Week View - Timeline por profissional */}
-          {(viewMode === 'day' || viewMode === 'week') && (
+          {/* Day View - Timeline por profissional */}
+          {viewMode === 'day' && (
             <Card>
               <CardContent className='p-0'>
                 <div className='overflow-x-auto'>
                   <div className='min-w-[800px]'>
                     {/* Header com nomes dos profissionais */}
-                    <div className='grid border-b sticky top-0 bg-background z-10'
+                    <div
+                      className='grid border-b sticky top-0 bg-background z-10'
                       style={{
-                        gridTemplateColumns: `80px repeat(${
-                          viewMode === 'day' ? visibleProfessionals.length : weekDays.length
-                        }, 1fr)`,
+                        gridTemplateColumns: `80px repeat(${visibleProfessionals.length}, 1fr)`,
                       }}
                     >
                       <div className='p-4 border-r bg-muted/50'>
                         <Clock className='h-4 w-4 text-muted-foreground' />
                       </div>
-                      {viewMode === 'day'
-                        ? visibleProfessionals.map((emp: any, idx) => (
-                            <div
-                              key={emp.userId}
-                              className='p-4 border-r text-center bg-muted/50'
-                            >
-                              <div className='font-medium'>{emp.user?.name || emp.name}</div>
-                              <div
-                                className={`w-2 h-2 rounded-full mx-auto mt-2 ${
-                                  PROFESSIONAL_COLORS[idx % PROFESSIONAL_COLORS.length]
-                                }`}
-                              />
-                            </div>
-                          ))
-                        : weekDays.map((day) => (
-                            <div
-                              key={day.toString()}
-                              className={`p-4 border-r text-center ${
-                                isToday(day) ? 'bg-primary/5' : 'bg-muted/50'
-                              }`}
-                            >
-                              <div className='text-sm text-muted-foreground'>
-                                {format(day, 'EEE', { locale: ptBR })}
-                              </div>
-                              <div
-                                className={`text-lg font-medium ${
-                                  isToday(day) ? 'text-primary' : ''
-                                }`}
-                              >
-                                {format(day, 'dd', { locale: ptBR })}
-                              </div>
-                            </div>
-                          ))}
+                      {visibleProfessionals.map((emp: any) => (
+                        <div
+                          key={emp.userId}
+                          className='p-4 border-r text-center bg-muted/50'
+                        >
+                          <div className='font-medium'>{emp.user?.name || emp.name}</div>
+                          <div
+                            className='w-3 h-3 rounded-full mx-auto mt-2'
+                            style={{
+                              backgroundColor: professionalColors[emp.userId],
+                            }}
+                          />
+                        </div>
+                      ))}
                     </div>
 
                     {/* Grade de horários */}
                     <div className='relative'>
-                      {TIME_SLOTS.map((slot, slotIdx) => (
+                      {TIME_SLOTS.map((slot) => (
                         <div
                           key={`${slot.hour}-${slot.minute}`}
-                          className={`grid border-b ${
-                            slot.minute === 0 ? 'border-b-2' : ''
-                          }`}
+                          className={`grid border-b ${slot.minute === 0 ? 'border-b-2' : ''}`}
                           style={{
-                            gridTemplateColumns: `80px repeat(${
-                              viewMode === 'day'
-                                ? visibleProfessionals.length
-                                : weekDays.length
-                            }, 1fr)`,
+                            gridTemplateColumns: `80px repeat(${visibleProfessionals.length}, 1fr)`,
                             height: '60px',
                           }}
                         >
                           {/* Coluna de horários */}
                           <div
-                            className={`p-2 border-r text-xs text-muted-foreground ${
-                              slot.minute === 0 ? 'font-medium' : 'text-muted-foreground/60'
+                            className={`p-2 border-r text-xs ${
+                              slot.minute === 0
+                                ? 'font-medium text-foreground'
+                                : 'text-muted-foreground/60'
                             }`}
                           >
                             {slot.minute === 0
@@ -769,135 +816,230 @@ export default function AgendaPage() {
                               : ''}
                           </div>
 
-                          {/* Células de agendamento */}
-                          {viewMode === 'day'
-                            ? visibleProfessionals.map((emp: any, empIdx) => {
-                                const dateKey = format(currentDate, 'yyyy-MM-dd');
-                                const timeKey = `${slot.hour
-                                  .toString()
-                                  .padStart(2, '0')}:${slot.minute
-                                  .toString()
-                                  .padStart(2, '0')}`;
-                                const slotAppointments =
-                                  appointmentsByProfessionalAndTime[emp.userId]?.[dateKey]?.[
-                                    timeKey
-                                  ] || [];
+                          {/* Células de agendamento por profissional */}
+                          {visibleProfessionals.map((emp: any) => {
+                            const dateKey = format(currentDate, 'yyyy-MM-dd');
+                            const timeKey = `${slot.hour
+                              .toString()
+                              .padStart(2, '0')}:${slot.minute
+                              .toString()
+                              .padStart(2, '0')}`;
+                            const slotAppointments =
+                              appointmentsByProfessionalAndTime[emp.userId]?.[dateKey]?.[
+                                timeKey
+                              ] || [];
 
-                                return (
-                                  <div
-                                    key={emp.userId}
-                                    className='border-r relative group hover:bg-muted/30 cursor-pointer transition-colors'
-                                    onClick={() => {
-                                      if (slotAppointments.length === 0) {
-                                        handleSlotClick(currentDate, slot, emp.userId);
-                                      }
-                                    }}
-                                  >
-                                    {slotAppointments.length === 0 && (
-                                      <div className='absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100'>
-                                        <Plus className='h-4 w-4 text-muted-foreground' />
-                                      </div>
-                                    )}
-                                    {slotAppointments.map((appt) => (
-                                      <div
-                                        key={appt.id}
-                                        className={`absolute inset-x-1 rounded p-1 text-xs text-white cursor-pointer ${
-                                          PROFESSIONAL_COLORS[
-                                            empIdx % PROFESSIONAL_COLORS.length
-                                          ]
-                                        } hover:opacity-90 transition-opacity overflow-hidden`}
-                                        style={getAppointmentStyle(appt)}
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleAppointmentClick(appt);
-                                        }}
-                                      >
-                                        <div className='font-medium truncate'>
-                                          {appt.client?.name}
-                                        </div>
-                                        <div className='text-[10px] opacity-90 truncate'>
-                                          {appt.services
-                                            ?.map((s: any) => s.service?.name)
-                                            .join(', ')}
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                );
-                              })
-                            : weekDays.map((day) => {
-                                const dateKey = format(day, 'yyyy-MM-dd');
-                                const hasAppointments = visibleProfessionals.some(
-                                  (emp: any) => {
-                                    const timeKey = `${slot.hour
-                                      .toString()
-                                      .padStart(2, '0')}:${slot.minute
-                                      .toString()
-                                      .padStart(2, '0')}`;
-                                    return (
-                                      appointmentsByProfessionalAndTime[emp.userId]?.[
-                                        dateKey
-                                      ]?.[timeKey]?.length > 0
-                                    );
+                            return (
+                              <div
+                                key={emp.userId}
+                                className='border-r relative group hover:bg-muted/30 cursor-pointer transition-colors'
+                                onClick={() => {
+                                  if (slotAppointments.length === 0) {
+                                    handleSlotClick(currentDate, slot, emp.userId);
                                   }
-                                );
-
-                                return (
-                                  <div
-                                    key={day.toString()}
-                                    className={`border-r relative group hover:bg-muted/30 cursor-pointer transition-colors ${
-                                      isToday(day) ? 'bg-primary/5' : ''
-                                    }`}
-                                    onClick={() => {
-                                      if (!hasAppointments && visibleProfessionals.length > 0 && visibleProfessionals[0].userId) {
-                                        handleSlotClick(day, slot, visibleProfessionals[0].userId);
-                                      }
-                                    }}
-                                  >
-                                    {!hasAppointments && (
-                                      <div className='absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100'>
-                                        <Plus className='h-4 w-4 text-muted-foreground' />
-                                      </div>
-                                    )}
-                                    {visibleProfessionals.map((emp: any, empIdx) => {
-                                      const timeKey = `${slot.hour
-                                        .toString()
-                                        .padStart(2, '0')}:${slot.minute
-                                        .toString()
-                                        .padStart(2, '0')}`;
-                                      const slotAppointments =
-                                        appointmentsByProfessionalAndTime[emp.userId]?.[
-                                          dateKey
-                                        ]?.[timeKey] || [];
-
-                                      return slotAppointments.map((appt) => (
-                                        <div
-                                          key={appt.id}
-                                          className={`absolute inset-x-1 rounded p-1 text-xs text-white cursor-pointer ${
-                                            PROFESSIONAL_COLORS[
-                                              empIdx % PROFESSIONAL_COLORS.length
-                                            ]
-                                          } hover:opacity-90 transition-opacity overflow-hidden`}
-                                          style={getAppointmentStyle(appt)}
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleAppointmentClick(appt);
-                                          }}
-                                        >
-                                          <div className='font-medium truncate'>
-                                            {appt.client?.name}
-                                          </div>
-                                          <div className='text-[10px] opacity-90 truncate'>
-                                            {appt.services
-                                              ?.map((s: any) => s.service?.name)
-                                              .join(', ')}
-                                          </div>
-                                        </div>
-                                      ));
-                                    })}
+                                }}
+                              >
+                                {slotAppointments.length === 0 && (
+                                  <div className='absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100'>
+                                    <Plus className='h-4 w-4 text-muted-foreground' />
                                   </div>
-                                );
-                              })}
+                                )}
+                                {slotAppointments.map((appt) => {
+                                  const colors = getColorClasses(
+                                    professionalColors[emp.userId]
+                                  );
+                                  return (
+                                    <div
+                                      key={appt.id}
+                                      className='absolute inset-x-1 rounded p-1 text-xs cursor-pointer hover:opacity-90 transition-opacity overflow-hidden shadow-sm'
+                                      style={{
+                                        backgroundColor: colors.background,
+                                        color: colors.text,
+                                        ...getAppointmentStyle(appt),
+                                      }}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleAppointmentClick(appt);
+                                      }}
+                                    >
+                                      <div className='font-medium truncate'>
+                                        {appt.client?.name}
+                                      </div>
+                                      <div className='text-[10px] opacity-90 truncate'>
+                                        {appt.services
+                                          ?.map((s: any) => s.service?.name)
+                                          .join(', ')}
+                                      </div>
+                                      <div className='text-[10px] opacity-75 mt-0.5'>
+                                        {formatTime(appt.startAt)}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Week View - Timeline com profissionais por dia */}
+          {viewMode === 'week' && (
+            <Card>
+              <CardContent className='p-0'>
+                <div className='overflow-x-auto'>
+                  <div className='min-w-[1200px]'>
+                    {/* Header com dias da semana e profissionais */}
+                    <div
+                      className='grid border-b sticky top-0 bg-background z-10'
+                      style={{
+                        gridTemplateColumns: `80px repeat(${weekDays.length}, 1fr)`,
+                      }}
+                    >
+                      <div className='p-4 border-r bg-muted/50'>
+                        <Clock className='h-4 w-4 text-muted-foreground' />
+                      </div>
+                      {weekDays.map((day) => (
+                        <div
+                          key={day.toString()}
+                          className={`p-4 border-r text-center ${
+                            isToday(day) ? 'bg-primary/5' : 'bg-muted/50'
+                          }`}
+                        >
+                          <div className='text-sm text-muted-foreground'>
+                            {format(day, 'EEE', { locale: ptBR })}
+                          </div>
+                          <div
+                            className={`text-lg font-medium ${
+                              isToday(day) ? 'text-primary' : ''
+                            }`}
+                          >
+                            {format(day, 'dd', { locale: ptBR })}
+                          </div>
+                          {/* Mini indicadores de profissionais */}
+                          <div className='flex gap-1 justify-center mt-2'>
+                            {visibleProfessionals.slice(0, 5).map((emp: any) => (
+                              <div
+                                key={emp.userId}
+                                className='w-2 h-2 rounded-full'
+                                style={{
+                                  backgroundColor: professionalColors[emp.userId],
+                                }}
+                                title={emp.user?.name || emp.name}
+                              />
+                            ))}
+                            {visibleProfessionals.length > 5 && (
+                              <span className='text-[10px] text-muted-foreground'>
+                                +{visibleProfessionals.length - 5}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Grade de horários */}
+                    <div className='relative'>
+                      {TIME_SLOTS.map((slot) => (
+                        <div
+                          key={`${slot.hour}-${slot.minute}`}
+                          className={`grid border-b ${slot.minute === 0 ? 'border-b-2' : ''}`}
+                          style={{
+                            gridTemplateColumns: `80px repeat(${weekDays.length}, 1fr)`,
+                            height: '60px',
+                          }}
+                        >
+                          {/* Coluna de horários */}
+                          <div
+                            className={`p-2 border-r text-xs ${
+                              slot.minute === 0
+                                ? 'font-medium text-foreground'
+                                : 'text-muted-foreground/60'
+                            }`}
+                          >
+                            {slot.minute === 0
+                              ? `${slot.hour.toString().padStart(2, '0')}:00`
+                              : ''}
+                          </div>
+
+                          {/* Células de agendamento por dia */}
+                          {weekDays.map((day) => {
+                            const dateKey = format(day, 'yyyy-MM-dd');
+                            const timeKey = `${slot.hour
+                              .toString()
+                              .padStart(2, '0')}:${slot.minute
+                              .toString()
+                              .padStart(2, '0')}`;
+
+                            // Coletar todos os agendamentos deste horário de todos os profissionais
+                            const allAppointments = visibleProfessionals.flatMap(
+                              (emp: any) =>
+                                appointmentsByProfessionalAndTime[emp.userId]?.[dateKey]?.[
+                                  timeKey
+                                ] || []
+                            );
+
+                            return (
+                              <div
+                                key={day.toString()}
+                                className={`border-r relative group hover:bg-muted/30 cursor-pointer transition-colors ${
+                                  isToday(day) ? 'bg-primary/5' : ''
+                                }`}
+                                onClick={() => {
+                                  if (
+                                    allAppointments.length === 0 &&
+                                    visibleProfessionals.length > 0 &&
+                                    visibleProfessionals[0].userId
+                                  ) {
+                                    handleSlotClick(day, slot, visibleProfessionals[0].userId);
+                                  }
+                                }}
+                              >
+                                {allAppointments.length === 0 && (
+                                  <div className='absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100'>
+                                    <Plus className='h-4 w-4 text-muted-foreground' />
+                                  </div>
+                                )}
+                                {/* Renderizar agendamentos empilhados */}
+                                {allAppointments.map((appt, idx) => {
+                                  const colors = getColorClasses(
+                                    professionalColors[appt.professionalId]
+                                  );
+                                  // Offset horizontal para múltiplos agendamentos
+                                  const offset = idx * 4;
+                                  return (
+                                    <div
+                                      key={appt.id}
+                                      className='absolute rounded p-1 text-xs cursor-pointer hover:opacity-90 transition-opacity overflow-hidden shadow-sm'
+                                      style={{
+                                        backgroundColor: colors.background,
+                                        color: colors.text,
+                                        left: `${4 + offset}px`,
+                                        right: `${4 + (allAppointments.length - 1 - idx) * 4}px`,
+                                        ...getAppointmentStyle(appt),
+                                      }}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleAppointmentClick(appt);
+                                      }}
+                                    >
+                                      <div className='font-medium truncate'>
+                                        {appt.client?.name}
+                                      </div>
+                                      <div className='text-[10px] opacity-75 truncate'>
+                                        {appt.professional?.name}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            );
+                          })}
                         </div>
                       ))}
                     </div>
@@ -959,16 +1101,9 @@ export default function AgendaPage() {
                           </div>
                           <div className='space-y-1'>
                             {dayAppointments.slice(0, 2).map((appt: any) => {
-                              const professionalIdx = visibleProfessionals.findIndex(
-                                (emp: any) => emp.userId === appt.professionalId
+                              const colors = getColorClasses(
+                                professionalColors[appt.professionalId]
                               );
-                              const colorClass =
-                                PROFESSIONAL_COLORS[
-                                  professionalIdx !== -1
-                                    ? professionalIdx % PROFESSIONAL_COLORS.length
-                                    : 0
-                                ];
-
                               return (
                                 <div
                                   key={appt.id}
@@ -976,14 +1111,19 @@ export default function AgendaPage() {
                                     e.stopPropagation();
                                     handleAppointmentClick(appt);
                                   }}
-                                  className={`text-xs p-1 rounded ${colorClass} text-white truncate hover:opacity-90`}
+                                  className='text-xs p-1 rounded truncate hover:opacity-90 transition-opacity'
+                                  style={{
+                                    backgroundColor: colors.background,
+                                    color: colors.text,
+                                  }}
+                                  title={`${formatTime(appt.startAt)} - ${appt.client?.name} (${appt.professional?.name})`}
                                 >
                                   {formatTime(appt.startAt)} - {appt.client?.name}
                                 </div>
                               );
                             })}
                             {dayAppointments.length > 2 && (
-                              <div className='text-xs text-muted-foreground'>
+                              <div className='text-xs text-muted-foreground px-1'>
                                 +{dayAppointments.length - 2} mais
                               </div>
                             )}
@@ -1003,7 +1143,10 @@ export default function AgendaPage() {
       <AppointmentModal
         open={isAppointmentModalOpen}
         onOpenChange={setIsAppointmentModalOpen}
-        onSuccess={() => refetch()}
+        onSuccess={() => {
+          refetch();
+          setSelectedSlot(null);
+        }}
       />
 
       {/* Details Modal */}
@@ -1024,9 +1167,18 @@ export default function AgendaPage() {
                 </div>
                 <div>
                   <p className='text-sm font-medium'>Profissional</p>
-                  <p className='text-sm text-muted-foreground'>
-                    {selectedAppointment.professional?.name}
-                  </p>
+                  <div className='flex items-center gap-2'>
+                    <div
+                      className='w-3 h-3 rounded-full'
+                      style={{
+                        backgroundColor:
+                          professionalColors[selectedAppointment.professionalId],
+                      }}
+                    />
+                    <p className='text-sm text-muted-foreground'>
+                      {selectedAppointment.professional?.name}
+                    </p>
+                  </div>
                 </div>
                 <div>
                   <p className='text-sm font-medium'>Data</p>
