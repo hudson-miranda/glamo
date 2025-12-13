@@ -437,17 +437,19 @@ export default function BrandsListPage() {
                   </TableHeader>
                   <TableBody>
                     {paginatedBrands.map((brand) => (
-                      <TableRow key={brand.id}>
+                      <TableRow key={brand.id} className='h-16'>
                         {visibleColumns.includes('name') && (
-                          <TableCell className="font-medium">{brand.name}</TableCell>
+                          <TableCell className="font-medium py-3 sm:py-2">
+                            <div className='max-w-[200px] truncate'>{brand.name}</div>
+                          </TableCell>
                         )}
                         {visibleColumns.includes('description') && (
-                          <TableCell className='max-w-xs'>
+                          <TableCell className='max-w-xs py-3 sm:py-2'>
                             {brand.description ? (
                               <TooltipProvider>
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <span className='text-sm text-muted-foreground line-clamp-2 cursor-help'>
+                                    <span className='text-sm text-muted-foreground line-clamp-1 cursor-help'>
                                       {brand.description}
                                     </span>
                                   </TooltipTrigger>
@@ -464,7 +466,7 @@ export default function BrandsListPage() {
                           </TableCell>
                         )}
                         {visibleColumns.includes('products') && (
-                          <TableCell className='text-center'>
+                          <TableCell className='text-center py-3 sm:py-2'>
                             <Badge variant='secondary'>
                               {brand._count?.products || 0}
                             </Badge>

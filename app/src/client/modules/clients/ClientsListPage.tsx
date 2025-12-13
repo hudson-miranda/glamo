@@ -617,13 +617,13 @@ export default function ClientsListPage() {
                   </TableHeader>
                   <TableBody>
                     {filteredAndSortedClients.map((client: any) => (
-                      <TableRow key={client.id}>
+                      <TableRow key={client.id} className='h-16'>
                         {visibleColumns.includes('name') && (
-                          <TableCell>
-                            <div>
-                              <div className='font-medium'>{client.name}</div>
+                          <TableCell className='py-3 sm:py-2'>
+                            <div className='max-w-[200px]'>
+                              <div className='font-medium truncate'>{client.name}</div>
                               {client.notes && (
-                                <div className='text-sm text-muted-foreground line-clamp-1'>
+                                <div className='text-sm text-muted-foreground truncate'>
                                   {client.notes}
                                 </div>
                               )}
@@ -631,10 +631,12 @@ export default function ClientsListPage() {
                           </TableCell>
                         )}
                         {visibleColumns.includes('email') && (
-                          <TableCell>{client.email || '-'}</TableCell>
+                          <TableCell className='py-3 sm:py-2'>
+                            <div className='max-w-[200px] truncate'>{client.email || '-'}</div>
+                          </TableCell>
                         )}
                         {visibleColumns.includes('phone') && (
-                          <TableCell>{client.phone || '-'}</TableCell>
+                          <TableCell className='py-3 sm:py-2'>{client.phone || '-'}</TableCell>
                         )}
                         {visibleColumns.includes('status') && (
                           <TableCell>

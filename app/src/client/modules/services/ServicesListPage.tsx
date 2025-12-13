@@ -587,13 +587,13 @@ export default function ServicesListPage() {
                   </TableHeader>
                   <TableBody>
                     {filteredAndSortedServices.map((service: any) => (
-                      <TableRow key={service.id}>
+                      <TableRow key={service.id} className='h-16'>
                         {visibleColumns.includes('name') && (
-                          <TableCell className='font-medium'>
-                            <div>
-                              <div>{service.name}</div>
+                          <TableCell className='font-medium py-3 sm:py-2'>
+                            <div className='max-w-[250px]'>
+                              <div className='truncate'>{service.name}</div>
                               {service.description && (
-                                <div className="text-xs text-muted-foreground truncate max-w-xs">
+                                <div className="text-xs text-muted-foreground truncate">
                                   {service.description}
                                 </div>
                               )}
@@ -601,8 +601,8 @@ export default function ServicesListPage() {
                           </TableCell>
                         )}
                         {visibleColumns.includes('category') && (
-                          <TableCell>
-                            {service.category?.name || '-'}
+                          <TableCell className='py-3 sm:py-2'>
+                            <div className='max-w-[150px] truncate'>{service.category?.name || '-'}</div>
                           </TableCell>
                         )}
                         {visibleColumns.includes('price') && (

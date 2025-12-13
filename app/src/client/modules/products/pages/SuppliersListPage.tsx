@@ -520,13 +520,13 @@ export default function SuppliersListPage() {
                 </TableHeader>
                 <TableBody>
                   {filteredSuppliers.map((supplier) => (
-                    <TableRow key={supplier.id}>
+                    <TableRow key={supplier.id} className='h-16'>
                       {visibleColumns.includes('name') && (
-                        <TableCell>
-                          <div className='flex flex-col'>
-                            <span className='font-medium'>{supplier.name}</span>
+                        <TableCell className='py-3 sm:py-2'>
+                          <div className='flex flex-col max-w-[250px]'>
+                            <span className='font-medium truncate'>{supplier.name}</span>
                             {supplier.contactName && (
-                              <span className='text-xs text-muted-foreground'>
+                              <span className='text-xs text-muted-foreground truncate'>
                                 Contato: {supplier.contactName}
                               </span>
                             )}
@@ -535,13 +535,13 @@ export default function SuppliersListPage() {
                               {supplier.phone && (
                                 <div className='flex items-center gap-1 text-xs text-muted-foreground'>
                                   <Phone className='h-3 w-3' />
-                                  {supplier.phone}
+                                  <span className='truncate'>{supplier.phone}</span>
                                 </div>
                               )}
                               {supplier.email && (
                                 <div className='flex items-center gap-1 text-xs text-muted-foreground'>
                                   <Mail className='h-3 w-3' />
-                                  {supplier.email}
+                                  <span className='truncate'>{supplier.email}</span>
                                 </div>
                               )}
                             </div>

@@ -573,22 +573,26 @@ export default function ProductsListPage() {
                 </TableHeader>
                 <TableBody>
                   {filteredAndSortedProducts.map((product: any) => (
-                    <TableRow key={product.id}>
+                    <TableRow key={product.id} className='h-16'>
                       {visibleColumns.includes('name') && (
-                        <TableCell className='font-medium'>
-                          <div className='flex items-center gap-2'>
+                        <TableCell className='font-medium py-3 sm:py-2'>
+                          <div className='flex items-center gap-2 max-w-[200px]'>
                             {product.isFavorite && (
-                              <Star className='h-4 w-4 fill-yellow-400 text-yellow-400' />
+                              <Star className='h-4 w-4 fill-yellow-400 text-yellow-400 flex-shrink-0' />
                             )}
-                            {product.name}
+                            <span className='truncate'>{product.name}</span>
                           </div>
                         </TableCell>
                       )}
                       {visibleColumns.includes('category') && (
-                        <TableCell>{product.category?.name || '-'}</TableCell>
+                        <TableCell className='py-3 sm:py-2'>
+                          <div className='max-w-[150px] truncate'>{product.category?.name || '-'}</div>
+                        </TableCell>
                       )}
                       {visibleColumns.includes('brand') && (
-                        <TableCell>{product.brand?.name || '-'}</TableCell>
+                        <TableCell className='py-3 sm:py-2'>
+                          <div className='max-w-[150px] truncate'>{product.brand?.name || '-'}</div>
+                        </TableCell>
                       )}
                       {visibleColumns.includes('cost') && (
                         <TableCell>{formatCurrency(product.costPrice || 0)}</TableCell>

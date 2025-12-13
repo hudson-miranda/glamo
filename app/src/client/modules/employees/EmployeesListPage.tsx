@@ -508,9 +508,9 @@ export default function EmployeesListPage() {
                   </TableHeader>
                   <TableBody>
                     {filteredAndSortedEmployees.map((employee) => (
-                      <TableRow key={employee.id}>
+                      <TableRow key={employee.id} className='h-16'>
                         {visibleColumns.includes('color') && (
-                          <TableCell>
+                          <TableCell className='py-3 sm:py-2'>
                             <div
                               className='w-8 h-8 rounded-full border-2 shadow-sm'
                               style={{ backgroundColor: employee.color || '#999' }}
@@ -519,9 +519,9 @@ export default function EmployeesListPage() {
                           </TableCell>
                         )}
                         {visibleColumns.includes('name') && (
-                          <TableCell>
-                            <div className='flex flex-col'>
-                              <span className='font-medium'>
+                          <TableCell className='py-3 sm:py-2'>
+                            <div className='flex flex-col max-w-[200px]'>
+                              <span className='font-medium truncate'>
                                 {employee.name}
                               </span>
                               {employee.user && (
@@ -534,7 +534,9 @@ export default function EmployeesListPage() {
                           </TableCell>
                         )}
                         {visibleColumns.includes('position') && (
-                          <TableCell>{employee.position || '-'}</TableCell>
+                          <TableCell className='py-3 sm:py-2'>
+                            <div className='max-w-[150px] truncate'>{employee.position || '-'}</div>
+                          </TableCell>
                         )}
                         {visibleColumns.includes('contact') && (
                           <TableCell>

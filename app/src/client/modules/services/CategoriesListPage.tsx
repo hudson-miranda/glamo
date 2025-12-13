@@ -517,9 +517,11 @@ export default function CategoriesListPage() {
               </TableHeader>
               <TableBody>
                 {filteredAndSortedCategories.map((category: any) => (
-                  <TableRow key={category.id}>
+                  <TableRow key={category.id} className='h-16'>
                     {visibleColumns.includes('name') && (
-                      <TableCell className='font-medium py-3 sm:py-2'>{category.name}</TableCell>
+                      <TableCell className='font-medium py-3 sm:py-2'>
+                        <div className='max-w-[200px] truncate'>{category.name}</div>
+                      </TableCell>
                     )}
                     {visibleColumns.includes('type') && (
                       <TableCell className='text-center py-3 sm:py-2'>
@@ -542,7 +544,7 @@ export default function CategoriesListPage() {
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <span className='text-sm text-muted-foreground line-clamp-2 cursor-help'>
+                              <span className='text-sm text-muted-foreground line-clamp-1 cursor-help'>
                                 {category.description}
                               </span>
                             </TooltipTrigger>

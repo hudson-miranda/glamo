@@ -462,20 +462,24 @@ export default function EmployeesPage() {
                   </TableHeader>
                   <TableBody>
                     {filteredAndSortedEmployees.map((employee: any) => (
-                      <TableRow key={employee.id}>
+                      <TableRow key={employee.id} className='h-16'>
                         {visibleColumns.includes('name') && (
-                          <TableCell>
-                            <div className='font-medium'>{employee.name}</div>
+                          <TableCell className='py-3 sm:py-2'>
+                            <div className='font-medium max-w-[200px] truncate'>{employee.name}</div>
                           </TableCell>
                         )}
                         {visibleColumns.includes('email') && (
-                          <TableCell>{employee.email || '-'}</TableCell>
+                          <TableCell className='py-3 sm:py-2'>
+                            <div className='max-w-[200px] truncate'>{employee.email || '-'}</div>
+                          </TableCell>
                         )}
                         {visibleColumns.includes('phone') && (
-                          <TableCell>{employee.phone || '-'}</TableCell>
+                          <TableCell className='py-3 sm:py-2'>{employee.phone || '-'}</TableCell>
                         )}
                         {visibleColumns.includes('position') && (
-                          <TableCell>{employee.position || '-'}</TableCell>
+                          <TableCell className='py-3 sm:py-2'>
+                            <div className='max-w-[150px] truncate'>{employee.position || '-'}</div>
+                          </TableCell>
                         )}
                         {visibleColumns.includes('status') && (
                           <TableCell>
