@@ -42,6 +42,7 @@ import { Label } from '../../../components/ui/label';
 import { Checkbox } from '../../../components/ui/checkbox';
 import { Plus, Search, Edit, Trash2, Tag, Eye, Filter, ArrowUpDown, Settings2, X } from 'lucide-react';
 import { useSalonContext } from '../../hooks/useSalonContext';
+import { Pagination } from '../../../components/ui/pagination';
 import { CategoryFormModal } from './components/CategoryFormModal';
 import { CategoryViewModal } from './components/CategoryViewModal';
 import { useToast } from '../../../components/ui/use-toast';
@@ -613,49 +614,21 @@ export default function CategoriesListPage() {
               </div>
 
               {/* Pagination */}
-              <div className='flex items-center justify-between border-t px-6 py-4'>
-                <div className='flex items-center gap-4'>
-                  <div className='text-sm text-muted-foreground'>
-                    Mostrando {startIndex + 1}-{Math.min(endIndex, allFilteredCategories.length)} de {allFilteredCategories.length} categoria{allFilteredCategories.length !== 1 ? 's' : ''}
-                  </div>
-                  <select
-                    value={perPage}
-                    onChange={(e) => {
-                      setPerPage(Number(e.target.value));
-                      setPage(1);
-                    }}
-                    className='h-8 rounded-md border border-input bg-background px-3 pr-8 text-sm'
-                  >
-                    <option value={10}>10</option>
-                    <option value={25}>25</option>
-                    <option value={50}>50</option>
-                    <option value={100}>100</option>
-                  </select>
-                </div>
-                <div className='flex items-center space-x-2'>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={() => setPage(page - 1)}
-                    disabled={page === 1}
-                  >
-                    Anterior
-                  </Button>
-                  <div className='flex items-center gap-1 px-2'>
-                    <span className='text-sm'>
-                      Página {page} de {totalPages || 1}
-                    </span>
-                  </div>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={() => setPage(page + 1)}
-                    disabled={page >= totalPages}
-                  >
-                    Próxima
-                  </Button>
-                </div>
-              </div>
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                totalItems={allFilteredCategories.length}
+                itemsPerPage={perPage}
+                startIndex={startIndex}
+                endIndex={endIndex}
+                onPageChange={setPage}
+                onItemsPerPageChange={(value) => {
+                  setPerPage(value);
+                  setPage(1);
+                }}
+                itemLabel="categoria"
+                itemLabelPlural="categorias"
+              />
             </>
           )}
         </CardContent>

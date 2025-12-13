@@ -46,6 +46,7 @@ import { BrandFormModal } from './components/BrandFormModal';
 import { BrandViewModal } from './components/BrandViewModal';
 import { useToast } from '../../../components/ui/use-toast';
 import { BrandStatsCards } from './components/BrandStatsCards';
+import { Pagination } from '../../../components/ui/pagination';
 import {
   Tooltip,
   TooltipContent,
@@ -513,49 +514,21 @@ export default function BrandsListPage() {
               </div>
 
               {/* Pagination */}
-              <div className='flex items-center justify-between border-t px-6 py-4'>
-                <div className='flex items-center gap-4'>
-                  <div className='text-sm text-muted-foreground'>
-                    Mostrando {(page - 1) * perPage + 1}-{Math.min(page * perPage, allFilteredBrands.length)} de {allFilteredBrands.length} marca{allFilteredBrands.length !== 1 ? 's' : ''}
-                  </div>
-                  <select
-                    value={perPage}
-                    onChange={(e) => {
-                      setPerPage(Number(e.target.value));
-                      setPage(1);
-                    }}
-                    className='h-8 rounded-md border border-input bg-background px-3 pr-8 text-sm'
-                  >
-                    <option value={10}>10</option>
-                    <option value={25}>25</option>
-                    <option value={50}>50</option>
-                    <option value={100}>100</option>
-                  </select>
-                </div>
-                <div className='flex items-center space-x-2'>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={() => setPage(page - 1)}
-                    disabled={page === 1}
-                  >
-                    Anterior
-                  </Button>
-                  <div className='flex items-center gap-1 px-2'>
-                    <span className='text-sm'>
-                      Página {page} de {totalPages || 1}
-                    </span>
-                  </div>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={() => setPage(page + 1)}
-                    disabled={page >= totalPages}
-                  >
-                    Próxima
-                  </Button>
-                </div>
-              </div>
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                totalItems={allFilteredBrands.length}
+                itemsPerPage={perPage}
+                startIndex={(page - 1) * perPage}
+                endIndex={page * perPage}
+                onPageChange={setPage}
+                onItemsPerPageChange={(value) => {
+                  setPerPage(value);
+                  setPage(1);
+                }}
+                itemLabel="marca"
+                itemLabelPlural="marcas"
+              />
             </>
           )}
         </CardContent>
