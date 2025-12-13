@@ -57,7 +57,6 @@ export function CategoryStatsCards({ stats, isLoading = false }: CategoryStatsCa
     <CollapsibleStats 
       cards={cards} 
       isLoading={isLoading}
-      title="Estatísticas de Categorias"
     />
   );
 }

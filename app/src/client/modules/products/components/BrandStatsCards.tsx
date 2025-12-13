@@ -41,7 +41,6 @@ export function BrandStatsCards({ stats, isLoading }: BrandStatsCardsProps) {
     <CollapsibleStats 
       cards={cards} 
       isLoading={isLoading}
-      title="Estatísticas de Marcas"
     />
   );
 }

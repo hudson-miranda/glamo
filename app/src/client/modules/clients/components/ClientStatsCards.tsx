@@ -50,7 +50,6 @@ export function ClientStatsCards({ stats, isLoading = false }: ClientStatsCardsP
     <CollapsibleStats 
       cards={cards} 
       isLoading={isLoading}
-      title="Estatísticas de Clientes"
     />
   );
 }

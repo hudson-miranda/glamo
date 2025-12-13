@@ -49,7 +49,6 @@ export function ServiceStatsCards({ stats, isLoading = false }: ServiceStatsCard
     <CollapsibleStats 
       cards={cards} 
       isLoading={isLoading}
-      title="Estatísticas de Serviços"
     />
   );
 }

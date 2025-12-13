@@ -57,7 +57,6 @@ export function ProductStatsCards({ stats, isLoading = false }: ProductStatsCard
     <CollapsibleStats 
       cards={cards} 
       isLoading={isLoading}
-      title="Estatísticas de Produtos"
     />
   );
 }

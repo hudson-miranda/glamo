@@ -57,7 +57,6 @@ export function AppointmentStatsCards({ stats, isLoading }: AppointmentStatsCard
     <CollapsibleStats 
       cards={cards} 
       isLoading={isLoading}
-      title="Estatísticas de Agendamentos"
     />
   );
 }

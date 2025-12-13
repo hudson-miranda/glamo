@@ -49,7 +49,6 @@ export function EmployeeStatsCards({ stats, isLoading = false }: EmployeeStatsCa
     <CollapsibleStats 
       cards={cards} 
       isLoading={isLoading}
-      title="Estatísticas de Colaboradores"
     />
   );
 }

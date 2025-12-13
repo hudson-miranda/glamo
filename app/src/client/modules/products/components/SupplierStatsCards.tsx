@@ -49,7 +49,6 @@ export function SupplierStatsCards({ stats, isLoading }: SupplierStatsCardsProps
     <CollapsibleStats 
       cards={cards} 
       isLoading={isLoading}
-      title="Estatísticas de Fornecedores"
     />
   );
 }
