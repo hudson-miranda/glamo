@@ -29,6 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from '../../../../components/ui/table';
+import { SortableTableHeader } from '../../../../components/ui/sortable-table-header';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -558,17 +559,45 @@ export default function ProductsListPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    {visibleColumns.includes('name') && <TableHead>Produto</TableHead>}
-                    {visibleColumns.includes('category') && <TableHead>Categoria</TableHead>}
-                    {visibleColumns.includes('brand') && <TableHead>Marca</TableHead>}
-                    {visibleColumns.includes('cost') && <TableHead>Custo</TableHead>}
-                    {visibleColumns.includes('price') && <TableHead>Venda</TableHead>}
-                    {visibleColumns.includes('stock') && <TableHead>Estoque</TableHead>}
+                    {visibleColumns.includes('name') && (
+                      <SortableTableHeader sortKey='name' currentSort={sortBy} currentOrder={sortOrder} onSort={(key) => { if (sortBy === key) { setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); } else { setSortBy(key); setSortOrder('asc'); } }}>
+                        Produto
+                      </SortableTableHeader>
+                    )}
+                    {visibleColumns.includes('category') && (
+                      <SortableTableHeader sortKey='category' currentSort={sortBy} currentOrder={sortOrder} onSort={(key) => { if (sortBy === key) { setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); } else { setSortBy(key); setSortOrder('asc'); } }}>
+                        Categoria
+                      </SortableTableHeader>
+                    )}
+                    {visibleColumns.includes('brand') && (
+                      <SortableTableHeader sortKey='brand' currentSort={sortBy} currentOrder={sortOrder} onSort={(key) => { if (sortBy === key) { setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); } else { setSortBy(key); setSortOrder('asc'); } }}>
+                        Marca
+                      </SortableTableHeader>
+                    )}
+                    {visibleColumns.includes('cost') && (
+                      <SortableTableHeader sortKey='cost' currentSort={sortBy} currentOrder={sortOrder} onSort={(key) => { if (sortBy === key) { setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); } else { setSortBy(key); setSortOrder('asc'); } }} align='center'>
+                        Custo
+                      </SortableTableHeader>
+                    )}
+                    {visibleColumns.includes('price') && (
+                      <SortableTableHeader sortKey='price' currentSort={sortBy} currentOrder={sortOrder} onSort={(key) => { if (sortBy === key) { setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); } else { setSortBy(key); setSortOrder('asc'); } }} align='center'>
+                        Venda
+                      </SortableTableHeader>
+                    )}
+                    {visibleColumns.includes('stock') && (
+                      <SortableTableHeader sortKey='stock' currentSort={sortBy} currentOrder={sortOrder} onSort={(key) => { if (sortBy === key) { setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); } else { setSortBy(key); setSortOrder('asc'); } }} align='center'>
+                        Estoque
+                      </SortableTableHeader>
+                    )}
                     {visibleColumns.includes('supplier') && <TableHead>Fornecedor</TableHead>}
                     {visibleColumns.includes('sku') && <TableHead>SKU</TableHead>}
                     {visibleColumns.includes('barcode') && <TableHead>Código de Barras</TableHead>}
-                    {visibleColumns.includes('status') && <TableHead>Status</TableHead>}
-                    <TableHead className='text-right'>Ações</TableHead>
+                    {visibleColumns.includes('status') && (
+                      <SortableTableHeader sortKey='active' currentSort={sortBy} currentOrder={sortOrder} onSort={(key) => { if (sortBy === key) { setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); } else { setSortBy(key); setSortOrder('asc'); } }} align='center'>
+                        Status
+                      </SortableTableHeader>
+                    )}
+                    <TableHead className='text-right w-[140px]'>Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

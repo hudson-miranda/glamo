@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from '../../../components/ui/table';
+import { SortableTableHeader } from '../../../components/ui/sortable-table-header';
 import { Badge } from '../../../components/ui/badge';
 import { EmptyState } from '../../../components/ui/empty-state';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
@@ -202,6 +203,15 @@ export default function ServicesListPage() {
   };
 
 
+
+  const handleSort = (key: string) => {
+    if (sortBy === key) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(key);
+      setSortOrder('asc');
+    }
+  };
 
   const handleDeleteService = (service: any) => {
     if (!activeSalonId) {
@@ -571,25 +581,45 @@ export default function ServicesListPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      {visibleColumns.includes('name') && <TableHead>Nome</TableHead>}
-                      {visibleColumns.includes('category') && <TableHead>Categoria</TableHead>}
-                      {visibleColumns.includes('price') && <TableHead>Preço</TableHead>}
-                      {visibleColumns.includes('duration') && <TableHead>Duração</TableHead>}
-                      {visibleColumns.includes('priceType') && <TableHead>Tipo de Preço</TableHead>}
-                      {visibleColumns.includes('commission') && <TableHead>Comissão</TableHead>}
-                      {visibleColumns.includes('cost') && <TableHead>Custo</TableHead>}
-                      {visibleColumns.includes('isFavorite') && <TableHead>Favorito</TableHead>}
-                      {visibleColumns.includes('isVisible') && <TableHead>Visível</TableHead>}
-                      {visibleColumns.includes('allowOnlineBooking') && <TableHead>Ag. Online</TableHead>}
-                      {visibleColumns.includes('status') && <TableHead>Status</TableHead>}
-                      <TableHead className='text-right'>Ações</TableHead>
+                      {visibleColumns.includes('name') && (
+                        <SortableTableHeader sortKey='name' currentSort={sortBy} currentOrder={sortOrder} onSort={handleSort}>
+                          Nome
+                        </SortableTableHeader>
+                      )}
+                      {visibleColumns.includes('category') && (
+                        <SortableTableHeader sortKey='category' currentSort={sortBy} currentOrder={sortOrder} onSort={handleSort}>
+                          Categoria
+                        </SortableTableHeader>
+                      )}
+                      {visibleColumns.includes('price') && (
+                        <SortableTableHeader sortKey='price' currentSort={sortBy} currentOrder={sortOrder} onSort={handleSort} align='center'>
+                          Preço
+                        </SortableTableHeader>
+                      )}
+                      {visibleColumns.includes('duration') && (
+                        <SortableTableHeader sortKey='duration' currentSort={sortBy} currentOrder={sortOrder} onSort={handleSort} align='center'>
+                          Duração
+                        </SortableTableHeader>
+                      )}
+                      {visibleColumns.includes('priceType') && <TableHead className='text-center'>Tipo de Preço</TableHead>}
+                      {visibleColumns.includes('commission') && <TableHead className='text-center'>Comissão</TableHead>}
+                      {visibleColumns.includes('cost') && <TableHead className='text-center'>Custo</TableHead>}
+                      {visibleColumns.includes('isFavorite') && <TableHead className='text-center'>Favorito</TableHead>}
+                      {visibleColumns.includes('isVisible') && <TableHead className='text-center'>Visível</TableHead>}
+                      {visibleColumns.includes('allowOnlineBooking') && <TableHead className='text-center'>Ag. Online</TableHead>}
+                      {visibleColumns.includes('status') && (
+                        <SortableTableHeader sortKey='active' currentSort={sortBy} currentOrder={sortOrder} onSort={handleSort} align='center'>
+                          Status
+                        </SortableTableHeader>
+                      )}
+                      <TableHead className='text-right w-[140px]'>Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredAndSortedServices.map((service: any) => (
                       <TableRow key={service.id} className='h-16'>
                         {visibleColumns.includes('name') && (
-                          <TableCell className='font-medium py-3 sm:py-2'>
+                          <TableCell className='font-medium'>
                             <div className='max-w-[250px]'>
                               <div className='truncate'>{service.name}</div>
                               {service.description && (
@@ -601,78 +631,96 @@ export default function ServicesListPage() {
                           </TableCell>
                         )}
                         {visibleColumns.includes('category') && (
-                          <TableCell className='py-3 sm:py-2'>
+                          <TableCell>
                             <div className='max-w-[150px] truncate'>{service.category?.name || '-'}</div>
                           </TableCell>
                         )}
                         {visibleColumns.includes('price') && (
                           <TableCell>
-                            {service.price ? formatCurrency(service.price) : '-'}
+                            <div className='flex justify-center'>
+                              {service.price ? formatCurrency(service.price) : '-'}
+                            </div>
                           </TableCell>
                         )}
                         {visibleColumns.includes('duration') && (
                           <TableCell>
-                            {service.duration ? formatDuration(service.duration) : '-'}
+                            <div className='flex justify-center'>
+                              {service.duration ? formatDuration(service.duration) : '-'}
+                            </div>
                           </TableCell>
                         )}
                         {visibleColumns.includes('priceType') && (
                           <TableCell>
-                            {service.priceType === 'FIXED' && 'Fixo'}
-                            {service.priceType === 'FROM' && 'A partir de'}
-                            {service.priceType === 'CONSULTATION' && 'Sob consulta'}
-                            {!service.priceType && '-'}
+                            <div className='flex justify-center'>
+                              {service.priceType === 'FIXED' && 'Fixo'}
+                              {service.priceType === 'FROM' && 'A partir de'}
+                              {service.priceType === 'CONSULTATION' && 'Sob consulta'}
+                              {!service.priceType && '-'}
+                            </div>
                           </TableCell>
                         )}
                         {visibleColumns.includes('commission') && (
                           <TableCell>
-                            {service.commissionValue 
-                              ? `${service.commissionValueType === 'PERCENT' ? service.commissionValue + '%' : formatCurrency(service.commissionValue)}`
-                              : '-'}
+                            <div className='flex justify-center'>
+                              {service.commissionValue 
+                                ? `${service.commissionValueType === 'PERCENT' ? service.commissionValue + '%' : formatCurrency(service.commissionValue)}`
+                                : '-'}
+                            </div>
                           </TableCell>
                         )}
                         {visibleColumns.includes('cost') && (
                           <TableCell>
-                            {service.costValue 
-                              ? `${service.costValueType === 'PERCENT' ? service.costValue + '%' : formatCurrency(service.costValue)}`
-                              : '-'}
+                            <div className='flex justify-center'>
+                              {service.costValue 
+                                ? `${service.costValueType === 'PERCENT' ? service.costValue + '%' : formatCurrency(service.costValue)}`
+                                : '-'}
+                            </div>
                           </TableCell>
                         )}
                         {visibleColumns.includes('isFavorite') && (
                           <TableCell>
-                            <Badge variant={service.isFavorite ? 'default' : 'secondary'}>
-                              {service.isFavorite ? 'Sim' : 'Não'}
-                            </Badge>
+                            <div className='flex justify-center'>
+                              <Badge variant={service.isFavorite ? 'default' : 'secondary'}>
+                                {service.isFavorite ? 'Sim' : 'Não'}
+                              </Badge>
+                            </div>
                           </TableCell>
                         )}
                         {visibleColumns.includes('isVisible') && (
                           <TableCell>
-                            <Badge variant={service.isVisible !== false ? 'default' : 'secondary'}>
-                              {service.isVisible !== false ? 'Sim' : 'Não'}
-                            </Badge>
+                            <div className='flex justify-center'>
+                              <Badge variant={service.isVisible !== false ? 'default' : 'secondary'}>
+                                {service.isVisible !== false ? 'Sim' : 'Não'}
+                              </Badge>
+                            </div>
                           </TableCell>
                         )}
                         {visibleColumns.includes('allowOnlineBooking') && (
                           <TableCell>
-                            <Badge variant={service.allowOnlineBooking !== false ? 'default' : 'secondary'}>
-                              {service.allowOnlineBooking !== false ? 'Sim' : 'Não'}
-                            </Badge>
+                            <div className='flex justify-center'>
+                              <Badge variant={service.allowOnlineBooking !== false ? 'default' : 'secondary'}>
+                                {service.allowOnlineBooking !== false ? 'Sim' : 'Não'}
+                              </Badge>
+                            </div>
                           </TableCell>
                         )}
                         {visibleColumns.includes('status') && (
                           <TableCell>
-                            <Badge variant={service.deletedAt ? 'secondary' : 'default'}>
-                              {service.deletedAt ? 'Inativo' : 'Ativo'}
-                            </Badge>
+                            <div className='flex justify-center'>
+                              <Badge variant={service.deletedAt ? 'secondary' : 'default'}>
+                                {service.deletedAt ? 'Inativo' : 'Ativo'}
+                              </Badge>
+                            </div>
                           </TableCell>
                         )}
-                        <TableCell className='text-right py-3 sm:py-2'>
-                          <div className='flex items-center justify-end gap-3 sm:gap-1'>
+                        <TableCell>
+                          <div className='flex items-center justify-end gap-2 sm:gap-1.5'>
                             <Button 
                               variant='ghost' 
                               size='sm'
                               onClick={() => handleViewService(service)}
                               title='Visualizar'
-                              className='h-10 w-10 p-0 sm:h-9 sm:w-9'
+                              className='h-10 w-10 p-0 sm:h-9 sm:w-9 hover:bg-primary/10'
                             >
                               <Eye className='h-5 w-5 sm:h-4 sm:w-4' />
                             </Button>
@@ -681,7 +729,7 @@ export default function ServicesListPage() {
                               size='sm'
                               onClick={() => handleOpenModal(service)}
                               title='Editar'
-                              className='h-10 w-10 p-0 sm:h-9 sm:w-9'
+                              className='h-10 w-10 p-0 sm:h-9 sm:w-9 hover:bg-primary/10'
                             >
                               <Edit className='h-5 w-5 sm:h-4 sm:w-4' />
                             </Button>
@@ -690,7 +738,7 @@ export default function ServicesListPage() {
                               size='sm'
                               onClick={() => handleDeleteService(service)}
                               title='Excluir'
-                              className='h-10 w-10 p-0 sm:h-9 sm:w-9'
+                              className='h-10 w-10 p-0 sm:h-9 sm:w-9 hover:bg-destructive/10'
                             >
                               <Trash2 className='h-5 w-5 sm:h-4 sm:w-4 text-destructive' />
                             </Button>

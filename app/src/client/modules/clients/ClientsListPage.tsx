@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '../../../components/ui/table';
+import { SortableTableHeader } from '../../../components/ui/sortable-table-header';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -602,28 +603,52 @@ export default function ClientsListPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      {visibleColumns.includes('name') && <TableHead>Cliente</TableHead>}
-                      {visibleColumns.includes('email') && <TableHead>E-mail</TableHead>}
+                      {visibleColumns.includes('name') && (
+                        <SortableTableHeader sortKey='name' currentSort={sortBy} currentOrder={sortOrder} onSort={(key) => { if (sortBy === key) { setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); } else { setSortBy(key); setSortOrder('asc'); } }}>
+                          Cliente
+                        </SortableTableHeader>
+                      )}
+                      {visibleColumns.includes('email') && (
+                        <SortableTableHeader sortKey='email' currentSort={sortBy} currentOrder={sortOrder} onSort={(key) => { if (sortBy === key) { setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); } else { setSortBy(key); setSortOrder('asc'); } }}>
+                          E-mail
+                        </SortableTableHeader>
+                      )}
                       {visibleColumns.includes('phone') && <TableHead>Telefone</TableHead>}
-                      {visibleColumns.includes('status') && <TableHead>Status</TableHead>}
-                      {visibleColumns.includes('clientType') && <TableHead>Tipo</TableHead>}
-                      {visibleColumns.includes('gender') && <TableHead>Gênero</TableHead>}
-                      {visibleColumns.includes('birthDate') && <TableHead>Aniversário</TableHead>}
-                      {visibleColumns.includes('visits') && <TableHead className='text-right'>Visitas</TableHead>}
-                      {visibleColumns.includes('totalSpent') && <TableHead className='text-right'>Total Gasto</TableHead>}
-                      {visibleColumns.includes('lastVisit') && <TableHead>Última Visita</TableHead>}
-                      <TableHead className='text-right'>Ações</TableHead>
+                      {visibleColumns.includes('status') && (
+                        <SortableTableHeader sortKey='status' currentSort={sortBy} currentOrder={sortOrder} onSort={(key) => { if (sortBy === key) { setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); } else { setSortBy(key); setSortOrder('asc'); } }} align='center'>
+                          Status
+                        </SortableTableHeader>
+                      )}
+                      {visibleColumns.includes('clientType') && <TableHead className='text-center'>Tipo</TableHead>}
+                      {visibleColumns.includes('gender') && <TableHead className='text-center'>Gênero</TableHead>}
+                      {visibleColumns.includes('birthDate') && <TableHead className='text-center'>Aniversário</TableHead>}
+                      {visibleColumns.includes('visits') && (
+                        <SortableTableHeader sortKey='visits' currentSort={sortBy} currentOrder={sortOrder} onSort={(key) => { if (sortBy === key) { setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); } else { setSortBy(key); setSortOrder('asc'); } }} align='center'>
+                          Visitas
+                        </SortableTableHeader>
+                      )}
+                      {visibleColumns.includes('totalSpent') && (
+                        <SortableTableHeader sortKey='totalSpent' currentSort={sortBy} currentOrder={sortOrder} onSort={(key) => { if (sortBy === key) { setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); } else { setSortBy(key); setSortOrder('asc'); } }} align='center'>
+                          Total Gasto
+                        </SortableTableHeader>
+                      )}
+                      {visibleColumns.includes('lastVisit') && (
+                        <SortableTableHeader sortKey='lastVisit' currentSort={sortBy} currentOrder={sortOrder} onSort={(key) => { if (sortBy === key) { setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); } else { setSortBy(key); setSortOrder('asc'); } }} align='center'>
+                          Última Visita
+                        </SortableTableHeader>
+                      )}
+                      <TableHead className='text-right w-[140px]'>Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredAndSortedClients.map((client: any) => (
                       <TableRow key={client.id} className='h-16'>
                         {visibleColumns.includes('name') && (
-                          <TableCell className='py-3 sm:py-2'>
+                          <TableCell className='font-medium'>
                             <div className='max-w-[200px]'>
-                              <div className='font-medium truncate'>{client.name}</div>
+                              <div className='truncate'>{client.name}</div>
                               {client.notes && (
-                                <div className='text-sm text-muted-foreground truncate'>
+                                <div className='text-xs text-muted-foreground truncate'>
                                   {client.notes}
                                 </div>
                               )}
@@ -631,52 +656,60 @@ export default function ClientsListPage() {
                           </TableCell>
                         )}
                         {visibleColumns.includes('email') && (
-                          <TableCell className='py-3 sm:py-2'>
-                            <div className='max-w-[200px] truncate'>{client.email || '-'}</div>
+                          <TableCell>
+                            <div className='max-w-[200px] truncate text-sm'>{client.email || '-'}</div>
                           </TableCell>
                         )}
                         {visibleColumns.includes('phone') && (
-                          <TableCell className='py-3 sm:py-2'>{client.phone || '-'}</TableCell>
+                          <TableCell><div className='text-sm'>{client.phone || '-'}</div></TableCell>
                         )}
                         {visibleColumns.includes('status') && (
                           <TableCell>
-                            <Badge variant={getStatusVariant(client.status)}>
-                              {getStatusLabel(client.status)}
-                            </Badge>
+                            <div className='flex justify-center'>
+                              <Badge variant={getStatusVariant(client.status)}>
+                                {getStatusLabel(client.status)}
+                              </Badge>
+                            </div>
                           </TableCell>
                         )}
                         {visibleColumns.includes('clientType') && (
-                          <TableCell>{formatClientType(client.clientType)}</TableCell>
+                          <TableCell><div className='flex justify-center text-sm'>{formatClientType(client.clientType)}</div></TableCell>
                         )}
                         {visibleColumns.includes('gender') && (
-                          <TableCell>{formatGender(client.gender)}</TableCell>
+                          <TableCell><div className='flex justify-center text-sm'>{formatGender(client.gender)}</div></TableCell>
                         )}
                         {visibleColumns.includes('birthDate') && (
                           <TableCell>
-                            {client.birthDate ? formatDate(new Date(client.birthDate)) : '-'}
+                            <div className='flex justify-center text-sm'>
+                              {client.birthDate ? formatDate(new Date(client.birthDate)) : '-'}
+                            </div>
                           </TableCell>
                         )}
                         {visibleColumns.includes('visits') && (
-                          <TableCell className='text-right'>{client.visits || 0}</TableCell>
+                          <TableCell><div className='flex justify-center'><Badge variant='secondary'>{client.visits || 0}</Badge></div></TableCell>
                         )}
                         {visibleColumns.includes('totalSpent') && (
-                          <TableCell className='text-right'>
-                            {formatCurrency(client.totalSpent || 0)}
+                          <TableCell>
+                            <div className='flex justify-center font-medium text-sm'>
+                              {formatCurrency(client.totalSpent || 0)}
+                            </div>
                           </TableCell>
                         )}
                         {visibleColumns.includes('lastVisit') && (
                           <TableCell>
-                            {client.lastVisit ? formatDate(new Date(client.lastVisit)) : '-'}
+                            <div className='flex justify-center text-sm'>
+                              {client.lastVisit ? formatDate(new Date(client.lastVisit)) : '-'}
+                            </div>
                           </TableCell>
                         )}
-                        <TableCell className='text-right py-3 sm:py-2'>
-                          <div className='flex items-center justify-end gap-3 sm:gap-1'>
+                        <TableCell>
+                          <div className='flex items-center justify-end gap-2 sm:gap-1.5'>
                             <Button
                               variant='ghost'
                               size='sm'
                               onClick={() => handleViewClient(client)}
                               title='Visualizar'
-                              className='h-10 w-10 p-0 sm:h-9 sm:w-9'
+                              className='h-10 w-10 p-0 sm:h-9 sm:w-9 hover:bg-primary/10'
                             >
                               <Eye className='h-5 w-5 sm:h-4 sm:w-4' />
                             </Button>
@@ -685,7 +718,7 @@ export default function ClientsListPage() {
                               size='sm'
                               onClick={() => handleOpenModal(client)}
                               title='Editar'
-                              className='h-10 w-10 p-0 sm:h-9 sm:w-9'
+                              className='h-10 w-10 p-0 sm:h-9 sm:w-9 hover:bg-primary/10'
                             >
                               <Edit className='h-5 w-5 sm:h-4 sm:w-4' />
                             </Button>
@@ -694,7 +727,7 @@ export default function ClientsListPage() {
                               size='sm'
                               onClick={() => handleDeleteClient(client)}
                               title='Excluir'
-                              className='h-10 w-10 p-0 sm:h-9 sm:w-9'
+                              className='h-10 w-10 p-0 sm:h-9 sm:w-9 hover:bg-destructive/10'
                             >
                               <Trash2 className='h-5 w-5 sm:h-4 sm:w-4 text-destructive' />
                             </Button>

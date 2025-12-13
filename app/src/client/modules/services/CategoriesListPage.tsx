@@ -9,8 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../../../components/ui/table';
-import { Badge } from '../../../components/ui/badge';
+} from '../../../components/ui/table';import { SortableTableHeader } from '../../components/ui/sortable-table-header';import { Badge } from '../../../components/ui/badge';
 import { EmptyState } from '../../../components/ui/empty-state';
 import { Card, CardContent } from '../../../components/ui/card';
 import {
@@ -191,6 +190,15 @@ export default function CategoriesListPage() {
         variant: 'destructive',
       });
       throw error;
+    }
+  };
+
+  const handleSort = (key: string) => {
+    if (sortBy === key) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(key);
+      setSortOrder('asc');
     }
   };
 
@@ -506,40 +514,93 @@ export default function CategoriesListPage() {
                 <Table>
               <TableHeader>
                 <TableRow>
-                  {visibleColumns.includes('name') && <TableHead>Nome</TableHead>}
-                  {visibleColumns.includes('type') && <TableHead className='text-center'>Tipo</TableHead>}
-                  {visibleColumns.includes('description') && <TableHead>Descrição</TableHead>}
-                  {visibleColumns.includes('services') && <TableHead className='text-center'>Serviços</TableHead>}
-                  {visibleColumns.includes('products') && <TableHead className='text-center'>Produtos</TableHead>}
-                  {visibleColumns.includes('status') && <TableHead className='text-center'>Status</TableHead>}
-                  <TableHead className='text-right'>Ações</TableHead>
+                  {visibleColumns.includes('name') && (
+                    <SortableTableHeader
+                      sortKey='name'
+                      currentSort={sortBy}
+                      currentOrder={sortOrder}
+                      onSort={handleSort}
+                    >
+                      Nome
+                    </SortableTableHeader>
+                  )}
+                  {visibleColumns.includes('type') && (
+                    <SortableTableHeader
+                      sortKey='type'
+                      currentSort={sortBy}
+                      currentOrder={sortOrder}
+                      onSort={handleSort}
+                      align='center'
+                    >
+                      Tipo
+                    </SortableTableHeader>
+                  )}
+                  {visibleColumns.includes('description') && (
+                    <TableHead>Descrição</TableHead>
+                  )}
+                  {visibleColumns.includes('services') && (
+                    <SortableTableHeader
+                      sortKey='services'
+                      currentSort={sortBy}
+                      currentOrder={sortOrder}
+                      onSort={handleSort}
+                      align='center'
+                    >
+                      Serviços
+                    </SortableTableHeader>
+                  )}
+                  {visibleColumns.includes('products') && (
+                    <SortableTableHeader
+                      sortKey='products'
+                      currentSort={sortBy}
+                      currentOrder={sortOrder}
+                      onSort={handleSort}
+                      align='center'
+                    >
+                      Produtos
+                    </SortableTableHeader>
+                  )}
+                  {visibleColumns.includes('status') && (
+                    <SortableTableHeader
+                      sortKey='active'
+                      currentSort={sortBy}
+                      currentOrder={sortOrder}
+                      onSort={handleSort}
+                      align='center'
+                    >
+                      Status
+                    </SortableTableHeader>
+                  )}
+                  <TableHead className='text-right w-[140px]'>Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredAndSortedCategories.map((category: any) => (
                   <TableRow key={category.id} className='h-16'>
                     {visibleColumns.includes('name') && (
-                      <TableCell className='font-medium py-3 sm:py-2'>
-                        <div className='max-w-[200px] truncate'>{category.name}</div>
+                      <TableCell className='font-medium'>
+                        <div className='max-w-[250px] truncate'>{category.name}</div>
                       </TableCell>
                     )}
                     {visibleColumns.includes('type') && (
-                      <TableCell className='text-center py-3 sm:py-2'>
-                        <Badge 
-                          variant={
-                            category.type === 'SERVICE' ? 'default' :
-                            category.type === 'PRODUCT' ? 'secondary' :
-                            'outline'
-                          }
-                        >
-                          {category.type === 'SERVICE' && 'Serviço'}
-                          {category.type === 'PRODUCT' && 'Produto'}
-                          {category.type === 'BOTH' && 'Ambos'}
-                        </Badge>
+                      <TableCell>
+                        <div className='flex justify-center'>
+                          <Badge 
+                            variant={
+                              category.type === 'SERVICE' ? 'default' :
+                              category.type === 'PRODUCT' ? 'secondary' :
+                              'outline'
+                            }
+                          >
+                            {category.type === 'SERVICE' && 'Serviço'}
+                            {category.type === 'PRODUCT' && 'Produto'}
+                            {category.type === 'BOTH' && 'Ambos'}
+                          </Badge>
+                        </div>
                       </TableCell>
                     )}
                     {visibleColumns.includes('description') && (
-                      <TableCell className='max-w-xs py-3 sm:py-2'>
+                      <TableCell className='max-w-xs'>
                       {category.description ? (
                         <TooltipProvider>
                           <Tooltip>
@@ -561,34 +622,40 @@ export default function CategoriesListPage() {
                       </TableCell>
                     )}
                     {visibleColumns.includes('services') && (
-                      <TableCell className='text-center py-3 sm:py-2'>
-                        <Badge variant='secondary'>
-                          {category._count?.services || 0}
-                        </Badge>
+                      <TableCell>
+                        <div className='flex justify-center'>
+                          <Badge variant='secondary'>
+                            {category._count?.services || 0}
+                          </Badge>
+                        </div>
                       </TableCell>
                     )}
                     {visibleColumns.includes('products') && (
-                      <TableCell className='text-center py-3 sm:py-2'>
-                        <Badge variant='outline'>
-                          {category._count?.products || 0}
-                        </Badge>
+                      <TableCell>
+                        <div className='flex justify-center'>
+                          <Badge variant='outline'>
+                            {category._count?.products || 0}
+                          </Badge>
+                        </div>
                       </TableCell>
                     )}
                     {visibleColumns.includes('status') && (
-                      <TableCell className='text-center py-3 sm:py-2'>
-                        <Badge variant={category.active ? 'default' : 'secondary'}>
-                          {category.active ? 'Ativa' : 'Inativa'}
-                        </Badge>
+                      <TableCell>
+                        <div className='flex justify-center'>
+                          <Badge variant={category.active ? 'default' : 'secondary'}>
+                            {category.active ? 'Ativa' : 'Inativa'}
+                          </Badge>
+                        </div>
                       </TableCell>
                     )}
-                    <TableCell className='text-right py-3 sm:py-2'>
-                      <div className='flex justify-end gap-3 sm:gap-2'>
+                    <TableCell>
+                      <div className='flex justify-end gap-2 sm:gap-1.5'>
                         <Button
                           variant='ghost'
                           size='sm'
                           onClick={() => handleOpenViewModal(category.id)}
                           title='Visualizar categoria'
-                          className='h-10 w-10 p-0 sm:h-9 sm:w-9'
+                          className='h-10 w-10 p-0 sm:h-9 sm:w-9 hover:bg-primary/10'
                         >
                           <Eye className='h-5 w-5 sm:h-4 sm:w-4' />
                         </Button>
@@ -597,7 +664,7 @@ export default function CategoriesListPage() {
                           size='sm'
                           onClick={() => handleOpenModal(category)}
                           title='Editar categoria'
-                          className='h-10 w-10 p-0 sm:h-9 sm:w-9'
+                          className='h-10 w-10 p-0 sm:h-9 sm:w-9 hover:bg-primary/10'
                         >
                           <Edit className='h-5 w-5 sm:h-4 sm:w-4' />
                         </Button>
@@ -606,9 +673,9 @@ export default function CategoriesListPage() {
                           size='sm'
                           onClick={() => handleDeleteCategory(category)}
                           title='Excluir categoria'
-                          className='h-10 w-10 p-0 sm:h-9 sm:w-9'
+                          className='h-10 w-10 p-0 sm:h-9 sm:w-9 hover:bg-destructive/10'
                         >
-                          <Trash2 className='h-5 w-5 sm:h-4 sm:w-4' />
+                          <Trash2 className='h-5 w-5 sm:h-4 sm:w-4 text-destructive' />
                         </Button>
                       </div>
                     </TableCell>
