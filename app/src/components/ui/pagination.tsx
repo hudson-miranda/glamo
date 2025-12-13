@@ -37,40 +37,37 @@ export function Pagination({
   const itemLabelText = totalItems === 1 ? itemLabel : itemLabelPlural;
 
   return (
-    <div className='flex flex-col sm:flex-row items-center justify-between gap-4 border-t px-4 sm:px-6 py-4'>
+    <div className='flex flex-row items-center justify-between gap-4 border-t px-4 sm:px-6 py-4'>
       {/* Info e Items per page */}
-      <div className='flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto'>
-        {/* Mobile: info mais compacta */}
+      <div className='flex flex-row items-center gap-3 sm:gap-4'>
+        {/* Info compacta */}
         <div className='text-sm text-muted-foreground'>
           <span className='hidden sm:inline'>
-            Mostrando {startIndex + 1}-{actualEndIndex} de {totalItems} {itemLabelText}
+            Mostrando {totalItems} {itemLabelText}
           </span>
           <span className='sm:hidden'>
-            {startIndex + 1}-{actualEndIndex} de {totalItems}
+            {totalItems}
           </span>
         </div>
         
         {/* Items per page */}
-        <div className='flex items-center gap-2'>
-          <span className='text-sm text-muted-foreground hidden sm:inline'>Por página:</span>
-          <Select
-            value={itemsPerPage.toString()}
-            onValueChange={(value) => {
-              onItemsPerPageChange(Number(value));
-              onPageChange(1);
-            }}
-          >
-            <SelectTrigger className='h-8 w-[70px]'>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='10'>10</SelectItem>
-              <SelectItem value='25'>25</SelectItem>
-              <SelectItem value='50'>50</SelectItem>
-              <SelectItem value='100'>100</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <Select
+          value={itemsPerPage.toString()}
+          onValueChange={(value) => {
+            onItemsPerPageChange(Number(value));
+            onPageChange(1);
+          }}
+        >
+          <SelectTrigger className='h-8 w-[70px]'>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='10'>10</SelectItem>
+            <SelectItem value='25'>25</SelectItem>
+            <SelectItem value='50'>50</SelectItem>
+            <SelectItem value='100'>100</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Navigation */}
@@ -88,7 +85,6 @@ export function Pagination({
         
         <div className='flex items-center gap-1 px-2'>
           <span className='text-sm whitespace-nowrap'>
-            <span className='hidden sm:inline'>Página </span>
             {currentPage} de {totalPages || 1}
           </span>
         </div>
