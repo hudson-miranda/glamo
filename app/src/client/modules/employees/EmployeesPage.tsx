@@ -45,6 +45,7 @@ import { useSalonContext } from '../../hooks/useSalonContext';
 import { useToast } from '../../../components/ui/use-toast';
 import { EmployeeStatsCards } from './components/EmployeeStatsCards';
 import { EmployeeFormModal } from './components/EmployeeFormModal';
+import { Pagination } from '../../../components/ui/pagination';
 
 // Definição de colunas disponíveis
 const AVAILABLE_COLUMNS = [
