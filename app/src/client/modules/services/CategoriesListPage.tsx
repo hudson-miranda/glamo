@@ -9,7 +9,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../../../components/ui/table';import { SortableTableHeader } from '../../components/ui/sortable-table-header';import { Badge } from '../../../components/ui/badge';
+} from '../../../components/ui/table';
+import { SortableTableHeader } from '../../../components/ui/sortable-table-header';
+import { Badge } from '../../../components/ui/badge';
 import { EmptyState } from '../../../components/ui/empty-state';
 import { Card, CardContent } from '../../../components/ui/card';
 import {
