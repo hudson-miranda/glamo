@@ -606,11 +606,11 @@ export default function SuppliersListPage() {
                           </Badge>
                         </TableCell>
                       )}
-                      <TableCell className='text-right'>
+                      <TableCell className='text-right py-3 sm:py-2'>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant='ghost' size='icon'>
-                              <MoreVertical className='h-4 w-4' />
+                            <Button variant='ghost' size='icon' className='h-10 w-10 sm:h-9 sm:w-9'>
+                              <MoreVertical className='h-5 w-5 sm:h-4 sm:w-4' />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align='end'>

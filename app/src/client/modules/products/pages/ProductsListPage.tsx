@@ -625,21 +625,23 @@ export default function ProductsListPage() {
                           </Badge>
                         </TableCell>
                       )}
-                      <TableCell className='text-right'>
-                        <div className='flex items-center justify-end gap-2'>
+                      <TableCell className='text-right py-3 sm:py-2'>
+                        <div className='flex items-center justify-end gap-3 sm:gap-2'>
                           <Button
                             variant='ghost'
                             size='sm'
                             onClick={() => handleOpenModal(product)}
+                            className='h-10 w-10 p-0 sm:h-9 sm:w-9'
                           >
-                            <Edit className='h-4 w-4' />
+                            <Edit className='h-5 w-5 sm:h-4 sm:w-4' />
                           </Button>
                           <Button
                             variant='ghost'
                             size='sm'
                             onClick={() => handleDeleteProduct(product)}
+                            className='h-10 w-10 p-0 sm:h-9 sm:w-9'
                           >
-                            <Trash2 className='h-4 w-4' />
+                            <Trash2 className='h-5 w-5 sm:h-4 sm:w-4' />
                           </Button>
                         </div>
                       </TableCell>

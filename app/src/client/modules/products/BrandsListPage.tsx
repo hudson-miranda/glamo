@@ -470,8 +470,8 @@ export default function BrandsListPage() {
                             </Badge>
                           </TableCell>
                         )}
-                        <TableCell className='text-right'>
-                          <div className='flex justify-end gap-2'>
+                        <TableCell className='text-right py-3 sm:py-2'>
+                          <div className='flex justify-end gap-3 sm:gap-2'>
                             <Button
                               variant='ghost'
                               size='sm'
@@ -480,8 +480,9 @@ export default function BrandsListPage() {
                                 setIsViewModalOpen(true);
                               }}
                               title='Visualizar marca'
+                              className='h-10 w-10 p-0 sm:h-9 sm:w-9'
                             >
-                              <Eye className='h-4 w-4' />
+                              <Eye className='h-5 w-5 sm:h-4 sm:w-4' />
                             </Button>
                             <Button
                               variant='ghost'
@@ -491,8 +492,9 @@ export default function BrandsListPage() {
                                 setIsModalOpen(true);
                               }}
                               title='Editar marca'
+                              className='h-10 w-10 p-0 sm:h-9 sm:w-9'
                             >
-                              <Edit className='h-4 w-4' />
+                              <Edit className='h-5 w-5 sm:h-4 sm:w-4' />
                             </Button>
                             <Button
                               variant='ghost'
@@ -502,8 +504,9 @@ export default function BrandsListPage() {
                                 setIsDeleteDialogOpen(true);
                               }}
                               title='Excluir marca'
+                              className='h-10 w-10 p-0 sm:h-9 sm:w-9'
                             >
-                              <Trash2 className='h-4 w-4' />
+                              <Trash2 className='h-5 w-5 sm:h-4 sm:w-4' />
                             </Button>
                           </div>
                         </TableCell>

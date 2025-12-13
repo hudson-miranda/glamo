@@ -43,10 +43,10 @@ export function Pagination({
         {/* Info compacta */}
         <div className='text-sm text-muted-foreground'>
           <span className='hidden sm:inline'>
-            Mostrando {totalItems} {itemLabelText}
+            Mostrando {actualEndIndex} de {totalItems}
           </span>
           <span className='sm:hidden'>
-            {totalItems}
+            {actualEndIndex} de {totalItems}
           </span>
         </div>
         

@@ -667,31 +667,34 @@ export default function ClientsListPage() {
                             {client.lastVisit ? formatDate(new Date(client.lastVisit)) : '-'}
                           </TableCell>
                         )}
-                        <TableCell className='text-right'>
-                          <div className='flex items-center justify-end gap-1'>
+                        <TableCell className='text-right py-3 sm:py-2'>
+                          <div className='flex items-center justify-end gap-3 sm:gap-1'>
                             <Button
                               variant='ghost'
                               size='sm'
                               onClick={() => handleViewClient(client)}
                               title='Visualizar'
+                              className='h-10 w-10 p-0 sm:h-9 sm:w-9'
                             >
-                              <Eye className='h-4 w-4' />
+                              <Eye className='h-5 w-5 sm:h-4 sm:w-4' />
                             </Button>
                             <Button
                               variant='ghost'
                               size='sm'
                               onClick={() => handleOpenModal(client)}
                               title='Editar'
+                              className='h-10 w-10 p-0 sm:h-9 sm:w-9'
                             >
-                              <Edit className='h-4 w-4' />
+                              <Edit className='h-5 w-5 sm:h-4 sm:w-4' />
                             </Button>
                             <Button
                               variant='ghost'
                               size='sm'
                               onClick={() => handleDeleteClient(client)}
                               title='Excluir'
+                              className='h-10 w-10 p-0 sm:h-9 sm:w-9'
                             >
-                              <Trash2 className='h-4 w-4 text-destructive' />
+                              <Trash2 className='h-5 w-5 sm:h-4 sm:w-4 text-destructive' />
                             </Button>
                           </div>
                         </TableCell>

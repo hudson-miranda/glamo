@@ -519,10 +519,10 @@ export default function CategoriesListPage() {
                 {filteredAndSortedCategories.map((category: any) => (
                   <TableRow key={category.id}>
                     {visibleColumns.includes('name') && (
-                      <TableCell className='font-medium'>{category.name}</TableCell>
+                      <TableCell className='font-medium py-3 sm:py-2'>{category.name}</TableCell>
                     )}
                     {visibleColumns.includes('type') && (
-                      <TableCell className='text-center'>
+                      <TableCell className='text-center py-3 sm:py-2'>
                         <Badge 
                           variant={
                             category.type === 'SERVICE' ? 'default' :
@@ -537,7 +537,7 @@ export default function CategoriesListPage() {
                       </TableCell>
                     )}
                     {visibleColumns.includes('description') && (
-                      <TableCell className='max-w-xs'>
+                      <TableCell className='max-w-xs py-3 sm:py-2'>
                       {category.description ? (
                         <TooltipProvider>
                           <Tooltip>
@@ -559,51 +559,54 @@ export default function CategoriesListPage() {
                       </TableCell>
                     )}
                     {visibleColumns.includes('services') && (
-                      <TableCell className='text-center'>
+                      <TableCell className='text-center py-3 sm:py-2'>
                         <Badge variant='secondary'>
                           {category._count?.services || 0}
                         </Badge>
                       </TableCell>
                     )}
                     {visibleColumns.includes('products') && (
-                      <TableCell className='text-center'>
+                      <TableCell className='text-center py-3 sm:py-2'>
                         <Badge variant='outline'>
                           {category._count?.products || 0}
                         </Badge>
                       </TableCell>
                     )}
                     {visibleColumns.includes('status') && (
-                      <TableCell className='text-center'>
+                      <TableCell className='text-center py-3 sm:py-2'>
                         <Badge variant={category.active ? 'default' : 'secondary'}>
                           {category.active ? 'Ativa' : 'Inativa'}
                         </Badge>
                       </TableCell>
                     )}
-                    <TableCell className='text-right'>
-                      <div className='flex justify-end gap-2'>
+                    <TableCell className='text-right py-3 sm:py-2'>
+                      <div className='flex justify-end gap-3 sm:gap-2'>
                         <Button
                           variant='ghost'
                           size='sm'
                           onClick={() => handleOpenViewModal(category.id)}
                           title='Visualizar categoria'
+                          className='h-10 w-10 p-0 sm:h-9 sm:w-9'
                         >
-                          <Eye className='h-4 w-4' />
+                          <Eye className='h-5 w-5 sm:h-4 sm:w-4' />
                         </Button>
                         <Button
                           variant='ghost'
                           size='sm'
                           onClick={() => handleOpenModal(category)}
                           title='Editar categoria'
+                          className='h-10 w-10 p-0 sm:h-9 sm:w-9'
                         >
-                          <Edit className='h-4 w-4' />
+                          <Edit className='h-5 w-5 sm:h-4 sm:w-4' />
                         </Button>
                         <Button
                           variant='ghost'
                           size='sm'
                           onClick={() => handleDeleteCategory(category)}
                           title='Excluir categoria'
+                          className='h-10 w-10 p-0 sm:h-9 sm:w-9'
                         >
-                          <Trash2 className='h-4 w-4' />
+                          <Trash2 className='h-5 w-5 sm:h-4 sm:w-4' />
                         </Button>
                       </div>
                     </TableCell>
