@@ -119,8 +119,8 @@ export function PersonalDataStep({ formData, updateFormData }: PersonalDataStepP
           <User className='mr-2 h-5 w-5 text-brand-600' />
           Informações Básicas
         </h3>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <div>
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+          <div className='md:col-span-2'>
             <Label htmlFor='name'>
               Nome Completo <span className='text-red-500'>*</span>
             </Label>
@@ -135,21 +135,21 @@ export function PersonalDataStep({ formData, updateFormData }: PersonalDataStepP
 
           <div>
             <Label htmlFor='color'>Cor para Agenda</Label>
-            <div className='relative mt-2' ref={colorPickerRef}>
+            <div className='relative' ref={colorPickerRef}>
               <button
                 type='button'
                 onClick={() => setIsColorPickerOpen(!isColorPickerOpen)}
-                className='flex items-center gap-3 px-4 py-3 w-full md:w-auto border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-gray-300 dark:hover:border-gray-600 transition-all bg-white dark:bg-gray-800'
+                className='flex items-center gap-2 px-3 py-2 w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-gray-300 dark:hover:border-gray-600 transition-all bg-white dark:bg-gray-800 h-10'
               >
                 <div
-                  className='w-8 h-8 rounded-full border-2 border-white dark:border-gray-900 shadow-sm'
+                  className='w-6 h-6 rounded-full border-2 border-white dark:border-gray-900 shadow-sm flex-shrink-0'
                   style={{ backgroundColor: formData.color || '#6B7280' }}
                 />
-                <span className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                <span className='text-sm font-medium text-gray-700 dark:text-gray-300 truncate'>
                   {selectedColor.name}
                 </span>
                 <svg
-                  className={`w-4 h-4 ml-auto text-gray-400 transition-transform ${isColorPickerOpen ? 'rotate-180' : ''}`}
+                  className={`w-4 h-4 ml-auto flex-shrink-0 text-gray-400 transition-transform ${isColorPickerOpen ? 'rotate-180' : ''}`}
                   fill='none'
                   stroke='currentColor'
                   viewBox='0 0 24 24'
@@ -160,7 +160,7 @@ export function PersonalDataStep({ formData, updateFormData }: PersonalDataStepP
 
               {/* Color Picker Popover */}
               {isColorPickerOpen && (
-                <div className='absolute z-50 mt-2 p-4 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg shadow-xl w-full md:w-80 animate-in fade-in-0 zoom-in-95'>
+                <div className='absolute z-50 mt-2 p-4 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg shadow-xl w-full min-w-[280px] animate-in fade-in-0 zoom-in-95'>
                   <p className='text-xs font-medium text-gray-500 dark:text-gray-400 mb-3'>
                     Selecione uma cor
                   </p>
@@ -190,7 +190,7 @@ export function PersonalDataStep({ formData, updateFormData }: PersonalDataStepP
             </div>
           </div>
 
-          <div>
+          <div className='md:col-span-3'>
             <Label htmlFor='email'>
               <Mail className='inline mr-1 h-4 w-4' />
               E-mail
@@ -218,7 +218,7 @@ export function PersonalDataStep({ formData, updateFormData }: PersonalDataStepP
             </p>
           </div>
 
-          <div>
+          <div className='md:col-span-3'>
             <Label htmlFor='position'>Cargo/Função</Label>
             <Input
               id='position'
