@@ -34,6 +34,7 @@ export default function EditEmployeePage() {
   } = useQuery(getEmployee, { id: id! }, { enabled: !!id });
 
   const [formData, setFormData] = useState<EmployeeFormData>({
+    salonId: activeSalonId || '',
     name: '',
     email: '',
     phone: '',
@@ -41,8 +42,7 @@ export default function EditEmployeePage() {
     instagram: '',
     birthDate: '',
     color: '',
-    position: '',
-    permissions: [],
+    roleId: null,
     cpf: '',
     rg: '',
     rgIssuingBody: '',
@@ -76,6 +76,7 @@ export default function EditEmployeePage() {
   useEffect(() => {
     if (employee) {
       setFormData({
+        salonId: activeSalonId || '',
         name: employee.name || '',
         email: employee.email || '',
         phone: employee.phone || '',
@@ -83,8 +84,7 @@ export default function EditEmployeePage() {
         instagram: employee.instagram || '',
         birthDate: employee.birthDate ? new Date(employee.birthDate).toISOString().split('T')[0] : '',
         color: employee.color || '',
-        position: employee.position || '',
-        permissions: employee.permissions || [],
+        roleId: employee.roleId || null,
         cpf: employee.cpf || '',
         rg: employee.rg || '',
         rgIssuingBody: employee.rgIssuingBody || '',
@@ -209,9 +209,9 @@ export default function EditEmployeePage() {
     try {
       // Atualizar dados do colaborador
       await updateEmployee({
+        ...formData,
         id: employee.id,
         salonId: activeSalonId,
-        ...formData,
       });
 
       // Atualizar horários

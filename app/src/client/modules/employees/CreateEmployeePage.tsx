@@ -12,6 +12,9 @@ import { ServicesStep } from './components/ServicesStep';
 import { CommissionStep } from './components/CommissionStep';
 
 export type EmployeeFormData = {
+  // Salão
+  salonId: string;
+  
   // Dados Pessoais
   name: string;
   email: string;
@@ -20,8 +23,7 @@ export type EmployeeFormData = {
   instagram: string;
   birthDate: string;
   color: string;
-  position: string;
-  permissions: string[];
+  roleId: string | null; // Cargo/Função
   
   // Documentos
   cpf: string;
@@ -84,6 +86,7 @@ export default function CreateEmployeePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [formData, setFormData] = useState<EmployeeFormData>({
+    salonId: activeSalonId || '',
     name: '',
     email: '',
     phone: '',
@@ -91,8 +94,7 @@ export default function CreateEmployeePage() {
     instagram: '',
     birthDate: '',
     color: '',
-    position: '',
-    permissions: [],
+    roleId: null,
     cpf: '',
     rg: '',
     rgIssuingBody: '',
@@ -215,8 +217,8 @@ export default function CreateEmployeePage() {
     setIsSubmitting(true);
     try {
       await createEmployee({
-        salonId: activeSalonId,
         ...formData,
+        salonId: activeSalonId,
       });
 
       toast({

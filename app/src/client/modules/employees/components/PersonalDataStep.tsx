@@ -1,7 +1,6 @@
 import { EmployeeFormData } from '../CreateEmployeePage';
 import { Input } from '../../../../components/ui/input';
 import { Label } from '../../../../components/ui/label';
-import { Checkbox } from '../../../../components/ui/checkbox';
 import { Switch } from '../../../../components/ui/switch';
 import {
   Select,
@@ -10,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../../../components/ui/select';
+import { RoleSelect } from '../../../components/RoleSelect';
 import { User, Mail, Phone, Instagram, Calendar, FileText, CreditCard, MapPin, Check } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
@@ -219,41 +219,12 @@ export function PersonalDataStep({ formData, updateFormData }: PersonalDataStepP
           </div>
 
           <div className='md:col-span-3'>
-            <Label htmlFor='position'>Cargo/Função</Label>
-            <Input
-              id='position'
-              value={formData.position}
-              onChange={(e) => handleChange('position', e.target.value)}
-              placeholder='Ex: Cabeleireiro, Manicure, Gerente'
-              className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+            <Label htmlFor='roleId'>Cargo/Função</Label>
+            <RoleSelect
+              value={formData.roleId || ''}
+              onChange={(value) => handleChange('roleId', value === 'none' ? null : value)}
+              salonId={formData.salonId}
             />
-          </div>
-
-          <div className='md:col-span-2'>
-            <Label>Permissões no Sistema (mockup)</Label>
-            <div className='grid grid-cols-2 md:grid-cols-3 gap-3 mt-2 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg'>
-              {['Gerenciar Clientes', 'Gerenciar Serviços', 'Gerenciar Agendamentos', 'Ver Relatórios', 'Gerenciar Estoque', 'Gerenciar Financeiro'].map((permission) => (
-                <div key={permission} className='flex items-center space-x-2'>
-                  <Checkbox
-                    id={permission}
-                    checked={formData.permissions.includes(permission)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        handleChange('permissions', [...formData.permissions, permission]);
-                      } else {
-                        handleChange('permissions', formData.permissions.filter((p) => p !== permission));
-                      }
-                    }}
-                  />
-                  <label
-                    htmlFor={permission}
-                    className='text-sm text-gray-700 dark:text-gray-300 cursor-pointer'
-                  >
-                    {permission}
-                  </label>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>
@@ -579,23 +550,6 @@ export function PersonalDataStep({ formData, updateFormData }: PersonalDataStepP
           </div>
         </div>
       </div>
-
-      {/* Enviar Convite */}
-      {formData.email && (
-        <div className='flex items-center space-x-2 p-4 bg-brand-50 dark:bg-brand-900/20 rounded-lg border border-brand-200 dark:border-brand-800'>
-          <Checkbox
-            id='sendInvite'
-            checked={formData.sendInvite}
-            onCheckedChange={(checked) => handleChange('sendInvite', checked)}
-          />
-          <label
-            htmlFor='sendInvite'
-            className='text-sm text-gray-700 dark:text-gray-300 cursor-pointer'
-          >
-            Enviar convite por e-mail para <strong>{formData.email}</strong> acessar o sistema
-          </label>
-        </div>
-      )}
     </div>
   );
 }

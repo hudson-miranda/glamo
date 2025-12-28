@@ -17,6 +17,9 @@ import { ServicesStep } from './ServicesStep';
 import { CommissionStep } from './CommissionStep';
 
 export type EmployeeFormData = {
+  // Salão
+  salonId: string;
+  
   // Dados Pessoais
   name: string;
   email: string;
@@ -25,8 +28,7 @@ export type EmployeeFormData = {
   instagram: string;
   birthDate: string;
   color: string;
-  position: string;
-  permissions: string[];
+  roleId: string | null; // Cargo/Função
   
   // Documentos
   cpf: string;
@@ -94,15 +96,15 @@ export function EmployeeFormModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [formData, setFormData] = useState<EmployeeFormData>({
+    salonId,
     name: '',
     email: '',
     phone: '',
     phone2: '',
     instagram: '',
     birthDate: '',
-    color: '',
-    position: '',
-    permissions: [],
+    color: '#EF4444',
+    roleId: null,
     cpf: '',
     rg: '',
     rgIssuingBody: '',
@@ -137,6 +139,7 @@ export function EmployeeFormModal({
       if (employee) {
         // Carregar dados do funcionário para edição
         setFormData({
+          salonId,
           name: employee.name || '',
           email: employee.email || '',
           phone: employee.phone || '',
@@ -144,8 +147,7 @@ export function EmployeeFormModal({
           instagram: employee.instagram || '',
           birthDate: employee.birthDate || '',
           color: employee.color || '',
-          position: employee.position || '',
-          permissions: employee.permissions || [],
+          roleId: employee.roleId || null,
           cpf: employee.cpf || '',
           rg: employee.rg || '',
           rgIssuingBody: employee.rgIssuingBody || '',
@@ -177,6 +179,7 @@ export function EmployeeFormModal({
       } else {
         // Reset para novo funcionário
         setFormData({
+          salonId,
           name: '',
           email: '',
           phone: '',
@@ -184,8 +187,7 @@ export function EmployeeFormModal({
           instagram: '',
           birthDate: '',
           color: '#EF4444',
-          position: '',
-          permissions: [],
+          roleId: null,
           cpf: '',
           rg: '',
           rgIssuingBody: '',
@@ -276,9 +278,8 @@ export function EmployeeFormModal({
       if (employee) {
         // Atualizar funcionário existente
         await updateEmployee({
-          id: employee.id,
-          salonId,
           ...formData,
+          id: employee.id,
         });
         toast({
           title: 'Funcionário atualizado!',
@@ -287,7 +288,6 @@ export function EmployeeFormModal({
       } else {
         // Criar novo funcionário
         await createEmployee({
-          salonId,
           ...formData,
         });
         toast({
