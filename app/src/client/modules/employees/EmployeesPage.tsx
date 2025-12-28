@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery, listEmployees, deleteEmployee } from 'wasp/client/operations';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '../../../components/ui/button';
 import { Card, CardContent } from '../../../components/ui/card';
 import { EmptyState } from '../../../components/ui/empty-state';
@@ -59,6 +59,7 @@ const AVAILABLE_COLUMNS = [
 
 export default function EmployeesPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { activeSalonId } = useSalonContext();
   const { toast } = useToast();
   
@@ -88,6 +89,17 @@ export default function EmployeesPage() {
   const [visibleColumns, setVisibleColumns] = useState<string[]>(
     AVAILABLE_COLUMNS.filter(col => col.enabled).map(col => col.id)
   );
+
+  // Detectar query parameter ?action=new e abrir modal
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('action') === 'new') {
+      setIsModalOpen(true);
+      setEditingEmployee(null);
+      // Limpar query parameter
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.search, location.pathname, navigate]);
 
   const { data, isLoading, error } = useQuery(
     listEmployees,

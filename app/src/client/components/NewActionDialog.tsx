@@ -95,7 +95,7 @@ export function NewActionDialog({ open, onOpenChange }: NewActionDialogProps) {
           title: 'Cliente',
           icon: Users,
           onClick: () => {
-            navigate('/clients');
+            navigate('/clients?action=new');
             onOpenChange(false);
           },
           permission: 'can_create_clients',
@@ -104,7 +104,7 @@ export function NewActionDialog({ open, onOpenChange }: NewActionDialogProps) {
           title: 'Serviço',
           icon: Scissors,
           onClick: () => {
-            navigate('/services');
+            navigate('/services?action=new');
             onOpenChange(false);
           },
           permission: 'can_create_services',
@@ -113,7 +113,7 @@ export function NewActionDialog({ open, onOpenChange }: NewActionDialogProps) {
           title: 'Produto',
           icon: Package,
           onClick: () => {
-            navigate('/products');
+            navigate('/products?action=new');
             onOpenChange(false);
           },
           permission: 'can_create_products',
@@ -122,7 +122,7 @@ export function NewActionDialog({ open, onOpenChange }: NewActionDialogProps) {
           title: 'Categoria',
           icon: Tag,
           onClick: () => {
-            navigate('/categories');
+            navigate('/categories?action=new');
             onOpenChange(false);
           },
           permission: 'can_create_services',
@@ -131,7 +131,7 @@ export function NewActionDialog({ open, onOpenChange }: NewActionDialogProps) {
           title: 'Profissional',
           icon: UserCog,
           onClick: () => {
-            navigate('/employees');
+            navigate('/employees?action=new');
             onOpenChange(false);
           },
           permission: 'can_create_staff',
@@ -140,7 +140,7 @@ export function NewActionDialog({ open, onOpenChange }: NewActionDialogProps) {
           title: 'Fornecedor',
           icon: Building2,
           onClick: () => {
-            navigate('/suppliers');
+            navigate('/suppliers?action=new');
             onOpenChange(false);
           },
           permission: 'can_create_products',
@@ -149,7 +149,7 @@ export function NewActionDialog({ open, onOpenChange }: NewActionDialogProps) {
           title: 'Compra',
           icon: ShoppingCart,
           onClick: () => {
-            navigate('/purchases');
+            navigate('/purchases?action=new');
             onOpenChange(false);
           },
           permission: 'can_create_purchases',
@@ -158,7 +158,7 @@ export function NewActionDialog({ open, onOpenChange }: NewActionDialogProps) {
           title: 'Marca',
           icon: Bookmark,
           onClick: () => {
-            navigate('/brands');
+            navigate('/brands?action=new');
             onOpenChange(false);
           },
           permission: 'can_create_products',

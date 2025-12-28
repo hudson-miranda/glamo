@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery, listCategories, createCategory, updateCategory, deleteCategory } from 'wasp/client/operations';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import {
@@ -68,6 +69,8 @@ const AVAILABLE_COLUMNS = [
 export default function CategoriesListPage() {
   const { activeSalonId } = useSalonContext();
   const { toast } = useToast();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
@@ -103,6 +106,17 @@ export default function CategoriesListPage() {
       enabled: !!activeSalonId,
     }
   );
+
+  // Detectar query parameter ?action=new e abrir modal
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('action') === 'new') {
+      setIsModalOpen(true);
+      setSelectedCategory(null);
+      // Limpar query parameter
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.search, location.pathname, navigate]);
 
   const handleOpenModal = (category: any = null) => {
     setSelectedCategory(category);

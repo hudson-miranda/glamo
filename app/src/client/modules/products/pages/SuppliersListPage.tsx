@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery, listSuppliers, createSupplier, updateSupplier, deleteSupplier } from 'wasp/client/operations';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useSalonContext } from '../../../hooks/useSalonContext';
 import { Card, CardContent } from '../../../../components/ui/card';
 import { Button } from '../../../../components/ui/button';
@@ -99,6 +100,8 @@ interface Supplier {
 export default function SuppliersListPage() {
   const { activeSalonId } = useSalonContext();
   const { toast } = useToast();
+  const location = useLocation();
+  const navigate = useNavigate();
   
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -131,6 +134,17 @@ export default function SuppliersListPage() {
   });
 
   const suppliers = data || [];
+
+  // Detectar query parameter ?action=new e abrir modal
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('action') === 'new') {
+      setIsModalOpen(true);
+      setEditingSupplier(null);
+      // Limpar query parameter
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.search, location.pathname, navigate]);
 
   // Filter and sort suppliers
   const allFilteredSuppliers = useMemo(() => {
