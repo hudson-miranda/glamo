@@ -183,7 +183,7 @@ export function EmployeeFormModal({
           phone2: '',
           instagram: '',
           birthDate: '',
-          color: '',
+          color: '#EF4444',
           position: '',
           permissions: [],
           cpf: '',
@@ -249,6 +249,17 @@ export function EmployeeFormModal({
         variant: 'destructive',
         title: 'CPF inválido',
         description: 'O CPF deve conter 11 dígitos',
+      });
+      setActiveTab('dados');
+      return false;
+    }
+    
+    // Validar se sendInvite está marcado mas email está vazio
+    if (formData.sendInvite && (!formData.email || formData.email.trim() === '')) {
+      toast({
+        variant: 'destructive',
+        title: 'E-mail obrigatório',
+        description: 'Para enviar o convite, é necessário informar o e-mail do colaborador',
       });
       setActiveTab('dados');
       return false;

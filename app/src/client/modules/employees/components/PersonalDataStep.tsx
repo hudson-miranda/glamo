@@ -2,6 +2,7 @@ import { EmployeeFormData } from '../CreateEmployeePage';
 import { Input } from '../../../../components/ui/input';
 import { Label } from '../../../../components/ui/label';
 import { Checkbox } from '../../../../components/ui/checkbox';
+import { Switch } from '../../../../components/ui/switch';
 import {
   Select,
   SelectContent,
@@ -119,7 +120,7 @@ export function PersonalDataStep({ formData, updateFormData }: PersonalDataStepP
           Informações Básicas
         </h3>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <div className='md:col-span-2'>
+          <div>
             <Label htmlFor='name'>
               Nome Completo <span className='text-red-500'>*</span>
             </Label>
@@ -132,7 +133,7 @@ export function PersonalDataStep({ formData, updateFormData }: PersonalDataStepP
             />
           </div>
 
-          <div className='md:col-span-2'>
+          <div>
             <Label htmlFor='color'>Cor para Agenda</Label>
             <div className='relative mt-2' ref={colorPickerRef}>
               <button
@@ -202,8 +203,18 @@ export function PersonalDataStep({ formData, updateFormData }: PersonalDataStepP
               placeholder='email@exemplo.com'
               className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
             />
+            <div className='flex items-center space-x-2 mt-3'>
+              <Switch
+                id='sendInvite'
+                checked={formData.sendInvite}
+                onCheckedChange={(checked) => handleChange('sendInvite', checked)}
+              />
+              <Label htmlFor='sendInvite' className='text-sm text-gray-600 dark:text-gray-400 cursor-pointer font-normal'>
+                Enviar convite por e-mail
+              </Label>
+            </div>
             <p className='text-xs text-gray-500 dark:text-gray-400 mt-1'>
-              Se informado, um convite será enviado automaticamente
+              {formData.sendInvite ? 'Um convite será enviado para o e-mail informado' : 'Nenhum e-mail será enviado'}
             </p>
           </div>
 
