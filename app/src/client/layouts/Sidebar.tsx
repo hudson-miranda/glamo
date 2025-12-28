@@ -31,9 +31,11 @@ import {
   Tag,
   Bookmark,
   Building2,
+  Plus,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Button } from '../../components/ui/button';
+import { NewActionDialog } from '../components/NewActionDialog';
 
 interface NavItem {
   title: string;
@@ -223,6 +225,7 @@ export function Sidebar({ className, onClose }: SidebarProps) {
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+  const [isNewActionDialogOpen, setIsNewActionDialogOpen] = useState(false);
 
   // TODO: Filter navigation items based on user permissions
   const visibleSections = navSections;
@@ -271,6 +274,21 @@ export function Sidebar({ className, onClose }: SidebarProps) {
             <Scissors className='h-6 w-6 text-primary' />
           </Link>
         )}
+      </div>
+
+      {/* Botão Novo */}
+      <div className='px-3 pt-3 pb-2 border-b'>
+        <Button
+          onClick={() => setIsNewActionDialogOpen(true)}
+          className={cn(
+            'w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70',
+            'transition-all duration-200 shadow-md hover:shadow-lg',
+            isCollapsed ? 'px-2' : 'justify-start'
+          )}
+        >
+          <Plus className={cn('h-5 w-5', !isCollapsed && 'mr-2')} />
+          {!isCollapsed && <span className='font-semibold'>Novo</span>}
+        </Button>
       </div>
 
       {/* Navigation */}
@@ -383,6 +401,12 @@ export function Sidebar({ className, onClose }: SidebarProps) {
           )}
         </Button>
       </div>
+
+      {/* Dialog de Nova Ação */}
+      <NewActionDialog
+        open={isNewActionDialogOpen}
+        onOpenChange={setIsNewActionDialogOpen}
+      />
     </div>
   );
 }
