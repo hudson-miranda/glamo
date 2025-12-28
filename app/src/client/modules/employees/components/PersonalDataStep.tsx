@@ -190,7 +190,7 @@ export function PersonalDataStep({ formData, updateFormData }: PersonalDataStepP
             </div>
           </div>
 
-          <div className='md:col-span-3'>
+          <div className='md:col-span-2'>
             <Label htmlFor='email'>
               <Mail className='inline mr-1 h-4 w-4' />
               E-mail
@@ -203,19 +203,19 @@ export function PersonalDataStep({ formData, updateFormData }: PersonalDataStepP
               placeholder='email@exemplo.com'
               className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
             />
-            <div className='flex items-center space-x-2 mt-3'>
+          </div>
+
+          <div className='flex items-center pt-6'>
+            <div className='flex items-center space-x-2'>
               <Switch
                 id='sendInvite'
                 checked={formData.sendInvite}
                 onCheckedChange={(checked) => handleChange('sendInvite', checked)}
               />
-              <Label htmlFor='sendInvite' className='text-sm text-gray-600 dark:text-gray-400 cursor-pointer font-normal'>
+              <Label htmlFor='sendInvite' className='text-sm text-gray-700 dark:text-gray-300 cursor-pointer font-normal'>
                 Enviar convite por e-mail
               </Label>
             </div>
-            <p className='text-xs text-gray-500 dark:text-gray-400 mt-1'>
-              {formData.sendInvite ? 'Um convite será enviado para o e-mail informado' : 'Nenhum e-mail será enviado'}
-            </p>
           </div>
 
           <div className='md:col-span-3'>

@@ -163,7 +163,7 @@ export const getPublicBookingConfig: GetPublicBookingConfig<
           name: true,
         },
       },
-      role: true,
+      specialty: true,
       profilePhoto: true,
       bio: true,
       specialties: true,
@@ -191,7 +191,7 @@ export const getPublicBookingConfig: GetPublicBookingConfig<
     professionals: professionals.map((p) => ({
       id: p.id,
       name: p.user?.name || 'Profissional',
-      role: p.role,
+      role: p.specialty,
       profilePhoto: p.profilePhoto,
       bio: p.bio,
       specialties: p.specialties,

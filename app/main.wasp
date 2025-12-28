@@ -749,6 +749,27 @@ action removeServiceFromEmployee {
   fn: import { removeServiceFromEmployee } from "@src/employees/serviceOperations",
   entities: [User, Employee, Service, EmployeeService, Appointment, Log, UserSalon]
 }
+
+// Employee Roles
+query getRoles {
+  fn: import { getRoles } from "@src/employees/roleOperations",
+  entities: [User, Role, UserSalon]
+}
+
+action createRole {
+  fn: import { createRole } from "@src/employees/roleOperations",
+  entities: [User, Role, Log, UserSalon]
+}
+
+action updateRole {
+  fn: import { updateRole } from "@src/employees/roleOperations",
+  entities: [User, Role, Log, UserSalon]
+}
+
+action deleteRole {
+  fn: import { deleteRole } from "@src/employees/roleOperations",
+  entities: [User, Role, Log, UserSalon]
+}
 //#endregion
 
 //#region Glamo - Appointments Module
