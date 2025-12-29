@@ -63,6 +63,7 @@ export default function App() {
            location.pathname.startsWith('/reports') ||
            location.pathname.startsWith('/notifications') ||
            location.pathname.startsWith('/employees') ||
+           location.pathname.startsWith('/roles') ||
            location.pathname.startsWith('/scheduling') ||
            location.pathname.startsWith('/programs') ||
            location.pathname.startsWith('/gallery') ||

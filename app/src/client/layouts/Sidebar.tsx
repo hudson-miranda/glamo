@@ -32,6 +32,7 @@ import {
   Bookmark,
   Building2,
   Plus,
+  Shield,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Button } from '../../components/ui/button';
@@ -87,6 +88,12 @@ const navSections: NavSection[] = [
         title: 'Colaboradores',
         href: '/employees',
         icon: UserCog,
+        permission: 'can_view_staff',
+      },
+      {
+        title: 'Cargos e Permissões',
+        href: '/roles',
+        icon: Shield,
         permission: 'can_view_staff',
       },
       {

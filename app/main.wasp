@@ -1159,6 +1159,12 @@ page EmployeeSchedulesPage {
   component: import EmployeeSchedulesPage from "@src/client/modules/employees/EmployeeSchedulesPage"
 }
 
+route RolesRoute { path: "/roles", to: RolesPage }
+page RolesPage {
+  authRequired: true,
+  component: import RolesPage from "@src/client/modules/roles/RolesPage"
+}
+
 route NotificationsRoute { path: "/notifications", to: NotificationsPage }
 page NotificationsPage {
   authRequired: true,
