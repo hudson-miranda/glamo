@@ -11,11 +11,13 @@ type StatCard = {
 type CollapsibleStatsProps = {
   cards: StatCard[];
   isLoading?: boolean;
+  cols?: 3 | 4 | 5;
 };
 
 export function CollapsibleStats({ 
   cards, 
-  isLoading = false
+  isLoading = false,
+  cols = 4
 }: CollapsibleStatsProps) {
   if (isLoading) {
     return (
@@ -42,7 +44,7 @@ export function CollapsibleStats({
         </div>
 
         {/* Desktop: Grid tradicional */}
-        <div className='hidden lg:grid gap-4 lg:grid-cols-4'>
+        <div className={`hidden lg:grid gap-4 lg:grid-cols-${cols}`}>
           {cards.map((_, index) => (
             <Card key={index}>
               <CardContent className='pt-6'>
@@ -93,7 +95,7 @@ export function CollapsibleStats({
       </div>
 
       {/* Desktop: Grid tradicional */}
-      <div className='hidden lg:grid gap-4 lg:grid-cols-4'>
+      <div className={`hidden lg:grid gap-4 lg:grid-cols-${cols}`}>
         {cards.map((card, index) => {
           const Icon = card.icon;
           return (

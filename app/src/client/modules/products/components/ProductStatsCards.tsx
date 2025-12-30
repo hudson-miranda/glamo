@@ -57,6 +57,7 @@ export function ProductStatsCards({ stats, isLoading = false }: ProductStatsCard
     <CollapsibleStats 
       cards={cards} 
       isLoading={isLoading}
+      cols={5}
     />
   );
 }

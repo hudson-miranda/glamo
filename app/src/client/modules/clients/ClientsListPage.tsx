@@ -404,19 +404,19 @@ export default function ClientsListPage() {
   return (
     <div className='space-y-6'>
       {/* Header */}
-      <div className='flex items-center justify-between'>
-        <div>
-          <h1 className='text-3xl font-bold tracking-tight'>Clientes</h1>
-          <p className='text-muted-foreground'>
+      <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+        <div className='space-y-1'>
+          <h1 className='text-2xl font-bold tracking-tight sm:text-3xl'>Clientes</h1>
+          <p className='text-sm text-muted-foreground'>
             Gerencie e acompanhe os clientes do seu salão
           </p>
         </div>
-        <div className='flex items-center gap-2'>
-          <Button variant='outline' onClick={handleExport}>
+        <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
+          <Button variant='outline' onClick={handleExport} className='w-full sm:w-auto'>
             <Download className='mr-2 h-4 w-4' />
             Exportar
           </Button>
-          <Button onClick={() => handleOpenModal()}>
+          <Button onClick={() => handleOpenModal()} className='w-full sm:w-auto'>
             <Plus className='mr-2 h-4 w-4' />
             Novo Cliente
           </Button>

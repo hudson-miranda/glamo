@@ -269,12 +269,12 @@ export default function BrandsListPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Marcas</h1>
-          <p className="text-muted-foreground mt-1">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Marcas</h1>
+          <p className="text-sm text-muted-foreground">
             Gerencie as marcas dos seus produtos
           </p>
         </div>
@@ -283,7 +283,7 @@ export default function BrandsListPage() {
             setSelectedBrand(null);
             setIsModalOpen(true);
           }}
-          className="flex items-center gap-2"
+          className="w-full sm:w-auto flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
           Nova Marca
