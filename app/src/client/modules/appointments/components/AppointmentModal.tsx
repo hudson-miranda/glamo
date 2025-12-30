@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery, listClients, listServices, createAppointment } from 'wasp/client/operations';
+import { useQuery, listServices, createAppointment } from 'wasp/client/operations';
 import {
   Dialog,
   DialogContent,
@@ -22,6 +22,7 @@ import { Textarea } from '../../../../components/ui/textarea';
 import { Calendar } from '../../../../components/ui/calendar';
 import { useToast } from '../../../../components/ui/use-toast';
 import { useSalonContext } from '../../../hooks/useSalonContext';
+import { ClientSelect } from '../../../components/ClientSelect';
 import { CalendarIcon, Clock } from 'lucide-react';
 
 interface AppointmentModalProps {
@@ -45,19 +46,12 @@ export default function AppointmentModal({ open, onOpenChange, onSuccess }: Appo
   const [noProfessional, setNoProfessional] = useState(true);
 
   // Queries
-  const { data: clientsData, isLoading: loadingClients } = useQuery(
-    listClients,
-    { salonId: activeSalonId || '' },
-    { enabled: !!activeSalonId && open }
-  );
-
   const { data: servicesData, isLoading: loadingServices } = useQuery(
     listServices,
     { salonId: activeSalonId || '' },
     { enabled: !!activeSalonId && open }
   );
 
-  const clients = clientsData?.clients || [];
   const services = servicesData?.services || [];
 
   // Generate time slots
@@ -142,22 +136,12 @@ export default function AppointmentModal({ open, onOpenChange, onSuccess }: Appo
           {/* Client Selection */}
           <div className="space-y-2">
             <Label htmlFor="client">Cliente *</Label>
-            {loadingClients ? (
-              <div className="text-sm text-muted-foreground">Carregando clientes...</div>
-            ) : (
-              <Select value={clientId} onValueChange={setClientId}>
-                <SelectTrigger id="client">
-                  <SelectValue placeholder="Selecione um cliente" />
-                </SelectTrigger>
-                <SelectContent>
-                  {clients.map((client: any) => (
-                    <SelectItem key={client.id} value={client.id}>
-                      {client.name} - {client.email}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
+            <ClientSelect
+              value={clientId}
+              onChange={setClientId}
+              salonId={activeSalonId || ''}
+              disabled={!activeSalonId}
+            />
           </div>
 
           {/* Date and Time */}

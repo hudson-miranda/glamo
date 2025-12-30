@@ -412,10 +412,6 @@ export default function ClientsListPage() {
           </p>
         </div>
         <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
-          <Button variant='outline' onClick={handleExport} className='w-full sm:w-auto'>
-            <Download className='mr-2 h-4 w-4' />
-            Exportar
-          </Button>
           <Button onClick={() => handleOpenModal()} className='w-full sm:w-auto'>
             <Plus className='mr-2 h-4 w-4' />
             Novo Cliente
